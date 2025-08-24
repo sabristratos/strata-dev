@@ -1,61 +1,151 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Strata UI
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive Laravel component library built with Tailwind CSS v4, featuring a semantic color system and dark mode support.
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Strata UI provides a complete set of modern UI components for Laravel applications, including:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Semantic Color System**: Primary (slate), accent (blue), success, warning, destructive, and info colors
+- **Dark Mode Support**: Automatic theme switching with CSS variables
+- **Tailwind CSS v4**: Modern utility-first CSS framework
+- **Laravel Components**: Blade components with proper PHP class structure
+- **Alpine.js Integration**: Interactive components with JavaScript functionality
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Theme System
 
-## Learning Laravel
+### Color Palette
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Strata UI uses a semantic approach to colors:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Primary**: Slate colors for main content and UI elements
+- **Accent**: Blue colors for interactive elements and highlights  
+- **Success**: Green for positive states and confirmations
+- **Warning**: Yellow for cautions and important notices
+- **Destructive**: Red for errors and dangerous actions
+- **Info**: Sky blue for informational content
+- **Muted**: Neutral colors for secondary content
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Dark Mode
 
-## Laravel Sponsors
+Dark mode is implemented using CSS custom properties that automatically switch when a `.dark` class is applied to a parent element (typically `<html>` or `<body>`).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Theme Override Utilities
 
-### Premium Partners
+Strata UI provides two utility classes for precise theme control:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+#### `always-light` Class
 
-## Contributing
+Forces elements to use light theme colors regardless of the current theme:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```blade
+{{-- Text that stays readable on dark images --}}
+<div class="relative">
+    <img src="dark-background.jpg" alt="Dark image">
+    <div class="absolute top-4 left-4 always-light">
+        <h5 class="text-primary">Always Light Text</h5>
+        <p class="text-secondary">This text remains light even in dark mode</p>
+        <x-strata::badge color="accent">Light Badge</x-strata::badge>
+    </div>
+</div>
+```
 
-## Code of Conduct
+#### `always-dark` Class
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Forces elements to use dark theme colors regardless of the current theme:
 
-## Security Vulnerabilities
+```blade
+{{-- Branded section that maintains dark appearance --}}
+<div class="always-dark">
+    <x-strata::card>
+        <h5 class="text-primary">Brand Section</h5>
+        <p class="text-secondary">This section stays dark for consistency</p>
+        <x-strata::button variant="accent">Dark Button</x-strata::button>
+    </x-strata::card>
+</div>
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#### How Theme Utilities Work
+
+The utilities work by overriding CSS custom properties with specific theme values:
+
+- `.dark .always-light` has higher CSS specificity than `.dark`, forcing light theme variables
+- `.always-dark` directly applies dark theme variables to any element
+- Both classes work seamlessly with all existing Tailwind utilities and Strata components
+
+#### Use Cases
+
+**Text on Images**: Ensure text readability regardless of image darkness and current theme:
+```blade
+<div class="always-light">
+    <h4 class="text-primary">Always visible text</h4>
+</div>
+```
+
+**Branded Sections**: Maintain consistent brand appearance:
+```blade
+<div class="always-dark p-6 rounded-lg">
+    <h4 class="text-primary">Brand Header</h4>
+    <p class="text-secondary">Consistent brand colors</p>
+</div>
+```
+
+**Mixed Content**: Combine themes in a single layout:
+```blade
+<x-strata::card>
+    <h5>Regular Content</h5>
+    
+    <div class="always-dark p-4 rounded">
+        <h6 class="text-primary">Dark Section</h6>
+    </div>
+    
+    <div class="always-light p-4 rounded border">
+        <h6 class="text-primary">Light Section</h6>
+    </div>
+</x-strata::card>
+```
+
+## Available Components
+
+- **Buttons**: Primary, accent, destructive, outline, and ghost variants
+- **Badges**: Solid, outline, and soft variants with multiple colors
+- **Cards**: Content containers with customizable borders
+- **Alerts**: Informational components with icons and dismissible options
+- **Forms**: Input, textarea, checkbox, radio, and toggle components
+- **Tables**: Structured data display with header, body, and row components
+- **Avatars**: User profile images with status indicators
+- **Typography**: Semantic heading and text styling
+
+## Development
+
+### Requirements
+
+- PHP 8.2+
+- Laravel 12
+- Node.js for frontend build process
+
+### Installation
+
+1. Install dependencies:
+```bash
+composer install
+npm install
+```
+
+2. Build assets:
+```bash
+npm run build
+# or for development
+npm run dev
+```
+
+3. View the component demo:
+```bash
+php artisan serve
+```
+
+Visit `/demo` to see all components in action.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

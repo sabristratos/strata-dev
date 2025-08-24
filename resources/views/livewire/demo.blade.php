@@ -1,474 +1,567 @@
-<div class="max-w-7xl mx-auto p-6 space-y-12">
-    <h1 class="text-4xl font-bold text-center mb-12">Strata UI Components Demo</h1>
-
-    <!-- Button Components -->
-    <x-strata::section width="wide" padding="lg">
-        <h2 class="text-2xl font-semibold mb-6">Buttons</h2>
-
-        <div class="space-y-6">
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Variants</h3>
-                <div class="flex flex-wrap gap-3">
-                    <x-strata::button variant="primary">Primary</x-strata::button>
-                    <x-strata::button variant="secondary">Secondary</x-strata::button>
-                    <x-strata::button variant="destructive">Destructive</x-strata::button>
-                    <x-strata::button variant="outline">Outline</x-strata::button>
-                    <x-strata::button variant="ghost">Ghost</x-strata::button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Sizes</h3>
-                <div class="flex items-center gap-3">
-                    <x-strata::button size="sm">Small</x-strata::button>
-                    <x-strata::button size="md">Medium</x-strata::button>
-                    <x-strata::button size="lg">Large</x-strata::button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">With Icons</h3>
-                <div class="flex flex-wrap gap-3">
-                    <x-strata::button icon="heroicon-o-user">Profile</x-strata::button>
-                    <x-strata::button icon="heroicon-o-cog" icon-position="right">Settings</x-strata::button>
-                    <x-strata::button variant="outline" icon="heroicon-o-arrow-down-tray">Download</x-strata::button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">States</h3>
-                <div class="flex gap-3">
-                    <x-strata::button disabled>Disabled</x-strata::button>
-                    <x-strata::button loading>Loading</x-strata::button>
-                </div>
-            </div>
+<div class="min-h-screen bg-background text-foreground">
+<div class="container mx-auto p-8 space-y-12">
+    {{-- Header with Dark Mode Toggle --}}
+    <div class="flex justify-between items-start">
+        <section class="space-y-4">
+            <h1>Strata UI Demo</h1>
+            <h2>Semantic Design System</h2>
+            <p>Showcasing updated components with semantic color variables</p>
+        </section>
+        <div class="flex flex-col items-end space-y-2">
+            <small class="text-muted-foreground">Dark Mode</small>
+            <x-dark-mode-toggle />
         </div>
-    </x-strata::section>
+    </div>
 
-    <!-- Alert Components -->
-    <x-strata::section width="wide" padding="lg">
-        <h2 class="text-2xl font-semibold mb-6">Alerts</h2>
+    {{-- Button Component Demo --}}
+    <section class="space-y-6">
+        <h3>Button Components</h3>
+        <div class="flex flex-wrap gap-4">
+            <x-strata::button>Primary Button</x-strata::button>
+            <x-strata::button variant="accent">Accent Button</x-strata::button>
+            <x-strata::button variant="secondary">Secondary Button</x-strata::button>
+            <x-strata::button variant="destructive">Destructive Button</x-strata::button>
+            <x-strata::button variant="outline">Outline Button</x-strata::button>
+            <x-strata::button variant="ghost">Ghost Button</x-strata::button>
+        </div>
+        <div class="flex flex-wrap gap-4">
+            <x-strata::button size="sm">Small Button</x-strata::button>
+            <x-strata::button>Default Button</x-strata::button>
+            <x-strata::button size="lg">Large Button</x-strata::button>
+        </div>
+    </section>
 
-        <div class="space-y-4">
-            <x-strata::alert color="info" title="Information Alert">
-                This is an informational alert with helpful content.
+    {{-- Alert Component Demo --}}
+    <section class="space-y-6">
+        <h3>Alert Components</h3>
+        <div class="space-y-4 max-w-2xl">
+            <x-strata::alert color="primary" title="Primary Alert">
+                This is a primary alert message using semantic colors.
             </x-strata::alert>
-
-            <x-strata::alert color="success" title="Success!" icon="heroicon-o-check-circle">
-                Operation completed successfully!
+            <x-strata::alert color="accent" title="Accent Alert" variant="soft">
+                This is an accent alert with soft variant styling.
             </x-strata::alert>
-
-            <x-strata::alert color="warning" dismissible>
-                This is a dismissible warning alert. Click the X to dismiss.
+            <x-strata::alert color="success" title="Success Alert" dismissible>
+                Operation completed successfully! This alert is dismissible.
             </x-strata::alert>
-
-            <x-strata::alert color="destructive" title="Error" variant="outline">
-                Something went wrong. Please try again.
+            <x-strata::alert color="warning" title="Warning Alert" variant="outline">
+                Please review the following information carefully.
             </x-strata::alert>
-
-            <x-strata::alert color="primary" variant="soft" size="lg">
-                <x-slot name="actions">
-                    <x-strata::button size="sm">Take Action</x-strata::button>
-                </x-slot>
-                This alert includes an action button.
+            <x-strata::alert color="destructive" title="Error Alert">
+                An error occurred while processing your request.
             </x-strata::alert>
         </div>
-    </x-strata::section>
+    </section>
 
-    <!-- Badge Components -->
-    <x-strata::section width="wide" padding="lg">
-        <h2 class="text-2xl font-semibold mb-6">Badges</h2>
-
-        <div class="space-y-6">
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Colors & Variants</h3>
-                <div class="flex flex-wrap gap-3">
-                    <x-strata::badge color="primary">Primary</x-strata::badge>
-                    <x-strata::badge color="secondary">Secondary</x-strata::badge>
-                    <x-strata::badge color="success">Success</x-strata::badge>
-                    <x-strata::badge color="warning">Warning</x-strata::badge>
-                    <x-strata::badge color="destructive">Error</x-strata::badge>
-                    <x-strata::badge color="info">Info</x-strata::badge>
-                </div>
-
-                <div class="flex flex-wrap gap-3 mt-3">
-                    <x-strata::badge variant="outline" color="primary">Outline</x-strata::badge>
-                    <x-strata::badge variant="soft" color="success">Soft</x-strata::badge>
-                    <x-strata::badge variant="solid" color="warning">Solid</x-strata::badge>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Sizes & Shapes</h3>
-                <div class="flex items-center gap-3">
-                    <x-strata::badge size="sm">Small</x-strata::badge>
-                    <x-strata::badge size="md">Medium</x-strata::badge>
-                    <x-strata::badge size="lg">Large</x-strata::badge>
-                    <x-strata::badge shape="square">99+</x-strata::badge>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">With Icons & Dismissible</h3>
-                <div class="flex gap-3">
-                    <x-strata::badge icon="heroicon-o-star" color="warning">Featured</x-strata::badge>
-                    <x-strata::badge dismissible color="info">Removable</x-strata::badge>
-                </div>
-            </div>
+    {{-- Badge Component Demo --}}
+    <section class="space-y-6">
+        <h3>Badge Components</h3>
+        <div class="flex flex-wrap gap-4 items-center">
+            <x-strata::badge>Default Badge</x-strata::badge>
+            <x-strata::badge color="accent">Accent Badge</x-strata::badge>
+            <x-strata::badge color="success">Success Badge</x-strata::badge>
+            <x-strata::badge color="warning">Warning Badge</x-strata::badge>
+            <x-strata::badge color="destructive">Error Badge</x-strata::badge>
+            <x-strata::badge color="info">Info Badge</x-strata::badge>
         </div>
-    </x-strata::section>
-
-    <!-- Avatar Components -->
-    <x-strata::section width="wide" padding="lg">
-        <h2 class="text-2xl font-semibold mb-6">Avatars</h2>
-
-        <div class="space-y-6">
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Sizes</h3>
-                <div class="flex items-center gap-4">
-                    <x-strata::avatar src="https://via.placeholder.com/32" alt="User" size="xs" />
-                    <x-strata::avatar src="https://via.placeholder.com/40" alt="User" size="sm" />
-                    <x-strata::avatar src="https://via.placeholder.com/48" alt="User" size="md" />
-                    <x-strata::avatar src="https://via.placeholder.com/56" alt="User" size="lg" />
-                    <x-strata::avatar src="https://via.placeholder.com/64" alt="User" size="xl" />
-                    <x-strata::avatar src="https://via.placeholder.com/80" alt="User" size="2xl" />
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Initials & Shapes</h3>
-                <div class="flex items-center gap-4">
-                    <x-strata::avatar initials="JD" shape="circle" />
-                    <x-strata::avatar initials="AB" shape="square" />
-                    <x-strata::avatar initials="XY" shape="rounded" />
-                    <x-strata::avatar initials="MN" border />
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Status Indicators</h3>
-                <div class="flex items-center gap-4">
-                    <x-strata::avatar initials="ON" status="online" />
-                    <x-strata::avatar initials="AW" status="away" status-position="top-right" />
-                    <x-strata::avatar initials="BS" status="busy" status-position="bottom-left" />
-                    <x-strata::avatar initials="OF" status="offline" />
-                </div>
-            </div>
+        <div class="flex flex-wrap gap-4 items-center">
+            <x-strata::badge variant="outline" color="primary">Outline Badge</x-strata::badge>
+            <x-strata::badge variant="soft" color="accent">Soft Badge</x-strata::badge>
+            <x-strata::badge size="sm">Small Badge</x-strata::badge>
+            <x-strata::badge size="lg">Large Badge</x-strata::badge>
         </div>
-    </x-strata::section>
+    </section>
 
-    <!-- Card Components -->
-    <x-strata::section width="wide" padding="lg">
-        <h2 class="text-2xl font-semibold mb-6">Cards</h2>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {{-- Card Component Demo --}}
+    <section class="space-y-6">
+        <h3>Card Components</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <x-strata::card>
-                <h3 class="text-lg font-semibold mb-2">Simple Card</h3>
-                <p>Basic card with default styling and medium size.</p>
+                <h4 class="font-semibold mb-2">Default Card</h4>
+                <p class="text-muted-foreground">This card uses bg-card and text-card-foreground semantic colors.</p>
+                <div class="mt-4">
+                    <x-strata::button size="sm">Action</x-strata::button>
+                </div>
             </x-strata::card>
 
-            <x-strata::card size="lg" border="primary">
-                <h3 class="text-lg font-semibold mb-2">Large Card</h3>
-                <p>This card has large padding and a primary border.</p>
+            <x-strata::card border="primary" size="lg">
+                <h4 class="font-semibold mb-2">Primary Border Card</h4>
+                <p class="text-muted-foreground">This card has a primary color border and large padding.</p>
+                <div class="mt-4 flex gap-2">
+                    <x-strata::badge color="primary">Featured</x-strata::badge>
+                </div>
             </x-strata::card>
 
-            <x-strata::card border="none">
-                <h3 class="text-lg font-semibold mb-2">No Border</h3>
-                <p>Card without border for cleaner look.</p>
+            <x-strata::card border="accent" size="sm">
+                <h4 class="font-semibold mb-2">Accent Border Card</h4>
+                <p class="text-muted-foreground text-sm">Compact card with accent border.</p>
             </x-strata::card>
         </div>
-    </x-strata::section>
+    </section>
 
-    <!-- Calendar Component -->
-    <x-strata::section width="wide" padding="lg">
-        <h2 class="text-2xl font-semibold mb-6">Calendar</h2>
+    {{-- Form Component Demo --}}
+    <section class="space-y-6">
+        <h3>Form Components</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <x-strata::form.group
+                    label="Email Address"
+                    for="email"
+                    help-text="We'll never share your email"
+                >
+                    <x-strata::form.input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        clearable
+                    />
+                </x-strata::form.group>
 
-        <div class="space-y-8">
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Date Range Picker (Default)</h3>
-                <p class="text-xs text-gray-500 mb-2">Standard date range picker with presets</p>
-                <x-strata::calendar />
+                <x-strata::form.group
+                    label="Password"
+                    for="password"
+                >
+                    <x-strata::form.input
+                        type="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        show-password-toggle
+                    />
+                </x-strata::form.group>
+
+                <x-strata::form.group
+                    label="Choose a Framework"
+                    for="framework"
+                    help-text="Select your preferred framework"
+                >
+                    <x-strata::form.select
+                        :items="['Laravel', 'Vue.js', 'React', 'Alpine.js', 'Tailwind CSS']"
+                        :selected="0"
+                        name="framework"
+                    />
+                </x-strata::form.group>
+
+                <x-strata::form.group
+                    label="Multiple Skills"
+                    for="skills"
+                    help-text="Auto-searchable when 10+ items (threshold reached)"
+                >
+                    <x-strata::form.select
+                        :items="['PHP', 'JavaScript', 'Python', 'Java', 'C#', 'Go', 'Rust', 'Laravel', 'Vue.js', 'React', 'Angular', 'TypeScript', 'Node.js', 'Docker']"
+                        :selected="[0, 7]"
+                        name="skills"
+                        :multiple="true"
+                        placeholder="Select your skills..."
+                    />
+                </x-strata::form.group>
+
+                <x-strata::form.group
+                    label="Top 3 Preferences"
+                    for="preferences"
+                    help-text="Select up to 3 preferred technologies (searchable)"
+                >
+                    <x-strata::form.select
+                        :items="['Backend Development', 'Frontend Development', 'Database Design', 'UI/UX Design', 'DevOps', 'Mobile Development', 'API Development', 'Testing', 'Machine Learning', 'Data Science', 'Cloud Computing', 'Security']"
+                        :selected="[0]"
+                        name="preferences"
+                        :multiple="true"
+                        :max-selections="3"
+                        :searchable="true"
+                        placeholder="Choose up to 3..."
+                    />
+                </x-strata::form.group>
+
+                <x-strata::form.group
+                    label="Country Selection"
+                    for="country"
+                    help-text="Search and select your country (with clear button)"
+                >
+                    <x-strata::form.select
+                        :items="[
+                            'Afghanistan', 'Albania', 'Algeria', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
+                            'Bangladesh', 'Belgium', 'Bolivia', 'Bosnia and Herzegovina', 'Brazil', 'Bulgaria', 'Canada',
+                            'Chile', 'China', 'Colombia', 'Croatia', 'Czech Republic', 'Denmark', 'Ecuador', 'Egypt',
+                            'Estonia', 'Finland', 'France', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Hungary', 'Iceland',
+                            'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Japan', 'Jordan',
+                            'Kazakhstan', 'Kenya', 'South Korea', 'Latvia', 'Lebanon', 'Lithuania', 'Luxembourg', 'Malaysia',
+                            'Mexico', 'Morocco', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Pakistan', 'Peru',
+                            'Philippines', 'Poland', 'Portugal', 'Romania', 'Russia', 'Saudi Arabia', 'Singapore',
+                            'Slovakia', 'Slovenia', 'South Africa', 'Spain', 'Sweden', 'Switzerland', 'Thailand', 'Turkey',
+                            'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Venezuela', 'Vietnam'
+                        ]"
+                        :selected="63"
+                        name="country"
+                        :searchable="true"
+                        :clearable="true"
+                        placeholder="Search for your country..."
+                    />
+                </x-strata::form.group>
             </div>
 
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Single Date Picker</h3>
-                <p class="text-xs text-gray-500 mb-2">Single date selection without presets</p>
-                <x-strata::calendar :range="false" :multiple="false" :presets="false" />
-            </div>
+            <div class="space-y-4">
+                <x-strata::form.group
+                    label="Message"
+                    for="message"
+                >
+                    <x-strata::form.textarea
+                        name="message"
+                        placeholder="Enter your message..."
+                        rows="4"
+                    />
+                </x-strata::form.group>
 
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">With Clear Button</h3>
-                <p class="text-xs text-gray-500 mb-2">Includes a clear button to reset selection</p>
-                <x-strata::calendar show-clear-button />
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Date Restrictions</h3>
-                <p class="text-xs text-gray-500 mb-2">Min date: 7 days ago, Max date: 30 days from now, Disabled: weekends in current month</p>
-                @php
-                    $minDate = now()->subDays(7)->format('Y-m-d');
-                    $maxDate = now()->addDays(30)->format('Y-m-d');
-                    
-                    // Disable weekends in current month
-                    $disabledDates = [];
-                    $currentMonth = now()->startOfMonth();
-                    $endOfMonth = now()->endOfMonth();
-                    
-                    while ($currentMonth <= $endOfMonth) {
-                        if ($currentMonth->isWeekend()) {
-                            $disabledDates[] = $currentMonth->format('Y-m-d');
-                        }
-                        $currentMonth->addDay();
-                    }
-                @endphp
-                <x-strata::calendar 
-                    :min-date="$minDate"
-                    :max-date="$maxDate"
-                    :disabled-dates="$disabledDates"
-                    show-clear-button
-                    :presets="false"
-                />
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Multi-Month View (3 months)</h3>
-                <p class="text-xs text-gray-500 mb-2">Three months visible with Monday as first day</p>
-                <x-strata::calendar 
-                    :visible-months="3" 
-                    week-start="monday"
-                    show-clear-button
-                />
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Compact Single Month</h3>
-                <p class="text-xs text-gray-500 mb-2">Single month view without presets, ideal for forms</p>
-                <div class="max-w-sm">
-                    <x-strata::calendar 
-                        :range="false"
-                        :multiple="false" 
-                        :presets="false"
-                        show-clear-button
+                <div class="space-y-3">
+                    <label class="text-sm font-medium">Preferences</label>
+                    <x-strata::form.checkbox
+                        name="newsletter"
+                        id="newsletter"
+                        value="1"
+                        label="Subscribe to newsletter"
+                    />
+                    <x-strata::form.checkbox
+                        name="marketing"
+                        id="marketing"
+                        value="1"
+                        label="Receive marketing emails"
+                    />
+                    <x-strata::form.toggle
+                        name="notifications"
+                        id="notifications"
+                        label="Enable notifications"
                     />
                 </div>
             </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Year View (12 months)</h3>
-                <p class="text-xs text-gray-500 mb-2">Full year calendar view</p>
-                <x-strata::calendar 
-                    :visible-months="12" 
-                    :presets="false"
-                    week-start="monday"
-                />
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Custom Disabled Dates</h3>
-                <p class="text-xs text-gray-500 mb-2">Specific dates disabled (holidays example)</p>
-                @php
-                    $holidays = [
-                        now()->year . '-12-24', // Christmas Eve
-                        now()->year . '-12-25', // Christmas
-                        now()->year . '-12-26', // Boxing Day
-                        now()->year . '-12-31', // New Year's Eve
-                        (now()->year + 1) . '-01-01', // New Year's Day
-                    ];
-                @endphp
-                <x-strata::calendar 
-                    :disabled-dates="$holidays"
-                    show-clear-button
-                    :visible-months="2"
-                />
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Future Dates Only</h3>
-                <p class="text-xs text-gray-500 mb-2">Only allows selection of future dates</p>
-                <x-strata::calendar 
-                    :min-date="now()->format('Y-m-d')"
-                    show-clear-button
-                />
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Past 30 Days Only</h3>
-                <p class="text-xs text-gray-500 mb-2">Restricts selection to the last 30 days</p>
-                <x-strata::calendar 
-                    :min-date="now()->subDays(30)->format('Y-m-d')"
-                    :max-date="now()->format('Y-m-d')"
-                    show-clear-button
-                    :presets="false"
-                />
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Custom Day Cell Slot</h3>
-                <p class="text-xs text-gray-500 mb-2">Custom day cells with event indicators</p>
-                <x-strata::calendar :range="false" :multiple="false" :presets="false">
-                    <x-slot:day>
-                        <div class="relative w-full h-full flex items-center justify-center">
-                            <span x-text="day.date"></span>
-                            <template x-if="day.date % 7 === 0 && day.isCurrentMonth">
-                                <div class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></div>
-                            </template>
-                            <template x-if="day.date % 5 === 0 && day.isCurrentMonth">
-                                <div class="absolute bottom-1 left-1 w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                            </template>
-                        </div>
-                    </x-slot:day>
-                </x-strata::calendar>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Calendar with Footer Actions</h3>
-                <p class="text-xs text-gray-500 mb-2">Includes custom footer with action buttons</p>
-                <x-strata::calendar>
-                    <x-slot:footer>
-                        <div class="flex items-center justify-between">
-                            <div class="text-sm text-gray-600">
-                                <span x-show="startDate || endDate" x-text="
-                                    startDate && endDate ? 
-                                    `Selected: ${formatLocalDate(startDate)} - ${formatLocalDate(endDate)}` :
-                                    startDate ? 
-                                    `Start: ${formatLocalDate(startDate)}` : 
-                                    'No dates selected'
-                                "></span>
-                                <span x-show="!startDate && !endDate">Select a date range</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <x-strata::button size="sm" variant="outline" 
-                                    x-on:click="clearSelection(); $dispatch('calendar-close')"
-                                >
-                                    Cancel
-                                </x-strata::button>
-                                <x-strata::button size="sm" 
-                                    x-bind:disabled="!startDate || (config.range && !endDate)"
-                                    x-on:click="$dispatch('calendar-apply', { start: startDate, end: endDate })"
-                                >
-                                    Apply
-                                </x-strata::button>
-                            </div>
-                        </div>
-                    </x-slot:footer>
-                </x-strata::calendar>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-600 mb-3">Event Calendar Example</h3>
-                <p class="text-xs text-gray-500 mb-2">Day cells with custom content and pricing</p>
-                @php
-                    $eventDates = [
-                        now()->format('Y-m-d') => ['price' => '$299', 'available' => true],
-                        now()->addDays(3)->format('Y-m-d') => ['price' => '$199', 'available' => true],
-                        now()->addDays(7)->format('Y-m-d') => ['price' => '$399', 'available' => false],
-                        now()->addDays(12)->format('Y-m-d') => ['price' => '$249', 'available' => true],
-                        now()->addDays(15)->format('Y-m-d') => ['price' => '$349', 'available' => true],
-                    ];
-                @endphp
-                <x-strata::calendar :range="false" :multiple="false" :presets="false">
-                    <x-slot:day>
-                        <div class="relative w-full h-full flex flex-col items-center justify-center text-xs">
-                            <span x-text="day.date" class="font-medium"></span>
-                            <template x-if="day.isCurrentMonth">
-                                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span x-text="day.date" class="font-medium"></span>
-                                    @foreach($eventDates as $date => $event)
-                                        <template x-if="formatLocalDate(day.fullDate) === '{{ $date }}'">
-                                            <div class="mt-0.5 text-center">
-                                                <div class="text-xs font-bold {{ $event['available'] ? 'text-green-600' : 'text-red-600' }}">
-                                                    {{ $event['price'] }}
-                                                </div>
-                                                <div class="w-1 h-1 mx-auto {{ $event['available'] ? 'bg-green-500' : 'bg-red-500' }} rounded-full"></div>
-                                            </div>
-                                        </template>
-                                    @endforeach
-                                </div>
-                            </template>
-                        </div>
-                    </x-slot:day>
-                    <x-slot:footer>
-                        <div class="text-center">
-                            <div class="flex items-center justify-center gap-4 text-xs">
-                                <div class="flex items-center gap-1">
-                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span>Available</span>
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-                                    <span>Unavailable</span>
-                                </div>
-                            </div>
-                        </div>
-                    </x-slot:footer>
-                </x-strata::calendar>
-            </div>
         </div>
-    </x-strata::section>
 
-    <!-- Combined Components Demo -->
-    <x-strata::section width="wide" padding="lg">
-        <h2 class="text-2xl font-semibold mb-6">Real-World Examples</h2>
+        <div class="flex gap-4 pt-4">
+            <x-strata::button>Submit Form</x-strata::button>
+            <x-strata::button variant="outline">Cancel</x-strata::button>
+        </div>
+    </section>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <!-- User Profile Card -->
-            <x-strata::card size="lg">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <x-strata::avatar initials="JS" size="lg" status="online" />
-                        <div>
-                            <h4 class="font-semibold">John Smith</h4>
-                            <p class="text-sm text-gray-600">Senior Developer</p>
+    {{-- Modal Component Demo --}}
+    <section class="space-y-6">
+        <h3>Modal Components</h3>
+
+        {{-- Basic Modal Example --}}
+        <div class="space-y-4">
+            <h4>Basic Modal</h4>
+            <div class="flex flex-wrap gap-4">
+                <x-strata::modal.trigger name="basic-modal">
+                    <x-strata::button>Open Basic Modal</x-strata::button>
+                </x-strata::modal.trigger>
+
+                <x-strata::modal name="basic-modal">
+                    <div class="space-y-4">
+                        <h4>Welcome to Strata Modals</h4>
+                        <p class="text-muted-foreground">
+                            This is a basic modal dialog. You can click outside or press escape to close it.
+                        </p>
+                        <div class="flex justify-end gap-2">
+                            <x-strata::modal.close>
+                                <x-strata::button variant="outline">Close</x-strata::button>
+                            </x-strata::modal.close>
                         </div>
                     </div>
-                    <x-strata::badge color="success" variant="soft">Active</x-strata::badge>
-                </div>
-
-                <p class="text-gray-600 mb-4">Experienced full-stack developer specializing in Laravel and Vue.js applications.</p>
-
-                <div class="flex flex-wrap gap-2 mb-4">
-                    <x-strata::badge size="sm" variant="outline">PHP</x-strata::badge>
-                    <x-strata::badge size="sm" variant="outline">Laravel</x-strata::badge>
-                    <x-strata::badge size="sm" variant="outline">Vue.js</x-strata::badge>
-                    <x-strata::badge size="sm" variant="outline">MySQL</x-strata::badge>
-                </div>
-
-                <div class="flex gap-2">
-                    <x-strata::button size="sm" variant="outline" icon="heroicon-o-envelope">Message</x-strata::button>
-                    <x-strata::button size="sm" icon="heroicon-o-user">View Profile</x-strata::button>
-                </div>
-            </x-strata::card>
-
-            <!-- Notification Card -->
-            <x-strata::card>
-                <div class="space-y-3">
-                    <x-strata::alert color="info" size="sm">
-                        You have 3 new messages
-                    </x-strata::alert>
-
-                    <x-strata::alert color="warning" size="sm" dismissible>
-                        System maintenance scheduled for tonight
-                    </x-strata::alert>
-
-                    <x-strata::alert color="success" size="sm">
-                        <x-slot name="actions">
-                            <x-strata::button size="sm" variant="ghost">View</x-strata::button>
-                        </x-slot>
-                        Deployment completed successfully
-                    </x-strata::alert>
-                </div>
-            </x-strata::card>
+                </x-strata::modal>
+            </div>
         </div>
 
-        <!-- Button with Badge -->
-        <div class="mt-6">
-            <h3 class="text-sm font-medium text-gray-600 mb-3">Button with Badge Overlay</h3>
-            <x-strata::button icon="heroicon-o-bell">
-                <x-slot name="badge">
-                    <x-strata::badge size="sm" color="destructive" shape="square">5</x-strata::badge>
-                </x-slot>
-                Notifications
-            </x-strata::button>
+        {{-- Modal Sizes --}}
+        <div class="space-y-4">
+            <h4>Modal Sizes</h4>
+            <div class="flex flex-wrap gap-4">
+                <x-strata::modal.trigger name="small-modal">
+                    <x-strata::button size="sm">Small Modal</x-strata::button>
+                </x-strata::modal.trigger>
+
+                <x-strata::modal.trigger name="large-modal">
+                    <x-strata::button>Large Modal</x-strata::button>
+                </x-strata::modal.trigger>
+
+                <x-strata::modal.trigger name="xl-modal">
+                    <x-strata::button size="lg">Extra Large Modal</x-strata::button>
+                </x-strata::modal.trigger>
+            </div>
+
+            {{-- Small Modal --}}
+            <x-strata::modal name="small-modal" size="sm">
+                <div class="space-y-4">
+                    <h5>Small Modal</h5>
+                    <p class="text-sm text-muted-foreground">This is a small modal dialog.</p>
+                    <x-strata::modal.close>
+                        <x-strata::button size="sm" variant="outline">Close</x-strata::button>
+                    </x-strata::modal.close>
+                </div>
+            </x-strata::modal>
+
+            {{-- Large Modal --}}
+            <x-strata::modal name="large-modal" size="lg">
+                <div class="space-y-6">
+                    <h4>Large Modal Dialog</h4>
+                    <div class="prose prose-sm max-w-none text-muted-foreground">
+                        <p>This is a larger modal that can accommodate more content. Perfect for forms, detailed information, or complex interactions.</p>
+                        <p>You can include multiple paragraphs, lists, and other content here.</p>
+                        <ul>
+                            <li>Feature one</li>
+                            <li>Feature two</li>
+                            <li>Feature three</li>
+                        </ul>
+                    </div>
+                    <div class="flex justify-between">
+                        <x-strata::button variant="secondary">Learn More</x-strata::button>
+                        <x-strata::modal.close>
+                            <x-strata::button variant="outline">Close</x-strata::button>
+                        </x-strata::modal.close>
+                    </div>
+                </div>
+            </x-strata::modal>
+
+            {{-- XL Modal --}}
+            <x-strata::modal name="xl-modal" size="xl">
+                <div class="space-y-6">
+                    <h4>Extra Large Modal</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h5>Content Section 1</h5>
+                            <p class="text-muted-foreground">This extra large modal can contain complex layouts with multiple columns.</p>
+                            <div class="mt-4">
+                                <x-strata::badge color="primary">Featured</x-strata::badge>
+                            </div>
+                        </div>
+                        <div>
+                            <h5>Content Section 2</h5>
+                            <p class="text-muted-foreground">Perfect for dashboards, detailed forms, or rich content presentations.</p>
+                            <div class="mt-4 space-y-2">
+                                <x-strata::button variant="outline" size="sm">Action 1</x-strata::button>
+                                <x-strata::button variant="outline" size="sm">Action 2</x-strata::button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-4 border-t border-border">
+                        <x-strata::button variant="secondary">Save Draft</x-strata::button>
+                        <x-strata::modal.close>
+                            <x-strata::button>Save & Close</x-strata::button>
+                        </x-strata::modal.close>
+                    </div>
+                </div>
+            </x-strata::modal>
         </div>
-    </x-strata::section>
+
+        {{-- Flyout Modal Example --}}
+        <div class="space-y-4">
+            <h4>Flyout Modals</h4>
+            <div class="flex flex-wrap gap-4">
+                <x-strata::modal.trigger name="right-flyout">
+                    <x-strata::button variant="secondary">Right Flyout</x-strata::button>
+                </x-strata::modal.trigger>
+
+                <x-strata::modal.trigger name="left-flyout">
+                    <x-strata::button variant="secondary">Left Flyout</x-strata::button>
+                </x-strata::modal.trigger>
+
+                <x-strata::modal.trigger name="bottom-flyout">
+                    <x-strata::button variant="secondary">Bottom Flyout</x-strata::button>
+                </x-strata::modal.trigger>
+            </div>
+
+            {{-- Right Flyout --}}
+            <x-strata::modal name="right-flyout" variant="flyout" position="right" size="md">
+                <div class="space-y-6">
+                    <h4>Right Flyout Panel</h4>
+                    <p class="text-muted-foreground">This flyout slides in from the right side of the screen.</p>
+                    <div class="space-y-4">
+                        <x-strata::form.group label="Name" for="flyout-name">
+                            <x-strata::form.input name="flyout-name" placeholder="Enter your name" />
+                        </x-strata::form.group>
+                        <x-strata::form.group label="Email" for="flyout-email">
+                            <x-strata::form.input type="email" name="flyout-email" placeholder="Enter your email" />
+                        </x-strata::form.group>
+                    </div>
+                    <div class="flex gap-2">
+                        <x-strata::button size="sm">Save</x-strata::button>
+                        <x-strata::modal.close>
+                            <x-strata::button variant="outline" size="sm">Cancel</x-strata::button>
+                        </x-strata::modal.close>
+                    </div>
+                </div>
+            </x-strata::modal>
+
+            {{-- Left Flyout --}}
+            <x-strata::modal name="left-flyout" variant="flyout" position="left" size="md">
+                <div class="space-y-6">
+                    <h4>Left Flyout Panel</h4>
+                    <p class="text-muted-foreground">This flyout slides in from the left side.</p>
+                    <div class="space-y-3">
+                        <x-strata::badge color="success">Status: Active</x-strata::badge>
+                        <x-strata::badge color="info">Type: Premium</x-strata::badge>
+                        <x-strata::badge color="warning">Expires: Soon</x-strata::badge>
+                    </div>
+                    <x-strata::modal.close>
+                        <x-strata::button variant="outline">Close Panel</x-strata::button>
+                    </x-strata::modal.close>
+                </div>
+            </x-strata::modal>
+
+            {{-- Bottom Flyout --}}
+            <x-strata::modal name="bottom-flyout" variant="flyout" position="bottom" size="lg">
+                <div class="space-y-4">
+                    <h4>Bottom Flyout Sheet</h4>
+                    <p class="text-muted-foreground">This flyout slides up from the bottom. Great for mobile-friendly interactions.</p>
+                    <div class="grid grid-cols-3 gap-4">
+                        <x-strata::card size="sm">
+                            <h6>Option 1</h6>
+                            <p class="text-sm text-muted-foreground">Description here</p>
+                        </x-strata::card>
+                        <x-strata::card size="sm">
+                            <h6>Option 2</h6>
+                            <p class="text-sm text-muted-foreground">Description here</p>
+                        </x-strata::card>
+                        <x-strata::card size="sm">
+                            <h6>Option 3</h6>
+                            <p class="text-sm text-muted-foreground">Description here</p>
+                        </x-strata::card>
+                    </div>
+                    <x-strata::modal.close>
+                        <x-strata::button class="w-full">Done</x-strata::button>
+                    </x-strata::modal.close>
+                </div>
+            </x-strata::modal>
+        </div>
+
+        {{-- Confirmation Modal Example --}}
+        <div class="space-y-4">
+            <h4>Confirmation Modal</h4>
+            <x-strata::modal.trigger name="confirm-delete">
+                <x-strata::button variant="destructive">Delete Account</x-strata::button>
+            </x-strata::modal.trigger>
+
+            <x-strata::modal name="confirm-delete" size="sm" :dismissible="false">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-destructive/10 rounded-full flex items-center justify-center">
+                            <x-icon name="heroicon-o-exclamation-triangle" class="w-5 h-5 text-destructive" />
+                        </div>
+                        <div>
+                            <h5>Delete Account</h5>
+                        </div>
+                    </div>
+                    <p class="text-sm text-muted-foreground">
+                        Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.
+                    </p>
+                    <div class="flex gap-2 justify-end">
+                        <x-strata::modal.close>
+                            <x-strata::button variant="outline" size="sm">Cancel</x-strata::button>
+                        </x-strata::modal.close>
+                        <x-strata::button variant="destructive" size="sm">Delete Account</x-strata::button>
+                    </div>
+                </div>
+            </x-strata::modal>
+        </div>
+
+        {{-- JavaScript API Demo --}}
+        <div class="space-y-4">
+            <h4>JavaScript API</h4>
+            <p class="text-sm text-muted-foreground">Modals can also be controlled via JavaScript:</p>
+            <div class="flex flex-wrap gap-4">
+                <x-strata::button
+                    variant="outline"
+                    onclick="$strata.modal('js-modal').show()"
+                >
+                    Open via $strata
+                </x-strata::button>
+                <x-strata::button
+                    variant="outline"
+                    onclick="Strata.modal('js-modal').show()"
+                >
+                    Open via window.Strata
+                </x-strata::button>
+                <x-strata::button
+                    variant="outline"
+                    onclick="Strata.modals().close()"
+                >
+                    Close All Modals
+                </x-strata::button>
+            </div>
+
+            <x-strata::modal name="js-modal">
+                <div class="space-y-4">
+                    <h4>JavaScript API Modal</h4>
+                    <p class="text-muted-foreground">This modal was opened using the JavaScript API!</p>
+                    <div class="flex gap-2 justify-end">
+                        <x-strata::button
+                            variant="outline"
+                            onclick="$strata.modal('js-modal').hide()"
+                        >
+                            Close via JS
+                        </x-strata::button>
+                        <x-strata::modal.close>
+                            <x-strata::button>Close Normally</x-strata::button>
+                        </x-strata::modal.close>
+                    </div>
+                </div>
+            </x-strata::modal>
+        </div>
+    </section>
+
+    {{-- Color Palette Demo --}}
+    <section class="space-y-6">
+        <h3>Semantic Color Palette</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="space-y-2">
+                <div class="h-16 bg-background border-2 border-border rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono">background</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Background</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-16 bg-card border-2 border-border rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono">card</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Card</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-16 bg-primary rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono text-primary-foreground">primary</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Primary</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-16 bg-accent rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono text-accent-foreground">accent</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Accent</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-16 bg-secondary rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono text-secondary-foreground">secondary</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Secondary</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-16 bg-destructive rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono text-destructive-foreground">destructive</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Destructive</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-16 bg-muted rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono text-muted-foreground">muted</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Muted</p>
+            </div>
+            <div class="space-y-2">
+                <div class="h-16 border-2 border-border rounded-lg flex items-center justify-center">
+                    <span class="text-xs font-mono">border</span>
+                </div>
+                <p class="text-xs text-center text-muted-foreground">Border</p>
+            </div>
+        </div>
+    </section>
+
 </div>
+
+    {{-- Toast container for Strata magic method registration --}}
+    <x-strata::toast-container />
+</div>
+

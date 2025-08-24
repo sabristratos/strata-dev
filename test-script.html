@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Modal Script</title>
+</head>
+<body>
+    <h1>Test</h1>
+
+<script>
+window.strataModalLoaded = true;
+console.log('🎯 Modal: Script tag executed');
+
+// Check if Alpine is available immediately
+if (typeof Alpine !== 'undefined') {
+    console.log('🎯 Modal: Alpine available immediately, registering now');
+} else {
+    console.log('🎯 Modal: Alpine not available, setting up event listener');
+    document.addEventListener('alpine:initializing', () => {
+        console.log('🎯 Modal: alpine:initializing event received');
+    });
+}
+
+// Also expose global debug info
+window.strataModalDebug = {
+    loaded: true,
+    alpine: typeof Alpine !== 'undefined',
+    strata: typeof window.Strata !== 'undefined',
+    timestamp: new Date()
+};
+
+console.log('Test script completed');
+</script>
+
+</body>
+</html>
