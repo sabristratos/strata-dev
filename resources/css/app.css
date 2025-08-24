@@ -14,8 +14,3 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
-
-/* Prevent layout shift when modals open by reserving scrollbar space */
-html {
-    scrollbar-gutter: stable;
-}
