@@ -17,8 +17,7 @@ class Tabs extends Component
         public string $orientation = 'horizontal',
         public string $activationMode = 'automatic',
         public string $variant = 'default'
-    ) {
-    }
+    ) {}
 
     /**
      * Get the view / contents that represent the component.

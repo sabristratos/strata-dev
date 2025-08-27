@@ -6,359 +6,264 @@ namespace Strata\UI\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
- * Service for handling file uploads in different modes for Strata UI components.
- * Solves the Spatie Media Library challenge by providing flexible upload strategies.
+ * Service class for handling file uploads with optional Spatie Media Library integration.
  */
 class StrataFileUploadService
 {
-    protected string $temporaryDisk = 'local';
-    protected string $temporaryPath = 'file-uploads/temporary';
-    protected string $deferredPath = 'file-uploads/deferred';
-    protected int $cleanupAfterHours = 24;
-
     /**
-     * Handle temporary file upload for later processing.
+     * Check if Spatie Media Library is available.
      */
-    public function handleTemporaryUpload(UploadedFile $file, ?string $sessionKey = null): array
+    public function isMediaLibraryAvailable(): bool
     {
-        $sessionKey = $sessionKey ?: session()->getId();
-        $fileId = Str::uuid()->toString();
-        $originalName = $file->getClientOriginalName();
-        $extension = $file->getClientOriginalExtension();
-        $storedName = $fileId . '.' . $extension;
-        $storagePath = "{$this->temporaryPath}/{$sessionKey}";
-        
-        // Store the file
-        $path = $file->storeAs($storagePath, $storedName, $this->temporaryDisk);
-        
-        // Store metadata in cache
-        $metadata = [
-            'id' => $fileId,
-            'original_name' => $originalName,
-            'stored_name' => $storedName,
-            'path' => $path,
-            'size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
-            'session_key' => $sessionKey,
-            'uploaded_at' => now()->toISOString(),
-            'cleanup_after' => now()->addHours($this->cleanupAfterHours)->toISOString(),
-        ];
-        
-        Cache::put("file_upload.{$fileId}", $metadata, now()->addHours($this->cleanupAfterHours));
-        
-        return [
-            'id' => $fileId,
-            'name' => $originalName,
-            'size' => $file->getSize(),
-            'type' => $file->getMimeType(),
-            'url' => null, // Temporary files don't have public URLs
-            'metadata' => $metadata
-        ];
+        return interface_exists(HasMedia::class) &&
+               class_exists(Media::class);
     }
 
     /**
-     * Handle deferred file upload with session storage.
+     * Check if a model implements HasMedia interface.
      */
-    public function handleDeferredUpload(UploadedFile $file, string $sessionKey): array
+    public function modelSupportsMedia(Model $model): bool
     {
-        $result = $this->handleTemporaryUpload($file, $sessionKey);
-        
-        // Add to session-based deferred files list
-        $deferredFiles = session("file_uploads.deferred.{$sessionKey}", []);
-        $deferredFiles[] = $result['id'];
-        session(["file_uploads.deferred.{$sessionKey}" => $deferredFiles]);
-        
-        return $result;
+        return $this->isMediaLibraryAvailable() && $model instanceof HasMedia;
     }
 
     /**
-     * Handle direct upload to an existing model with Spatie Media Library.
+     * Store files using Spatie Media Library.
      */
-    public function handleDirectUpload(UploadedFile $file, HasMedia $model, string $collection = 'default'): array
-    {
-        $mediaItem = $model->addMediaFromRequest('file')
-            ->usingFileName($file->getClientOriginalName())
-            ->toMediaCollection($collection);
-        
-        return [
-            'id' => $mediaItem->id,
-            'name' => $mediaItem->name,
-            'file_name' => $mediaItem->file_name,
-            'size' => $mediaItem->size,
-            'type' => $mediaItem->mime_type,
-            'url' => $mediaItem->getUrl(),
-            'collection' => $collection,
-            'model_id' => $model->getKey(),
-            'model_type' => get_class($model),
-            'media_item' => $mediaItem
-        ];
-    }
+    public function storeWithMediaLibrary(
+        Model $model,
+        array $files,
+        ?string $collection = null,
+        ?array $customProperties = null,
+        ?array $manipulations = null,
+        ?string $conversionsDisk = null,
+        bool $responsiveImages = false
+    ): array {
+        if (! $this->modelSupportsMedia($model)) {
+            throw new \InvalidArgumentException('Model must implement HasMedia interface');
+        }
 
-    /**
-     * Attach deferred files to a model after it's been created.
-     */
-    public function attachDeferredFiles(HasMedia $model, string $sessionKey, string $collection = 'default'): array
-    {
-        $deferredFileIds = session("file_uploads.deferred.{$sessionKey}", []);
-        $attachedFiles = [];
-        
-        foreach ($deferredFileIds as $fileId) {
-            $metadata = Cache::get("file_upload.{$fileId}");
-            
-            if (!$metadata) {
-                continue; // File metadata expired or doesn't exist
-            }
-            
-            try {
-                // Get the stored file
-                $filePath = $metadata['path'];
-                
-                if (!Storage::disk($this->temporaryDisk)->exists($filePath)) {
-                    continue; // File doesn't exist
-                }
-                
-                // Create a new UploadedFile instance from stored file
-                $storedFilePath = Storage::disk($this->temporaryDisk)->path($filePath);
-                $uploadedFile = new UploadedFile(
-                    $storedFilePath,
-                    $metadata['original_name'],
-                    $metadata['mime_type'],
-                    null,
-                    true // Mark as test file to skip is_uploaded_file() check
-                );
-                
-                // Add to media library
-                $mediaItem = $model->addMedia($storedFilePath)
-                    ->usingName(pathinfo($metadata['original_name'], PATHINFO_FILENAME))
-                    ->usingFileName($metadata['original_name'])
-                    ->toMediaCollection($collection);
-                
-                $attachedFiles[] = [
-                    'id' => $mediaItem->id,
-                    'name' => $mediaItem->name,
-                    'file_name' => $mediaItem->file_name,
-                    'size' => $mediaItem->size,
-                    'type' => $mediaItem->mime_type,
-                    'url' => $mediaItem->getUrl(),
-                    'collection' => $collection,
-                    'original_file_id' => $fileId
-                ];
-                
-                // Clean up temporary file
-                $this->cleanupTemporaryFile($fileId);
-                
-            } catch (\Exception $e) {
-                // Log error but continue with other files
-                logger()->error("Failed to attach deferred file {$fileId}: " . $e->getMessage());
+        $mediaItems = [];
+        $collection = $collection ?? 'default';
+
+        foreach ($files as $file) {
+            if (! $file instanceof UploadedFile) {
                 continue;
             }
-        }
-        
-        // Clear deferred files from session
-        session()->forget("file_uploads.deferred.{$sessionKey}");
-        
-        return $attachedFiles;
-    }
 
-    /**
-     * Get temporary file metadata.
-     */
-    public function getTemporaryFileMetadata(string $fileId): ?array
-    {
-        return Cache::get("file_upload.{$fileId}");
-    }
+            $mediaItem = $model
+                ->addMediaFromRequest($file->getClientOriginalName())
+                ->toMediaCollection($collection);
 
-    /**
-     * Get all temporary files for a session.
-     */
-    public function getSessionTemporaryFiles(string $sessionKey): array
-    {
-        $files = [];
-        $sessionPath = "{$this->temporaryPath}/{$sessionKey}";
-        
-        if (!Storage::disk($this->temporaryDisk)->exists($sessionPath)) {
-            return $files;
-        }
-        
-        $storedFiles = Storage::disk($this->temporaryDisk)->files($sessionPath);
-        
-        foreach ($storedFiles as $filePath) {
-            $fileName = basename($filePath);
-            $fileId = pathinfo($fileName, PATHINFO_FILENAME);
-            $metadata = $this->getTemporaryFileMetadata($fileId);
-            
-            if ($metadata) {
-                $files[] = $metadata;
+            // Add custom properties if specified
+            if ($customProperties) {
+                foreach ($customProperties as $key => $value) {
+                    $mediaItem->setCustomProperty($key, $value);
+                }
+                $mediaItem->save();
             }
+
+            // Set conversions disk if specified
+            if ($conversionsDisk) {
+                $mediaItem->setCustomProperty('conversions_disk', $conversionsDisk);
+                $mediaItem->save();
+            }
+
+            // Enable responsive images if requested
+            if ($responsiveImages) {
+                $mediaItem->setCustomProperty('responsive_images', true);
+                $mediaItem->save();
+            }
+
+            // Apply manipulations if specified
+            if ($manipulations) {
+                foreach ($manipulations as $conversionName => $manipulation) {
+                    $mediaItem->setCustomProperty("manipulation_{$conversionName}", $manipulation);
+                }
+                $mediaItem->save();
+            }
+
+            $mediaItems[] = $mediaItem;
         }
-        
-        return $files;
+
+        return $mediaItems;
     }
 
     /**
-     * Clean up a specific temporary file.
+     * Get media items from a model for a specific collection.
      */
-    public function cleanupTemporaryFile(string $fileId): bool
+    public function getMediaFromModel(
+        Model $model,
+        ?string $collection = null,
+        ?string $conversion = null
+    ): array {
+        if (! $this->modelSupportsMedia($model)) {
+            return [];
+        }
+
+        $collection = $collection ?? 'default';
+        $mediaItems = $model->getMedia($collection);
+
+        return $mediaItems->map(function (Media $media) use ($conversion) {
+            $data = [
+                'id' => $media->id,
+                'name' => $media->name,
+                'file_name' => $media->file_name,
+                'mime_type' => $media->mime_type,
+                'size' => $media->size,
+                'collection_name' => $media->collection_name,
+                'url' => $conversion ? $media->getUrl($conversion) : $media->getUrl(),
+                'custom_properties' => $media->custom_properties,
+                'uploaded' => true,
+            ];
+
+            // Add conversion URLs if they exist
+            if ($media->hasGeneratedConversion($conversion ?? 'thumb')) {
+                $data['thumb_url'] = $media->getUrl($conversion ?? 'thumb');
+            }
+
+            return $data;
+        })->toArray();
+    }
+
+    /**
+     * Reorder media items in a collection.
+     */
+    public function reorderMedia(Model $model, array $mediaIds, ?string $collection = null): bool
     {
-        $metadata = Cache::get("file_upload.{$fileId}");
-        
-        if (!$metadata) {
+        if (! $this->modelSupportsMedia($model)) {
             return false;
         }
-        
-        // Delete the physical file
-        if (Storage::disk($this->temporaryDisk)->exists($metadata['path'])) {
-            Storage::disk($this->temporaryDisk)->delete($metadata['path']);
+
+        $collection = $collection ?? 'default';
+
+        foreach ($mediaIds as $order => $mediaId) {
+            $media = $model->getMedia($collection)->find($mediaId);
+            if ($media) {
+                $media->order_column = $order + 1;
+                $media->save();
+            }
         }
-        
-        // Remove metadata from cache
-        Cache::forget("file_upload.{$fileId}");
-        
+
         return true;
     }
 
     /**
-     * Clean up expired temporary files.
-     * Should be called by a scheduled task.
+     * Delete media from a model.
      */
-    public function cleanupExpiredFiles(): array
+    public function deleteMedia(Model $model, int $mediaId): bool
     {
-        $cleanedFiles = [];
-        $allFiles = Storage::disk($this->temporaryDisk)->allFiles($this->temporaryPath);
-        
-        foreach ($allFiles as $filePath) {
-            $fileName = basename($filePath);
-            $fileId = pathinfo($fileName, PATHINFO_FILENAME);
-            $metadata = Cache::get("file_upload.{$fileId}");
-            
-            if (!$metadata) {
-                // No metadata = expired, delete file
-                Storage::disk($this->temporaryDisk)->delete($filePath);
-                $cleanedFiles[] = $filePath;
+        if (! $this->modelSupportsMedia($model)) {
+            return false;
+        }
+
+        $media = $model->getMedia()->find($mediaId);
+
+        if ($media) {
+            $media->delete();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Store files using standard Laravel file storage.
+     */
+    public function storeFiles(
+        array $files,
+        string $path = 'uploads',
+        ?string $disk = null
+    ): array {
+        $storedFiles = [];
+        $disk = $disk ?? config('filesystems.default');
+
+        foreach ($files as $file) {
+            if (! $file instanceof UploadedFile) {
                 continue;
             }
-            
-            // Check if cleanup time has passed
-            $cleanupTime = \Carbon\Carbon::parse($metadata['cleanup_after']);
-            if (now()->isAfter($cleanupTime)) {
-                $this->cleanupTemporaryFile($fileId);
-                $cleanedFiles[] = $filePath;
-            }
+
+            $filePath = $file->store($path, $disk);
+
+            $storedFiles[] = [
+                'id' => uniqid(),
+                'name' => $file->getClientOriginalName(),
+                'file_name' => basename($filePath),
+                'path' => $filePath,
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'disk' => $disk,
+                'url' => \Storage::disk($disk)->url($filePath),
+                'uploaded' => true,
+            ];
         }
-        
-        return $cleanedFiles;
+
+        return $storedFiles;
     }
 
     /**
-     * Get a public URL for a temporary file (if possible).
+     * Validate file types against accepted mime types or extensions.
      */
-    public function getTemporaryFileUrl(string $fileId): ?string
+    public function validateFileType(UploadedFile $file, string $accept): bool
     {
-        $metadata = $this->getTemporaryFileMetadata($fileId);
-        
-        if (!$metadata) {
-            return null;
+        if ($accept === '*/*') {
+            return true;
         }
-        
-        // For security, temporary files shouldn't be publicly accessible
-        // Return a route that serves the file after authentication/authorization
-        return route('strata.file-upload.serve', ['fileId' => $fileId]);
-    }
 
-    /**
-     * Serve a temporary file (for internal routes).
-     */
-    public function serveTemporaryFile(string $fileId): ?\Illuminate\Http\Response
-    {
-        $metadata = $this->getTemporaryFileMetadata($fileId);
-        
-        if (!$metadata || !Storage::disk($this->temporaryDisk)->exists($metadata['path'])) {
-            return null;
-        }
-        
-        return response()->file(
-            Storage::disk($this->temporaryDisk)->path($metadata['path']),
-            [
-                'Content-Type' => $metadata['mime_type'],
-                'Content-Disposition' => 'inline; filename="' . $metadata['original_name'] . '"'
-            ]
-        );
-    }
+        $acceptedTypes = array_map('trim', explode(',', $accept));
 
-    /**
-     * Validate file upload constraints.
-     */
-    public function validateFile(UploadedFile $file, array $rules = []): array
-    {
-        $errors = [];
-        
-        // Check max file size
-        if (isset($rules['max_size'])) {
-            $maxSize = $this->parseSize($rules['max_size']);
-            if ($file->getSize() > $maxSize) {
-                $errors[] = "File size exceeds maximum allowed size of {$rules['max_size']}";
-            }
-        }
-        
-        // Check file type
-        if (isset($rules['allowed_types'])) {
-            $allowedTypes = is_array($rules['allowed_types']) ? $rules['allowed_types'] : [$rules['allowed_types']];
-            $fileType = $file->getMimeType();
-            $fileName = $file->getClientOriginalName();
-            
-            $isAllowed = false;
-            foreach ($allowedTypes as $allowedType) {
-                if ($allowedType === $fileType) {
-                    $isAllowed = true;
-                    break;
-                }
-                
-                if (str_ends_with($allowedType, '/*')) {
-                    $category = str_replace('/*', '/', $allowedType);
-                    if (str_starts_with($fileType, $category)) {
-                        $isAllowed = true;
-                        break;
-                    }
-                }
-                
-                if (str_starts_with($allowedType, '.')) {
-                    if (str_ends_with(strtolower($fileName), strtolower($allowedType))) {
-                        $isAllowed = true;
-                        break;
-                    }
+        foreach ($acceptedTypes as $type) {
+            // Extension-based check
+            if (str_starts_with($type, '.')) {
+                if (str_ends_with(strtolower($file->getClientOriginalName()), strtolower($type))) {
+                    return true;
                 }
             }
-            
-            if (!$isAllowed) {
-                $errors[] = "File type not allowed. Accepted types: " . implode(', ', $allowedTypes);
+            // Wildcard mime type check (e.g., image/*)
+            elseif (str_ends_with($type, '/*')) {
+                $category = str_replace('/*', '', $type);
+                if (str_starts_with($file->getMimeType(), $category)) {
+                    return true;
+                }
+            }
+            // Exact mime type check
+            elseif ($file->getMimeType() === $type) {
+                return true;
             }
         }
-        
-        return $errors;
+
+        return false;
     }
 
     /**
-     * Parse size string to bytes.
+     * Format file size in human-readable format.
      */
-    protected function parseSize(string $size): int
+    public function formatFileSize(int $bytes): string
     {
-        $size = strtolower(trim($size));
-        $bytes = (int) $size;
-        
-        if (str_contains($size, 'k')) {
-            $bytes *= 1024;
-        } elseif (str_contains($size, 'm')) {
-            $bytes *= 1024 * 1024;
-        } elseif (str_contains($size, 'g')) {
-            $bytes *= 1024 * 1024 * 1024;
-        }
-        
-        return $bytes;
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $power = floor(log($bytes, 1024));
+
+        return round($bytes / (1024 ** $power), 2).' '.$units[$power];
+    }
+
+    /**
+     * Get file type icon based on mime type.
+     */
+    public function getFileTypeIcon(string $mimeType): string
+    {
+        return match (true) {
+            str_starts_with($mimeType, 'image/') => 'heroicon-o-photo',
+            $mimeType === 'application/pdf' => 'heroicon-o-document-text',
+            str_contains($mimeType, 'word') => 'heroicon-o-document-text',
+            str_contains($mimeType, 'spreadsheet') => 'heroicon-o-table-cells',
+            str_starts_with($mimeType, 'video/') => 'heroicon-o-video-camera',
+            str_starts_with($mimeType, 'audio/') => 'heroicon-o-musical-note',
+            default => 'heroicon-o-document',
+        };
     }
 }

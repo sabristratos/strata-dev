@@ -1,18 +1,23 @@
-<div 
-    x-data="{
-        value: @if($attributes->wire('model')) @entangle($attributes->wire('model')) @else {{ $checked ? 'true' : 'false' }} @endif,
-        
-        get isOn() {
-            return this.value === true || this.value === '1' || this.value === 1;
-        },
-        
-        toggle() {
-            this.value = !this.isOn;
-            this.$refs.hiddenInput.checked = this.isOn;
-        }
-    }" 
-    class="flex items-center space-x-3"
->
+@php
+    $hasError = !empty($error);
+@endphp
+
+<div class="space-y-1">
+    <div 
+        x-data="{
+            value: @if($attributes->wire('model')) @entangle($attributes->wire('model')) @else {{ $checked ? 'true' : 'false' }} @endif,
+            
+            get isOn() {
+                return this.value === true || this.value === '1' || this.value === 1;
+            },
+            
+            toggle() {
+                this.value = !this.isOn;
+                this.$refs.hiddenInput.checked = this.isOn;
+            }
+        }" 
+        class="flex items-center space-x-3"
+    >
     @if($name && !$attributes->wire('model'))
         <input type="hidden" name="{{ $name }}" value="0">
     @endif
@@ -36,7 +41,8 @@
         :aria-pressed="isOn.toString()"
         role="switch"
         @if($label) aria-labelledby="{{ $id }}-label" @endif
-        @if($description) aria-describedby="{{ $id }}-description" @endif
+        @if($description && !$hasError) aria-describedby="{{ $id }}-description" @endif
+        @if($hasError) aria-describedby="{{ $id }}_error" aria-invalid="true" @endif
     >
         <span 
             :class="isOn ? 'translate-x-5' : 'translate-x-0'" 
@@ -45,24 +51,24 @@
     </button>
 
     @if($label || $description)
-        <div class="flex flex-col">
+        <div class="flex flex-col space-y-1">
             @if($label)
-                <label 
+                <x-strata::form.label 
                     id="{{ $id }}-label"
-                    @click="$refs.switchButton.click(); $refs.switchButton.focus()" 
-                    class="text-sm font-medium cursor-pointer select-none text-foreground"
+                    class="cursor-pointer select-none"
+                    @click="$refs.switchButton.click(); $refs.switchButton.focus()"
                 >
                     {{ $label }}
-                </label>
+                </x-strata::form.label>
             @endif
             @if($description)
-                <p 
-                    id="{{ $id }}-description"
-                    class="text-xs text-muted-foreground mt-0.5"
-                >
-                    {{ $description }}
-                </p>
+                <x-strata::form.helper id="{{ $id }}-description">{{ $description }}</x-strata::form.helper>
             @endif
         </div>
+    @endif
+    </div>
+    
+    @if($hasError)
+        <x-strata::form.error id="{{ $id }}_error">{{ $error }}</x-strata::form.error>
     @endif
 </div>

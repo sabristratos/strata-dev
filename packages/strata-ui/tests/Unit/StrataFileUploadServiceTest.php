@@ -4,239 +4,128 @@ declare(strict_types=1);
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Cache;
 use Strata\UI\Services\StrataFileUploadService;
-
-// Mock interface for HasMedia since we don't have Spatie in tests
-interface MockHasMedia
-{
-    //
-}
 
 describe('StrataFileUploadService', function () {
     beforeEach(function () {
-        $this->service = new StrataFileUploadService();
-        Storage::fake('local');
-        Cache::flush();
+        $this->service = new StrataFileUploadService;
     });
 
-    it('can be instantiated', function () {
-        expect($this->service)->toBeInstanceOf(StrataFileUploadService::class);
+    describe('file validation', function () {
+        it('validates file types correctly', function () {
+            $jpegFile = UploadedFile::fake()->image('test.jpg');
+            $pdfFile = UploadedFile::fake()->create('test.pdf', 1000, 'application/pdf');
+            $txtFile = UploadedFile::fake()->create('test.txt', 100, 'text/plain');
+
+            // Test wildcard image acceptance
+            expect($this->service->validateFileType($jpegFile, 'image/*'))->toBeTrue();
+
+            // Test specific mime type
+            expect($this->service->validateFileType($pdfFile, 'application/pdf'))->toBeTrue();
+
+            // Test extension-based validation
+            expect($this->service->validateFileType($txtFile, '.txt'))->toBeTrue();
+
+            // Test rejection
+            expect($this->service->validateFileType($txtFile, 'image/*'))->toBeFalse();
+            expect($this->service->validateFileType($jpegFile, 'application/pdf'))->toBeFalse();
+        });
+
+        it('accepts all files with wildcard', function () {
+            $file = UploadedFile::fake()->image('test.jpg');
+            expect($this->service->validateFileType($file, '*/*'))->toBeTrue();
+        });
+
+        it('validates multiple accept types', function () {
+            $jpegFile = UploadedFile::fake()->image('test.jpg');
+            $pdfFile = UploadedFile::fake()->create('test.pdf', 1000, 'application/pdf');
+
+            $accept = 'image/*,application/pdf,.txt';
+
+            expect($this->service->validateFileType($jpegFile, $accept))->toBeTrue();
+            expect($this->service->validateFileType($pdfFile, $accept))->toBeTrue();
+        });
     });
 
-    it('handles temporary file upload correctly', function () {
-        $file = UploadedFile::fake()->image('test.jpg', 100, 100);
-        $sessionKey = 'test-session';
-        
-        $result = $this->service->handleTemporaryUpload($file, $sessionKey);
-        
-        expect($result)->toHaveKey('id')
-        ->and($result)->toHaveKey('name', 'test.jpg')
-        ->and($result)->toHaveKey('size')
-        ->and($result)->toHaveKey('type')
-        ->and($result)->toHaveKey('url', null)
-        ->and($result)->toHaveKey('metadata');
-        
-        // Verify file was stored
-        $metadata = $result['metadata'];
-        expect(Storage::disk('local')->exists($metadata['path']))->toBeTrue();
-        
-        // Verify metadata was cached
-        expect(Cache::get("file_upload.{$result['id']}"))->not->toBeNull();
+    describe('file size formatting', function () {
+        it('formats bytes correctly', function () {
+            expect($this->service->formatFileSize(0))->toBe('0 B');
+            expect($this->service->formatFileSize(1024))->toBe('1 KB');
+            expect($this->service->formatFileSize(1048576))->toBe('1 MB');
+            expect($this->service->formatFileSize(1073741824))->toBe('1 GB');
+            expect($this->service->formatFileSize(1536))->toBe('1.5 KB');
+            expect($this->service->formatFileSize(2621440))->toBe('2.5 MB');
+        });
     });
 
-    it('handles deferred file upload correctly', function () {
-        $file = UploadedFile::fake()->image('deferred.jpg', 150, 150);
-        $sessionKey = 'deferred-session';
-        
-        $result = $this->service->handleDeferredUpload($file, $sessionKey);
-        
-        expect($result)->toHaveKey('id')
-        ->and($result)->toHaveKey('name', 'deferred.jpg');
-        
-        // Verify file was added to session
-        $deferredFiles = session("file_uploads.deferred.{$sessionKey}", []);
-        expect($deferredFiles)->toContain($result['id']);
+    describe('file type icons', function () {
+        it('returns correct icons for different file types', function () {
+            expect($this->service->getFileTypeIcon('image/jpeg'))
+                ->toBe('heroicon-o-photo');
+
+            expect($this->service->getFileTypeIcon('application/pdf'))
+                ->toBe('heroicon-o-document-text');
+
+            expect($this->service->getFileTypeIcon('video/mp4'))
+                ->toBe('heroicon-o-video-camera');
+
+            expect($this->service->getFileTypeIcon('audio/mp3'))
+                ->toBe('heroicon-o-musical-note');
+
+            expect($this->service->getFileTypeIcon('application/vnd.ms-word'))
+                ->toBe('heroicon-o-document-text');
+
+            expect($this->service->getFileTypeIcon('application/vnd.ms-excel'))
+                ->toBe('heroicon-o-table-cells');
+
+            expect($this->service->getFileTypeIcon('application/unknown'))
+                ->toBe('heroicon-o-document');
+        });
     });
 
-    it('retrieves temporary file metadata correctly', function () {
-        $file = UploadedFile::fake()->image('metadata.jpg', 200, 200);
-        $sessionKey = 'metadata-session';
-        
-        $result = $this->service->handleTemporaryUpload($file, $sessionKey);
-        $metadata = $this->service->getTemporaryFileMetadata($result['id']);
-        
-        expect($metadata)->not->toBeNull()
-        ->and($metadata['id'])->toBe($result['id'])
-        ->and($metadata['original_name'])->toBe('metadata.jpg')
-        ->and($metadata['session_key'])->toBe($sessionKey);
+    describe('standard file storage', function () {
+        beforeEach(function () {
+            Storage::fake('local');
+        });
+
+        it('stores files using Laravel storage', function () {
+            $files = [
+                UploadedFile::fake()->image('image1.jpg'),
+                UploadedFile::fake()->create('document.pdf', 1000, 'application/pdf'),
+            ];
+
+            $storedFiles = $this->service->storeFiles($files, 'test-uploads');
+
+            expect($storedFiles)->toHaveCount(2);
+
+            foreach ($storedFiles as $storedFile) {
+                expect($storedFile)->toHaveKeys([
+                    'id', 'name', 'file_name', 'path',
+                    'mime_type', 'size', 'disk', 'url', 'uploaded',
+                ]);
+                expect($storedFile['uploaded'])->toBeTrue();
+                expect($storedFile['disk'])->toBe('local');
+            }
+        });
+
+        it('filters out non-file objects', function () {
+            $files = [
+                UploadedFile::fake()->image('image1.jpg'),
+                'not-a-file',
+                null,
+                UploadedFile::fake()->create('document.pdf', 1000, 'application/pdf'),
+            ];
+
+            $storedFiles = $this->service->storeFiles($files, 'test-uploads');
+
+            expect($storedFiles)->toHaveCount(2);
+        });
     });
 
-    it('returns null for non-existent file metadata', function () {
-        $metadata = $this->service->getTemporaryFileMetadata('non-existent-id');
-        
-        expect($metadata)->toBeNull();
-    });
-
-    it('gets session temporary files correctly', function () {
-        $sessionKey = 'session-files-test';
-        
-        // Upload multiple files
-        $file1 = UploadedFile::fake()->image('file1.jpg', 100, 100);
-        $file2 = UploadedFile::fake()->image('file2.jpg', 150, 150);
-        
-        $result1 = $this->service->handleTemporaryUpload($file1, $sessionKey);
-        $result2 = $this->service->handleTemporaryUpload($file2, $sessionKey);
-        
-        $sessionFiles = $this->service->getSessionTemporaryFiles($sessionKey);
-        
-        expect($sessionFiles)->toHaveCount(2)
-        ->and($sessionFiles[0]['id'])->toBe($result1['id'])
-        ->and($sessionFiles[1]['id'])->toBe($result2['id']);
-    });
-
-    it('returns empty array for non-existent session', function () {
-        $sessionFiles = $this->service->getSessionTemporaryFiles('non-existent-session');
-        
-        expect($sessionFiles)->toBe([]);
-    });
-
-    it('cleans up temporary file correctly', function () {
-        $file = UploadedFile::fake()->image('cleanup.jpg', 100, 100);
-        $sessionKey = 'cleanup-session';
-        
-        $result = $this->service->handleTemporaryUpload($file, $sessionKey);
-        $fileId = $result['id'];
-        $metadata = $result['metadata'];
-        
-        // Verify file exists before cleanup
-        expect(Storage::disk('local')->exists($metadata['path']))->toBeTrue();
-        expect(Cache::get("file_upload.{$fileId}"))->not->toBeNull();
-        
-        // Clean up file
-        $cleaned = $this->service->cleanupTemporaryFile($fileId);
-        
-        expect($cleaned)->toBeTrue();
-        expect(Storage::disk('local')->exists($metadata['path']))->toBeFalse();
-        expect(Cache::get("file_upload.{$fileId}"))->toBeNull();
-    });
-
-    it('returns false when cleaning up non-existent file', function () {
-        $cleaned = $this->service->cleanupTemporaryFile('non-existent-id');
-        
-        expect($cleaned)->toBeFalse();
-    });
-
-    it('validates file correctly with size constraint', function () {
-        $smallFile = UploadedFile::fake()->image('small.jpg', 50, 50)->size(100); // 100KB
-        $largeFile = UploadedFile::fake()->image('large.jpg', 500, 500)->size(2048); // 2MB
-        
-        $rules = ['max_size' => '1MB'];
-        
-        $smallFileErrors = $this->service->validateFile($smallFile, $rules);
-        $largeFileErrors = $this->service->validateFile($largeFile, $rules);
-        
-        expect($smallFileErrors)->toBe([]);
-        expect($largeFileErrors)->toHaveCount(1);
-        expect($largeFileErrors[0])->toContain('exceeds maximum allowed size');
-    });
-
-    it('validates file correctly with type constraint', function () {
-        $imageFile = UploadedFile::fake()->image('image.jpg');
-        $textFile = UploadedFile::fake()->create('document.txt', 100, 'text/plain');
-        
-        $rules = ['allowed_types' => ['image/jpeg', 'image/png']];
-        
-        $imageErrors = $this->service->validateFile($imageFile, $rules);
-        $textErrors = $this->service->validateFile($textFile, $rules);
-        
-        expect($imageErrors)->toBe([]);
-        expect($textErrors)->toHaveCount(1);
-        expect($textErrors[0])->toContain('File type not allowed');
-    });
-
-    it('validates file with wildcard type constraint', function () {
-        $imageFile = UploadedFile::fake()->image('image.jpg');
-        $rules = ['allowed_types' => ['image/*']];
-        
-        $errors = $this->service->validateFile($imageFile, $rules);
-        
-        expect($errors)->toBe([]);
-    });
-
-    it('validates file with extension constraint', function () {
-        $pdfFile = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
-        $rules = ['allowed_types' => ['.pdf', '.doc']];
-        
-        $errors = $this->service->validateFile($pdfFile, $rules);
-        
-        expect($errors)->toBe([]);
-    });
-
-    it('parses size strings correctly', function () {
-        expect($this->service->parseSize('100'))->toBe(100);
-        expect($this->service->parseSize('1k'))->toBe(1024);
-        expect($this->service->parseSize('2KB'))->toBe(2048);
-        expect($this->service->parseSize('1m'))->toBe(1024 * 1024);
-        expect($this->service->parseSize('5MB'))->toBe(5 * 1024 * 1024);
-        expect($this->service->parseSize('1g'))->toBe(1024 * 1024 * 1024);
-        expect($this->service->parseSize('2GB'))->toBe(2 * 1024 * 1024 * 1024);
-    });
-
-    it('generates temporary file URL correctly', function () {
-        $file = UploadedFile::fake()->image('url-test.jpg');
-        $result = $this->service->handleTemporaryUpload($file);
-        
-        $url = $this->service->getTemporaryFileUrl($result['id']);
-        
-        expect($url)->toContain('strata.file-upload.serve');
-        expect($url)->toContain($result['id']);
-    });
-
-    it('returns null for non-existent file URL', function () {
-        $url = $this->service->getTemporaryFileUrl('non-existent-id');
-        
-        expect($url)->toBeNull();
-    });
-
-    it('cleans up expired files correctly', function () {
-        // Create a file and manually set expired metadata
-        $file = UploadedFile::fake()->image('expired.jpg');
-        $result = $this->service->handleTemporaryUpload($file);
-        $fileId = $result['id'];
-        
-        // Manually set expired metadata
-        $metadata = Cache::get("file_upload.{$fileId}");
-        $metadata['cleanup_after'] = now()->subHours(2)->toISOString();
-        Cache::put("file_upload.{$fileId}", $metadata, now()->addHours(24));
-        
-        $cleanedFiles = $this->service->cleanupExpiredFiles();
-        
-        expect($cleanedFiles)->toContain($metadata['path']);
-        expect(Cache::get("file_upload.{$fileId}"))->toBeNull();
-    });
-
-    it('validates multiple rules simultaneously', function () {
-        $largeTextFile = UploadedFile::fake()->create('large.txt', 5120, 'text/plain'); // 5MB
-        
-        $rules = [
-            'max_size' => '2MB',
-            'allowed_types' => ['image/*']
-        ];
-        
-        $errors = $this->service->validateFile($largeTextFile, $rules);
-        
-        expect($errors)->toHaveCount(2);
-        expect($errors[0])->toContain('exceeds maximum allowed size');
-        expect($errors[1])->toContain('File type not allowed');
-    });
-
-    it('handles case insensitive extensions correctly', function () {
-        $upperCaseFile = UploadedFile::fake()->create('document.PDF', 100, 'application/pdf');
-        $rules = ['allowed_types' => ['.pdf']];
-        
-        $errors = $this->service->validateFile($upperCaseFile, $rules);
-        
-        expect($errors)->toBe([]);
+    describe('media library availability', function () {
+        it('checks for media library classes and interfaces', function () {
+            $available = $this->service->isMediaLibraryAvailable();
+            expect($available)->toBeBool();
+        });
     });
 });

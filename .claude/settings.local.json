@@ -1,6 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(for:*)",
+      "Bash(do sed -i 's/extends Component/extends FormComponent/g' \"$file\")",
+      "Bash(sed:*)",
+      "Bash(done)",
+      "Bash(do sed -i 's/extends Component/extends BaseComponent/g' \"$file\")"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "laravel-boost"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

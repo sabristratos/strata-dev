@@ -4,7 +4,7 @@
 
 <label 
     for="{{ $radioId }}" 
-    class="flex items-start gap-3 px-3 py-2 text-sm cursor-pointer rounded-[var(--radius-component-sm)] hover:bg-default transition-colors group"
+    class="flex items-start gap-3 px-3 py-2 text-sm cursor-pointer button-radius-sm hover:bg-default transition-colors group"
     {{ $attributes }}
 >
     <div class="flex items-center h-5">
@@ -14,7 +14,7 @@
             type="radio"
             value="{{ $value }}"
             @if($checked) checked @endif
-            class="h-4 w-4 text-primary border-default focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            class="h-4 w-4 text-primary border-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
     </div>
     

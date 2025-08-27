@@ -59,7 +59,7 @@
             class="w-full pointer-events-auto"
         >
             <div class="w-full">
-                <x-strata::card class="!p-4" style="border-radius: min(var(--radius-component), var(--radius-component-lg))">
+                <x-strata::card class="!p-4">
                     <div class="flex items-start gap-3">
                         {{-- Variant icons --}}
                         <div class="w-5 h-5 mt-0.5 shrink-0">

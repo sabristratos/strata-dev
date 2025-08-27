@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Strata\UI\View\Components\Form;
 
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\Component;
 
 /**
- * File upload component with multi-mode support for Livewire and Spatie Media Library integration.
+ * File upload component with drag-drop support and optional Spatie Media Library integration.
  */
 class FileUpload extends Component
 {
@@ -17,35 +16,78 @@ class FileUpload extends Component
         public ?string $name = null,
         public bool $multiple = false,
         public ?string $accept = null,
-        public ?int $maxFiles = null,
-        public ?string $maxSize = '10MB',
-        public string $mode = 'temporary', // 'temporary', 'direct', 'deferred'
-        public ?Model $model = null,
-        public ?string $collection = 'default',
-        public ?string $sessionKey = null,
-        public bool $dragDrop = true,
-        public bool $imagePreview = true,
+        public ?int $maxSize = null,
+        public ?string $collection = null,
+        public bool $mediaLibrary = false,
+        public bool $enableReordering = false,
+        public bool $showPreview = true,
         public bool $showProgress = true,
-        public ?string $validationRules = null,
         public ?string $placeholder = null,
+        public ?string $helpText = null,
+        public ?array $customProperties = null,
+        public ?array $manipulations = null,
+        public ?string $conversion = null,
+        public bool $responsiveImages = false,
+        public ?string $conversionsDisk = null,
+        public string $variant = 'default',
         public mixed $value = null
     ) {
-        // Generate unique session key for deferred mode if not provided
-        if ($this->mode === 'deferred' && !$this->sessionKey) {
-            $this->sessionKey = 'file-upload-' . uniqid();
+        // Set default accept types if not specified
+        if ($this->accept === null) {
+            $this->accept = 'image/*,application/pdf,.doc,.docx,.txt';
         }
 
-        // Set default placeholder text
-        if (!$this->placeholder) {
-            $this->placeholder = $this->multiple 
-                ? 'Drop files here or click to browse' 
+        // Set default max size (12MB) if not specified
+        if ($this->maxSize === null) {
+            $this->maxSize = 12288; // 12MB in KB
+        }
+
+        // Set default placeholder if not specified
+        if ($this->placeholder === null) {
+            $this->placeholder = $this->multiple
+                ? 'Drop files here or click to browse'
                 : 'Drop file here or click to browse';
         }
+    }
 
-        // Validate mode configuration
-        if ($this->mode === 'direct' && !$this->model) {
-            throw new \InvalidArgumentException('Direct mode requires a model instance.');
+    /**
+     * Get the maximum file size in a human-readable format.
+     */
+    public function getMaxSizeFormatted(): string
+    {
+        $bytes = $this->maxSize * 1024;
+
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2).' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2).' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2).' KB';
         }
+
+        return $bytes.' bytes';
+    }
+
+    /**
+     * Check if the model uses Spatie Media Library.
+     */
+    public function isMediaLibraryAvailable(): bool
+    {
+        return $this->mediaLibrary &&
+               interface_exists('\Spatie\MediaLibrary\HasMedia') &&
+               class_exists('\Spatie\MediaLibrary\MediaCollections\Models\Media');
+    }
+
+    /**
+     * Get the variant-specific CSS classes.
+     */
+    public function getVariantClasses(): string
+    {
+        return match ($this->variant) {
+            'compact' => 'border border-dashed border-border input-radius p-4',
+            'gallery' => 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4',
+            default => 'border-2 border-dashed border-border input-radius p-8'
+        };
     }
 
     /**
@@ -54,79 +96,5 @@ class FileUpload extends Component
     public function render(): View
     {
         return view('strata::components.form.file-upload');
-    }
-
-    /**
-     * Get the maximum file size in bytes.
-     */
-    public function getMaxSizeBytes(): int
-    {
-        $size = strtolower($this->maxSize);
-        $bytes = (int) $size;
-        
-        if (str_contains($size, 'k')) {
-            $bytes *= 1024;
-        } elseif (str_contains($size, 'm')) {
-            $bytes *= 1024 * 1024;
-        } elseif (str_contains($size, 'g')) {
-            $bytes *= 1024 * 1024 * 1024;
-        }
-        
-        return $bytes;
-    }
-
-    /**
-     * Get the accepted file types as an array.
-     */
-    public function getAcceptedTypes(): array
-    {
-        if (!$this->accept) {
-            return [];
-        }
-        
-        return array_map('trim', explode(',', $this->accept));
-    }
-
-    /**
-     * Check if the accepted types include images.
-     */
-    public function acceptsImages(): bool
-    {
-        if (!$this->accept) {
-            return true; // No restrictions means all types including images
-        }
-        
-        $types = $this->getAcceptedTypes();
-        
-        foreach ($types as $type) {
-            if (str_starts_with($type, 'image/') || $type === 'image/*') {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-
-    /**
-     * Get the configuration array for Alpine.js.
-     */
-    public function getAlpineConfig(): array
-    {
-        return [
-            'name' => $this->name,
-            'multiple' => $this->multiple,
-            'accept' => $this->accept,
-            'maxFiles' => $this->maxFiles,
-            'maxSize' => $this->getMaxSizeBytes(),
-            'mode' => $this->mode,
-            'modelId' => $this->model?->getKey(),
-            'modelType' => $this->model ? get_class($this->model) : null,
-            'collection' => $this->collection,
-            'sessionKey' => $this->sessionKey,
-            'dragDrop' => $this->dragDrop,
-            'imagePreview' => $this->imagePreview && $this->acceptsImages(),
-            'showProgress' => $this->showProgress,
-            'placeholder' => $this->placeholder,
-        ];
     }
 }

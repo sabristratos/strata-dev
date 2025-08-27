@@ -3,12 +3,12 @@
 
     $isIconOnly = $icon && empty(trim(strip_tags($slot)));
 
-    $baseClasses = 'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0';
+    $baseClasses = 'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0';
 
     $sizeClasses = match ($size) {
-        'sm' => 'h-8 rounded-md px-3 text-xs',
-        'lg' => 'h-10 rounded-md px-8',
-        default => 'h-9 px-4 py-2 rounded-md',
+        'sm' => 'h-8 button-radius-sm px-3 text-xs',
+        'lg' => 'h-10 button-radius-lg px-8',
+        default => 'h-9 px-4 py-2 button-radius',
     };
 
     $iconSizeClasses = match ($size) {
@@ -19,9 +19,9 @@
 
     if ($isIconOnly) {
         $layoutClasses = match ($size) {
-            'sm' => 'h-8 w-8 rounded-md',
-            'lg' => 'h-10 w-10 rounded-md',
-            default => 'h-9 w-9 rounded-md',
+            'sm' => 'h-8 w-8 button-radius-sm',
+            'lg' => 'h-10 w-10 button-radius-lg',
+            default => 'h-9 w-9 button-radius',
         };
     } else {
         $layoutClasses = $sizeClasses;

@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/vendor/strata-ui/strata-ui.js', function () {
-    $path = realpath(__DIR__ . '/../resources/dist/strata-ui.iife.js');
+    $path = realpath(__DIR__.'/../resources/dist/strata-ui.iife.js');
 
-    if (!$path || !file_exists($path)) {
+    if (! $path || ! file_exists($path)) {
         abort(404, 'Strata UI JavaScript bundle not found. Please run: cd packages/strata-ui && npm run build');
     }
 

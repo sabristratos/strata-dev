@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Strata UI improvement plan (development notes)
+/packages/strata-ui/IMPROVEMENT_PLAN.md

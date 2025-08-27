@@ -12,6 +12,6 @@ return [
     'clear' => 'Effacer',
 
     'days_short' => [
-        'Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'
+        'Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam',
     ],
 ];

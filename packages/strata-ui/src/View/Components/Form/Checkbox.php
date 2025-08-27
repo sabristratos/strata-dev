@@ -13,11 +13,11 @@ class Checkbox extends Component
         public string $name,
         public string $id,
         public mixed $value,
-        public string $label,
+        public ?string $label = null,
         public ?string $description = null,
+        public ?string $error = null,
         public bool $checked = false
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

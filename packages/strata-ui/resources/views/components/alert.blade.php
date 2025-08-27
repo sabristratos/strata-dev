@@ -1,5 +1,5 @@
 @php
-    $baseClasses = 'flex rounded-[var(--radius-component-lg)] shadow-xs';
+    $baseClasses = 'flex alert-radius shadow-xs';
     $role = match ($color) {
         'destructive' => 'alert',
         'warning' => 'alert', 

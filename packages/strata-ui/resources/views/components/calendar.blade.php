@@ -32,8 +32,8 @@
                     <button
                         x-on:click="setPreset(@js($label))"
                         type="button"
-                        class="px-3 py-1.5 text-left text-sm rounded-[var(--radius-component)] hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                        :class="{ 'bg-primary-50 dark:bg-primary-900/20 font-semibold text-primary-700 dark:text-primary-300': isPresetActive(@js($label)) }"
+                        class="px-3 py-1.5 text-left text-sm button-radius hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                        :class="{ 'bg-primary/10 font-semibold text-primary': isPresetActive(@js($label)) }"
                     >
                         {{ $label }}
                     </button>
@@ -47,7 +47,7 @@
             <button
                 x-on:click="prevMonths()"
                 type="button"
-                class="p-2 rounded-[var(--radius-component)] hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+                class="p-2 button-radius hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -57,7 +57,7 @@
             <button
                 x-on:click="nextMonths()"
                 type="button"
-                class="p-2 rounded-[var(--radius-component)] hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+                class="p-2 button-radius hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -80,16 +80,16 @@
                                 :class="{
                                     'text-secondary-400 dark:text-secondary-600': !day.isCurrentMonth,
                                     'text-primary': day.isCurrentMonth && !day.isStartDate && !day.isEndDate && !day.isInRange && !day.isDisabled,
-                                    'bg-primary-600 text-white font-semibold ring-2 ring-primary-200 dark:ring-primary-800': day.isStartDate && !day.isDisabled,
+                                    'bg-primary text-primary-foreground font-semibold ring-2 ring-primary/30': day.isStartDate && !day.isDisabled,
                                     'bg-primary-500 text-white font-semibold': day.isEndDate && !day.isDisabled,
                                     'bg-primary-100 dark:bg-primary-900/30': day.isInRange && !day.isDisabled,
-                                    'rounded-l-[var(--radius-component-sm)]': day.isStartDate && !day.isEndDate,
-                                    'rounded-r-[var(--radius-component-sm)]': day.isEndDate && !day.isStartDate,
-                                    'rounded-[var(--radius-component-sm)]': day.isStartDate && day.isEndDate,
-                                    'font-bold ring-2 ring-primary-300 dark:ring-primary-700 rounded-[var(--radius-component-sm)]': day.isToday && !day.isStartDate && !day.isEndDate && !day.isInRange && !this.selecting && !day.isDisabled,
-                                    'cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-[var(--radius-component-sm)]': day.isCurrentMonth && !day.isStartDate && !day.isEndDate && !day.isInRange && !this.selecting && !this.updating && !day.isDisabled,
-                                    'cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-800 rounded-[var(--radius-component-sm)]': day.isCurrentMonth && this.selecting && !day.isStartDate && !this.updating && !day.isDisabled,
-                                    'ring-2 ring-primary-400 dark:ring-primary-600 animate-pulse': (this.selecting && day.isStartDate) || (this.updating && (day.isStartDate || day.isEndDate)),
+                                    'button-radius-sm rounded-r-none': day.isStartDate && !day.isEndDate,
+                                    'button-radius-sm rounded-l-none': day.isEndDate && !day.isStartDate,
+                                    'button-radius-sm': day.isStartDate && day.isEndDate,
+                                    'font-bold ring-2 ring-primary/50 button-radius-sm': day.isToday && !day.isStartDate && !day.isEndDate && !day.isInRange && !this.selecting && !day.isDisabled,
+                                    'cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 button-radius-sm': day.isCurrentMonth && !day.isStartDate && !day.isEndDate && !day.isInRange && !this.selecting && !this.updating && !day.isDisabled,
+                                    'cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-800 button-radius-sm': day.isCurrentMonth && this.selecting && !day.isStartDate && !this.updating && !day.isDisabled,
+                                    'ring-2 ring-primary/60 animate-pulse': (this.selecting && day.isStartDate) || (this.updating && (day.isStartDate || day.isEndDate)),
                                     'opacity-50': !day.isCurrentMonth && (this.selecting || this.updating),
                                     'text-gray-300 dark:text-gray-600 cursor-not-allowed': day.isDisabled,
                                     'line-through': day.isDisabled,
@@ -127,7 +127,7 @@
                     <button
                         x-on:click="clearSelection()"
                         type="button"
-                        class="px-3 py-1.5 text-sm rounded-[var(--radius-component-sm)] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        class="px-3 py-1.5 text-sm button-radius-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
                         {{ trans('strata::calendar.clear', [], $locale) }}
                     </button>

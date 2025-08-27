@@ -27,7 +27,7 @@
             class="absolute z-50 {{ $width }}"
             style="display: none;"
         >
-            <div class="bg-popover text-popover-foreground rounded-lg shadow-lg border border-border">
+            <div class="bg-popover text-popover-foreground dropdown-radius shadow-lg border border-border">
                 {{ $slot }}
             </div>
         </div>

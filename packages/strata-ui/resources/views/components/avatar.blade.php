@@ -6,7 +6,7 @@
         : 'relative inline-flex overflow-hidden';
     
     $innerClasses = implode(' ', array_filter([
-        'relative inline-flex items-center justify-center bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-200 font-medium select-none',
+        'relative inline-flex items-center justify-center bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 font-medium select-none',
         $hasStatusIndicator ? 'overflow-hidden' : '',
         $getSizeClasses(),
         $getShapeClasses(),

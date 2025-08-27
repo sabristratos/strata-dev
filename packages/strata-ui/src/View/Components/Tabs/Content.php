@@ -15,8 +15,7 @@ class Content extends Component
     public function __construct(
         public string $value,
         public bool $forceMount = false
-    ) {
-    }
+    ) {}
 
     /**
      * Get the view / contents that represent the component.

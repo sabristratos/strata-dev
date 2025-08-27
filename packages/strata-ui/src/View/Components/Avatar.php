@@ -53,8 +53,8 @@ class Avatar extends Component
     public function getShapeClasses(): string
     {
         return match ($this->shape) {
-            'square' => 'rounded-[var(--radius-component)]',
-            'rounded' => 'rounded-[var(--radius-component-lg)]',
+            'square' => 'avatar-radius',
+            'rounded' => 'avatar-radius',
             default => 'rounded-full',
         };
     }

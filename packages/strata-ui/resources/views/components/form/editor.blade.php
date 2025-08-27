@@ -50,7 +50,7 @@
     x-init="init()"
     class="w-full"
 >
-    <div class="border border-muted rounded-md overflow-hidden bg-white dark:bg-gray-900">
+    <div class="border border-muted input-radius overflow-hidden bg-white dark:bg-gray-900">
         <div class="flex items-center gap-1 p-2 border-b border-muted bg-gray-50 dark:bg-gray-800">
             <x-strata::button 
                 variant="ghost" 
@@ -111,7 +111,7 @@
             @if($id) id="{{ $id }}" @endif
             x-ref="editor"
             @if($disabled ?? false) @else contenteditable="true" @endif
-            class="block w-full p-4 text-primary focus:outline-none focus:ring-0 bg-white dark:bg-gray-900 prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6"
+            class="block w-full p-4 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white dark:bg-gray-900 prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6"
             style="min-height: {{ $minHeight }}px; {{ $maxHeight ? 'max-height: ' . $maxHeight . 'px; overflow-y: auto;' : '' }}"
             @input="update"
             @if($placeholder) data-placeholder="{{ $placeholder }}" @endif
@@ -120,7 +120,7 @@
     </div>
     <input type="hidden" @if($name) name="{{ $name }}" @endif x-model="content">
     
-    <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800 border border-muted rounded-md">
+    <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800 border border-muted input-radius">
         <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Generated HTML:</div>
         <pre class="text-xs text-gray-600 dark:text-gray-400 whitespace-pre-wrap" x-text="content"></pre>
     </div>

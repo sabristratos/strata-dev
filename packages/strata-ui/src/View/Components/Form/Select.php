@@ -18,9 +18,12 @@ class Select extends Component
         public mixed $selected = null,
         public ?string $placeholder = 'Choose...',
         public ?string $name = null,
+        public ?string $id = null,
         public ?string $error = null,
-        public ?string $helpText = null,
+        public ?string $description = null,
+        public ?string $helpText = null, // Keep for backward compatibility
         public bool $disabled = false,
+        public bool $required = false,
         public bool $clearable = false,
         public bool $multiple = false,
         public int $maxSelections = 0,
@@ -28,6 +31,17 @@ class Select extends Component
         public int $searchThreshold = 10,
         public string $searchPlaceholder = 'Search...',
     ) {
+        // Backward compatibility for helpText
+        if (! $this->description && $this->helpText) {
+            $this->description = $this->helpText;
+        }
+
+        // Auto-generate ID if not provided
+        if (! $this->id && $this->name) {
+            $this->id = $this->name.'_'.uniqid();
+        } elseif (! $this->id) {
+            $this->id = 'select_'.uniqid();
+        }
     }
 
     /**
@@ -36,13 +50,5 @@ class Select extends Component
     public function render(): View
     {
         return view('strata::components.form.select');
-    }
-
-    /**
-     * Get the unique ID for this select component.
-     */
-    public function getId(): string
-    {
-        return 'select_' . uniqid();
     }
 }

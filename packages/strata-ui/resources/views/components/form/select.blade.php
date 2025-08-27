@@ -1,5 +1,5 @@
 @php
-    $selectId = $getId();
+    $selectId = $id;
     $itemCount = count($items);
     $initialSelected = $multiple ? (is_array($selected) ? $selected : []) : $selected;
     $isSearchable = $searchable || count($items) >= $searchThreshold;
@@ -10,7 +10,7 @@
     <div
         x-data="{
             open: false,
-            highlighted: {{ $multiple ? 0 : ($selected ?? 0) }},
+            highlighted: @js($multiple ? 0 : ($selected ?? 0)),
             count: {{ $itemCount }},
             multiple: {{ $multiple ? 'true' : 'false' }},
             maxSelections: {{ $maxSelections }},
@@ -91,16 +91,16 @@
             filterItems() {
                 if (!this.searchQuery.trim()) {
                     this.filteredItems = this.items;
-                    this.filteredIndices = Object.keys(this.items).map(Number);
+                    this.filteredIndices = Object.keys(this.items);
                 } else {
                     const query = this.searchQuery.toLowerCase();
                     this.filteredItems = [];
                     this.filteredIndices = [];
                     
-                    this.items.forEach((item, index) => {
-                        if (item.toLowerCase().includes(query)) {
-                            this.filteredItems.push(item);
-                            this.filteredIndices.push(index);
+                    Object.keys(this.items).forEach((key) => {
+                        if (this.items[key].toLowerCase().includes(query)) {
+                            this.filteredItems.push(this.items[key]);
+                            this.filteredIndices.push(key);
                         }
                     });
                 }
@@ -190,7 +190,7 @@
                 <template x-if="multiple && Array.isArray(value) && value.length > 0">
                     <div class="flex items-center gap-1 flex-nowrap min-w-0 overflow-hidden">
                         <template x-for="selectedIndex in getVisibleTags()" :key="selectedIndex">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/20 text-primary text-xs flex-shrink-0">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 button-radius-sm bg-primary/20 text-primary text-xs flex-shrink-0">
                                 <span x-text="items[selectedIndex]" class="truncate max-w-16"></span>
                                 <button 
                                     type="button" 
@@ -252,7 +252,7 @@
             class="absolute z-50 w-full mt-1"
             style="display: none;"
         >
-            <div class="bg-popover text-popover-foreground rounded-lg shadow-lg border border-border max-h-60 overflow-hidden flex flex-col">
+            <div class="bg-popover text-popover-foreground dropdown-radius shadow-lg border border-border max-h-60 overflow-hidden flex flex-col">
                 <!-- Search Input (when searchable) -->
                 <template x-if="searchable">
                     <div class="p-2 border-b border-border">
@@ -295,7 +295,7 @@
                                 x-on:click="multiple ? toggleSelection(filteredIndices[index]) : (value = filteredIndices[index], open = false, $refs.trigger.focus())"
                                 x-on:mouseover="highlighted = index"
                                 :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-popover-foreground'"
-                                class="w-full text-left px-3 py-2 text-sm cursor-pointer rounded-md transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
+                                class="w-full text-left px-3 py-2 text-sm cursor-pointer button-radius transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
                                 :disabled="multiple && maxSelections > 0 && !isSelected(filteredIndices[index]) && Array.isArray(value) && value.length >= maxSelections"
                             >
                                 <span x-text="item"></span>
@@ -312,24 +312,24 @@
                     <!-- Static Items (when not searchable) -->
                     <template x-if="!searchable">
                         <div>
-                            @foreach($items as $index => $item)
+                            <template x-for="(item, index) in Object.entries(items)" :key="index">
                                 <button
                                     type="button"
-                                    @click="multiple ? toggleSelection({{ $index }}) : (value = {{ $index }}, open = false, $refs.trigger.focus())"
-                                    @mouseover="highlighted = {{ $index }}"
-                                    :class="highlighted === {{ $index }} ? 'bg-accent text-accent-foreground' : 'text-popover-foreground'"
-                                    class="w-full text-left px-3 py-2 text-sm cursor-pointer rounded-md transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
-                                    :disabled="multiple && maxSelections > 0 && !isSelected({{ $index }}) && Array.isArray(value) && value.length >= maxSelections"
+                                    x-on:click="multiple ? toggleSelection(item[0]) : (value = item[0], open = false, $refs.trigger.focus())"
+                                    x-on:mouseover="highlighted = index"
+                                    :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-popover-foreground'"
+                                    class="w-full text-left px-3 py-2 text-sm cursor-pointer button-radius transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
+                                    :disabled="multiple && maxSelections > 0 && !isSelected(item[0]) && Array.isArray(value) && value.length >= maxSelections"
                                 >
-                                    <span>{{ $item }}</span>
+                                    <span x-text="item[1]"></span>
                                     <x-icon
-                                        x-show="isSelected({{ $index }})"
+                                        x-show="isSelected(item[0])"
                                         name="heroicon-o-check"
-                                        :class="highlighted === {{ $index }} ? 'text-accent-foreground' : 'text-primary'"
+                                        :class="highlighted === index ? 'text-accent-foreground' : 'text-primary'"
                                         class="h-5 w-5"
                                     />
                                 </button>
-                            @endforeach
+                            </template>
                         </div>
                     </template>
                 </div>

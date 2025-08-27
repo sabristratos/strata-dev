@@ -13,22 +13,26 @@ use Strata\UI\ValueObjects\DateRange;
 class Calendar extends Component
 {
     public Carbon $initialDate;
+
     public ?Carbon $startDate;
+
     public ?Carbon $endDate;
+
     public array $presets;
+
     public string $locale;
 
     public function __construct(
         public mixed $value = null,
-        string $initialDate = null,
-        string $startDate = null,
-        string $endDate = null,
+        ?string $initialDate = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
         public string $weekStart = 'sunday',
         public bool $range = true,
         public bool $multiple = true,
         public int $visibleMonths = 2,
         bool $presets = true,
-        string $locale = null,
+        ?string $locale = null,
         public bool $selecting = false,
         public bool $updating = false,
         public ?string $minDate = null,
@@ -58,7 +62,7 @@ class Calendar extends Component
         $this->locale = $locale ?? App::getLocale();
         $this->presets = $presets ? $this->getTranslatedPresets() : [];
     }
-    
+
     public function render(): View
     {
         return view('strata::components.calendar');
@@ -71,6 +75,7 @@ class Calendar extends Component
             $sunday = array_shift($days);
             $days[] = $sunday;
         }
+
         return $days;
     }
 

@@ -2,106 +2,113 @@
 
 declare(strict_types=1);
 
-use Illuminate\View\ComponentAttributeBag;
 use Strata\UI\View\Components\Form\FileUpload;
 
 describe('FileUpload Component', function () {
-    it('can be instantiated with default props', function () {
-        $component = new FileUpload();
-        
-        expect($component->name)->toBeNull()
-        ->and($component->accept)->toBeNull()
-        ->and($component->multiple)->toBeFalse()
-        ->and($component->maxSize)->toBe('10MB')
-        ->and($component->maxFiles)->toBeNull()
-        ->and($component->mode)->toBe('temporary')
-        ->and($component->imagePreview)->toBeTrue()
-        ->and($component->showProgress)->toBeTrue()
-        ->and($component->collection)->toBe('default')
-        ->and($component->sessionKey)->toBeNull()
-        ->and($component->validationRules)->toBeNull()
-        ->and($component->dragDrop)->toBeTrue();
+    it('creates component with default values', function () {
+        $component = new FileUpload;
+
+        expect($component->multiple)->toBeFalse()
+            ->and($component->accept)->toBe('image/*,application/pdf,.doc,.docx,.txt')
+            ->and($component->maxSize)->toBe(12288)
+            ->and($component->mediaLibrary)->toBeFalse()
+            ->and($component->showPreview)->toBeTrue()
+            ->and($component->variant)->toBe('default');
     });
 
-    it('can be instantiated with custom props', function () {
+    it('creates component with custom values', function () {
         $component = new FileUpload(
-            name: 'test-upload',
-            accept: 'image/*',
+            name: 'attachments',
             multiple: true,
-            maxSize: '5MB',
-            maxFiles: 10,
-            mode: 'temporary',
-            imagePreview: true,
-            showProgress: false,
-            placeholder: 'Upload files here',
-            collection: 'images',
-            sessionKey: 'test-session'
+            accept: 'image/*',
+            maxSize: 5120,
+            mediaLibrary: true,
+            variant: 'gallery'
         );
-        
-        expect($component->name)->toBe('test-upload')
-        ->and($component->accept)->toBe('image/*')
-        ->and($component->multiple)->toBeTrue()
-        ->and($component->maxSize)->toBe('5MB')
-        ->and($component->maxFiles)->toBe(10)
-        ->and($component->mode)->toBe('temporary')
-        ->and($component->imagePreview)->toBeTrue()
-        ->and($component->showProgress)->toBeFalse()
-        ->and($component->placeholder)->toBe('Upload files here')
-        ->and($component->collection)->toBe('images')
-        ->and($component->sessionKey)->toBe('test-session');
+
+        expect($component->name)->toBe('attachments')
+            ->and($component->multiple)->toBeTrue()
+            ->and($component->accept)->toBe('image/*')
+            ->and($component->maxSize)->toBe(5120)
+            ->and($component->mediaLibrary)->toBeTrue()
+            ->and($component->variant)->toBe('gallery');
     });
 
-    it('generates correct Alpine.js configuration', function () {
-        $component = new FileUpload(
-            name: 'test',
-            mode: 'deferred',
-            maxFiles: 5
-        );
-        
-        $config = $component->getAlpineConfig();
-        
-        expect($config)->toBeArray()
-        ->and($config['name'])->toBe('test')
-        ->and($config['mode'])->toBe('deferred')
-        ->and($config['maxFiles'])->toBe(5);
+    it('formats max size correctly', function () {
+        $component = new FileUpload(maxSize: 1024);
+        expect($component->getMaxSizeFormatted())->toBe('1.00 MB');
+
+        $component = new FileUpload(maxSize: 1536);
+        expect($component->getMaxSizeFormatted())->toBe('1.50 MB');
+
+        $component = new FileUpload(maxSize: 1048576);
+        expect($component->getMaxSizeFormatted())->toBe('1.00 GB');
+
+        $component = new FileUpload(maxSize: 512);
+        expect($component->getMaxSizeFormatted())->toBe('512.00 KB');
     });
 
-    it('parses file size correctly', function () {
-        $component = new FileUpload();
-        
-        $sizeBytes = $component->getMaxSizeBytes();
-        expect($sizeBytes)->toBe(10 * 1024 * 1024); // 10MB default
-    });
-
-    it('gets accepted types correctly', function () {
-        $imageComponent = new FileUpload(accept: 'image/*,.pdf,.doc');
-        
-        $types = $imageComponent->getAcceptedTypes();
-        expect($types)->toBe(['image/*', '.pdf', '.doc']);
-    });
-
-    it('checks if accepts images correctly', function () {
-        $imageComponent = new FileUpload(accept: 'image/*');
-        $documentComponent = new FileUpload(accept: '.pdf');
-        $allTypesComponent = new FileUpload();
-        
-        expect($imageComponent->acceptsImages())->toBeTrue()
-        ->and($documentComponent->acceptsImages())->toBeFalse()
-        ->and($allTypesComponent->acceptsImages())->toBeTrue(); // No restrictions means all types
-    });
-
-    it('sets default placeholder text correctly', function () {
+    it('sets default placeholder based on multiple setting', function () {
         $singleComponent = new FileUpload(multiple: false);
+        expect($singleComponent->placeholder)->toBe('Drop file here or click to browse');
+
         $multipleComponent = new FileUpload(multiple: true);
-        
-        expect($singleComponent->placeholder)->toBe('Drop file here or click to browse')
-        ->and($multipleComponent->placeholder)->toBe('Drop files here or click to browse');
+        expect($multipleComponent->placeholder)->toBe('Drop files here or click to browse');
     });
 
-    it('generates session key for deferred mode', function () {
-        $deferredComponent = new FileUpload(mode: 'deferred');
-        
-        expect($deferredComponent->sessionKey)->not->toBeNull()
-        ->and($deferredComponent->sessionKey)->toStartWith('file-upload-');
+    it('uses custom placeholder when provided', function () {
+        $component = new FileUpload(
+            multiple: true,
+            placeholder: 'Custom upload message'
+        );
+
+        expect($component->placeholder)->toBe('Custom upload message');
+    });
+
+    it('checks media library availability', function () {
+        $component = new FileUpload(mediaLibrary: true);
+
+        // This will depend on whether Spatie Media Library is installed
+        // In a real environment, this would check for the interface and class existence
+        expect($component->isMediaLibraryAvailable())->toBeBool();
+    });
+
+    it('returns correct variant classes', function () {
+        $defaultComponent = new FileUpload(variant: 'default');
+        expect($defaultComponent->getVariantClasses())
+            ->toBe('border-2 border-dashed border-border input-radius p-8');
+
+        $compactComponent = new FileUpload(variant: 'compact');
+        expect($compactComponent->getVariantClasses())
+            ->toBe('border border-dashed border-border input-radius p-4');
+
+        $galleryComponent = new FileUpload(variant: 'gallery');
+        expect($galleryComponent->getVariantClasses())
+            ->toBe('grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4');
+    });
+
+    it('renders correct view', function () {
+        $component = new FileUpload;
+        $view = $component->render();
+
+        expect($view->name())->toBe('strata::components.form.file-upload');
+    });
+
+    it('handles optional properties correctly', function () {
+        $component = new FileUpload(
+            collection: 'avatars',
+            customProperties: ['alt' => 'User avatar'],
+            manipulations: ['thumb' => ['width' => 150]],
+            conversion: 'thumb',
+            responsiveImages: true,
+            conversionsDisk: 's3'
+        );
+
+        expect($component->collection)->toBe('avatars')
+            ->and($component->customProperties)->toBe(['alt' => 'User avatar'])
+            ->and($component->manipulations)->toBe(['thumb' => ['width' => 150]])
+            ->and($component->conversion)->toBe('thumb')
+            ->and($component->responsiveImages)->toBeTrue()
+            ->and($component->conversionsDisk)->toBe('s3');
     });
 });

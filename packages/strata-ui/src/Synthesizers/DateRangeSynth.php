@@ -27,11 +27,11 @@ class DateRangeSynth extends Synth
         if ($value === null) {
             return null;
         }
-        
+
         if ($value instanceof DateRange) {
             return $value;
         }
-        
+
         return DateRange::fromArray($value);
     }
 
@@ -54,7 +54,7 @@ class DateRangeSynth extends Synth
     public function get(&$target, $key)
     {
         // Return the property value from the DateRange object
-        return match($key) {
+        return match ($key) {
             'start' => $target->start->toDateString(),
             'end' => $target->end->toDateString(),
             default => $target->$key ?? null,

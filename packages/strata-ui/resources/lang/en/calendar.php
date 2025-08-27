@@ -12,6 +12,6 @@ return [
     'clear' => 'Clear',
 
     'days_short' => [
-        'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+        'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
     ],
 ];

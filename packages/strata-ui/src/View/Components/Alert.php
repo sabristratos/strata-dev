@@ -54,10 +54,10 @@ class Alert extends Component
             default => match ($this->color) {
                 'accent' => 'bg-accent text-accent-foreground border border-transparent',
                 'destructive' => 'bg-destructive text-destructive-foreground border border-transparent',
-                'success' => 'bg-teal-500 text-foreground border border-transparent',
-                'warning' => 'bg-yellow-500 text-foreground border border-transparent',
+                'success' => 'bg-teal-500 text-white border border-transparent',
+                'warning' => 'bg-yellow-500/20 text-yellow-800 dark:text-yellow-200 border border-transparent',
                 'primary' => 'bg-primary text-primary-foreground border border-transparent',
-                default => 'bg-indigo-500 text-foreground border border-transparent',
+                default => 'bg-indigo-500 text-white border border-transparent',
             },
         };
     }

@@ -15,8 +15,8 @@ class Card extends Component
     /**
      * Create a new component instance.
      *
-     * @param string $size The card size (sm, md, lg)
-     * @param string $border The border style (none, default, primary, accent)
+     * @param  string  $size  The card size (sm, md, lg)
+     * @param  string  $border  The border style (none, default, primary, accent)
      */
     public function __construct(
         public string $size = 'md',

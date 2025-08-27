@@ -3,6 +3,6 @@
     $classes = implode(' ', [$baseClasses, $getSizeClasses(), $getBorderClasses()]);
 @endphp
 
-<div {{ $attributes->merge(['class' => $classes . ' rounded-lg']) }}>
+<div {{ $attributes->merge(['class' => $classes . ' card-radius']) }}>
     {{ $slot }}
 </div>

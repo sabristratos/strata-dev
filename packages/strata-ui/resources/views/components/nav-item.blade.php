@@ -6,7 +6,7 @@
 
 @php
     $tag = $href ? 'a' : 'button';
-    $baseClasses = 'flex items-center w-full gap-x-3 px-3 py-2 text-left rounded-[var(--radius-component)] transition-colors text-secondary';
+    $baseClasses = 'flex items-center w-full gap-x-3 px-3 py-2 text-left button-radius transition-colors text-foreground';
     $activeClasses = $active
         ? 'bg-primary/10 text-primary font-semibold'
         : 'hover:bg-default';

@@ -15,13 +15,13 @@ class Button extends Component
     /**
      * Create a new component instance.
      *
-     * @param string $variant The button variant (primary, accent, destructive, outline, secondary, ghost)
-     * @param string $size The button size (sm, md, lg)
-     * @param string $type The button type attribute
-     * @param bool $disabled Whether the button is disabled
-     * @param bool $loading Whether the button is in loading state
-     * @param string|null $icon The icon name to display
-     * @param string $iconPosition The position of the icon (left, right)
+     * @param  string  $variant  The button variant (primary, accent, destructive, outline, secondary, ghost)
+     * @param  string  $size  The button size (sm, md, lg)
+     * @param  string  $type  The button type attribute
+     * @param  bool  $disabled  Whether the button is disabled
+     * @param  bool  $loading  Whether the button is in loading state
+     * @param  string|null  $icon  The icon name to display
+     * @param  string  $iconPosition  The position of the icon (left, right)
      */
     public function __construct(
         public string $variant = 'primary',
@@ -31,8 +31,8 @@ class Button extends Component
         public bool $loading = false,
         public ?string $icon = null,
         public string $iconPosition = 'left',
-    ) {
-    }
+        public mixed $badge = null,
+    ) {}
 
     /**
      * Get the view / contents that represent the component.

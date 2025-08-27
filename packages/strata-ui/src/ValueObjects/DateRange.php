@@ -16,10 +16,10 @@ class DateRange implements Arrayable
 
     public static function fromArray(array $data): self
     {
-        if (!isset($data['start']) || !isset($data['end'])) {
+        if (! isset($data['start']) || ! isset($data['end'])) {
             throw new \InvalidArgumentException('DateRange array must contain both "start" and "end" keys');
         }
-        
+
         return new self(
             Carbon::parse($data['start']),
             Carbon::parse($data['end'])
