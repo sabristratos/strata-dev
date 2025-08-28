@@ -2,7 +2,7 @@
     $hasError = !empty($error);
 @endphp
 
-<div class="space-y-1">
+<div class="flex flex-col gap-1">
     <div 
         x-data="{
             value: @if($attributes->wire('model')) @entangle($attributes->wire('model')) @else {{ $checked ? 'true' : 'false' }} @endif,
@@ -16,7 +16,7 @@
                 this.$refs.hiddenInput.checked = this.isOn;
             }
         }" 
-        class="flex items-center space-x-3"
+        class="flex items-center gap-3"
     >
     @if($name && !$attributes->wire('model'))
         <input type="hidden" name="{{ $name }}" value="0">
@@ -51,7 +51,7 @@
     </button>
 
     @if($label || $description)
-        <div class="flex flex-col space-y-1">
+        <div class="flex flex-col items-start gap-1">
             @if($label)
                 <x-strata::form.label 
                     id="{{ $id }}-label"

@@ -97,8 +97,55 @@
                         <x-strata::button icon="heroicon-o-arrow-right" iconPosition="right">Icon Right</x-strata::button>
                         <x-strata::button loading>Loading...</x-strata::button>
                         <x-strata::button disabled>Disabled</x-strata::button>
-                        <x-strata::button badge="3">Messages</x-strata::button>
                     </div>
+                    <div class="space-y-3">
+                        <h4 class="font-medium">Buttons with Badges (Slot-based)</h4>
+                        <div class="flex flex-wrap gap-3">
+                            <x-strata::button>
+                                Messages
+                                <x-slot:badge>
+                                    <x-strata::badge size="sm" color="destructive">3</x-strata::badge>
+                                </x-slot:badge>
+                            </x-strata::button>
+                            <x-strata::button variant="outline">
+                                Notifications
+                                <x-slot:badge>
+                                    <x-strata::badge size="sm" color="primary" shape="square">12</x-strata::badge>
+                                </x-slot:badge>
+                            </x-strata::button>
+                            <x-strata::button variant="secondary" size="sm">
+                                Cart
+                                <x-slot:badge>
+                                    <x-strata::badge size="sm" color="accent">99+</x-strata::badge>
+                                </x-slot:badge>
+                            </x-strata::button>
+                            <x-strata::button variant="ghost" icon="heroicon-o-bell">
+                                Alerts
+                                <x-slot:badge>
+                                    <x-strata::badge size="sm" color="warning">!</x-strata::badge>
+                                </x-slot:badge>
+                            </x-strata::button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Toast Testing --}}
+            <div class="space-y-4">
+                <h3 class="text-xl font-semibold">Toast Notifications</h3>
+                <div class="flex flex-wrap gap-3">
+                    <x-strata::button wire:click="showToast('success')" variant="outline" color="success">
+                        Success Toast
+                    </x-strata::button>
+                    <x-strata::button wire:click="showToast('error')" variant="outline" color="destructive">
+                        Error Toast
+                    </x-strata::button>
+                    <x-strata::button wire:click="showToast('warning')" variant="outline" color="warning">
+                        Warning Toast
+                    </x-strata::button>
+                    <x-strata::button wire:click="showToast('info')" variant="outline" color="info">
+                        Info Toast
+                    </x-strata::button>
                 </div>
             </div>
 
@@ -201,6 +248,14 @@
                         rows="4"
                         autoResize
                         description="This textarea will automatically resize as you type."
+                    />
+
+                    <x-strata::form.editor
+                        name="content"
+                        label="Rich Text Content"
+                        placeholder="Start typing your content here..."
+                        :minHeight="200"
+                        description="Rich text editor with formatting capabilities"
                     />
 
                     <x-strata::form.select
@@ -312,7 +367,7 @@
             {{-- Tabs --}}
             <div class="space-y-6">
                 <h3 class="text-xl font-semibold">Tabs</h3>
-                
+
                 {{-- Default Tabs --}}
                 <x-strata::tabs defaultValue="overview" class="max-w-4xl">
                     <x-strata::tabs.list>
@@ -418,11 +473,11 @@
                     <x-strata::modal.trigger name="basic-modal">
                         <x-strata::button>Basic Modal</x-strata::button>
                     </x-strata::modal.trigger>
-                    
+
                     <x-strata::modal.trigger name="large-modal">
                         <x-strata::button variant="accent">Large Modal</x-strata::button>
                     </x-strata::modal.trigger>
-                    
+
                     <x-strata::modal.trigger name="flyout-modal">
                         <x-strata::button variant="outline">Right Flyout</x-strata::button>
                     </x-strata::modal.trigger>
@@ -483,8 +538,7 @@
                             <x-strata::button variant="outline">Dropdown Menu</x-strata::button>
                         </x-slot>
                         <div class="py-1">
-                            <a href="#" class="block px-4 py-2 hover:bg-muted">Profile</a>
-                            <a href="#" class="block px-4 py-2 hover:bg-muted">Settings</a>
+                            <x-strata::nav-item icon="heroicon-o-user">Profile</x-strata::nav-item>
                             <x-strata::dropdown.separator />
                             <x-strata::dropdown.checkbox name="notifications" value="1" label="Notifications" />
                             <x-strata::dropdown.radio name="theme" value="dark" label="Dark Mode" />
@@ -510,8 +564,8 @@
             {{-- Calendar --}}
             <div class="space-y-4">
                 <h3 class="text-xl font-semibold">Calendar</h3>
-                <div class="max-w-2xl">
-                    <x-strata::calendar 
+                <div class="max-w-4xl">
+                    <x-strata::calendar
                         :range="true"
                         :presets="true"
                         :showClearButton="true"
@@ -705,6 +759,4 @@
         </div>
     </x-strata::modal>
 
-    {{-- Toast Container --}}
-    <x-strata::toast-container />
 </div>

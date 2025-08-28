@@ -58,8 +58,8 @@
 </{{ $tag }}>
 
 @isset($badge)
-    <div class="absolute -top-1 -right-1 z-10 transform">
-        {!! $badge !!}
+    <div class="absolute -top-2 -right-2 z-10">
+        {{ $badge }}
     </div>
 </div>
 @endisset

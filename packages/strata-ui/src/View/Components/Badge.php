@@ -52,12 +52,12 @@ class Badge extends Component
                 default => 'bg-primary/20 text-primary border-0',
             },
             default => match ($this->color) {
-                'accent' => 'bg-accent text-accent-foreground border-0',
-                'destructive' => 'bg-destructive text-destructive-foreground border-0',
-                'success' => 'bg-teal-500 text-foreground border-0',
-                'warning' => 'bg-yellow-500 text-foreground border-0',
-                'info' => 'bg-indigo-500 text-foreground border-0',
-                default => 'bg-primary text-primary-foreground border-0',
+                'accent' => 'bg-accent text-white border-0',
+                'destructive' => 'bg-destructive text-white border-0',
+                'success' => 'bg-teal-500 text-white border-0',
+                'warning' => 'bg-yellow-500 text-white border-0',
+                'info' => 'bg-indigo-500 text-white border-0',
+                default => 'bg-primary text-white border-0',
             },
         };
     }

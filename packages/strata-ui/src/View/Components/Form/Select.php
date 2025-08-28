@@ -30,6 +30,7 @@ class Select extends Component
         public bool $searchable = false,
         public int $searchThreshold = 10,
         public string $searchPlaceholder = 'Search...',
+        public string $variant = 'default',
     ) {
         // Backward compatibility for helpText
         if (! $this->description && $this->helpText) {
@@ -50,5 +51,16 @@ class Select extends Component
     public function render(): View
     {
         return view('strata::components.form.select');
+    }
+
+    /**
+     * Get the CSS classes for the select variant.
+     */
+    public function getVariantClasses(): string
+    {
+        return match ($this->variant) {
+            'minimal' => 'select-minimal',
+            default => 'input-base h-9',
+        };
     }
 }

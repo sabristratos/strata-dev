@@ -290,7 +290,7 @@
 
     /* Links */
     a {
-        @apply text-accent font-medium no-underline hover:underline underline-offset-4;
+        @apply text-accent font-medium no-underline underline-offset-4;
     }
 
     /* Lists */
@@ -348,6 +348,15 @@
     @apply disabled:cursor-not-allowed;
 }
 
+/* Remove padding when input has prefixes or postfixes to prevent double padding */
+.input-base:has(> :first-child:not(input)) .input-element {
+    @apply pl-0;
+}
+
+.input-base:has(> :last-child:not(input)) .input-element {
+    @apply pr-0;
+}
+
 /* Error state and focus states for input-base */
 @layer components {
     .input-base.border-destructive {
@@ -369,6 +378,86 @@
     /* Reduced motion for accessibility */
     @media (prefers-reduced-motion: reduce) {
         .input-base {
+            @apply transition-none;
+        }
+    }
+}
+
+@utility select-minimal {
+    @apply bg-transparent border-0 text-sm text-foreground placeholder:text-muted-foreground;
+    @apply focus:outline-none focus:ring-0 focus:bg-transparent;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+    @apply py-1 transition-colors duration-200;
+}
+
+/* ----------------------------------------- */
+/* Button Components Focus States           */
+/* ----------------------------------------- */
+@layer components {
+    /* Variant-specific button focus states - each variant uses its own color */
+    
+    /* Primary variant (default) */
+    button:focus:not([class*="bg-accent"]):not([class*="bg-destructive"]):not([class*="bg-secondary"]):not([class*="border-border"]):not([class*="hover:bg-accent"]),
+    button:focus-visible:not([class*="bg-accent"]):not([class*="bg-destructive"]):not([class*="bg-secondary"]):not([class*="border-border"]):not([class*="hover:bg-accent"]),
+    a[role="button"]:focus:not([class*="bg-accent"]):not([class*="bg-destructive"]):not([class*="bg-secondary"]):not([class*="border-border"]):not([class*="hover:bg-accent"]),
+    a[role="button"]:focus-visible:not([class*="bg-accent"]):not([class*="bg-destructive"]):not([class*="bg-secondary"]):not([class*="border-border"]):not([class*="hover:bg-accent"]) {
+        @apply ring-2 ring-primary/50 ring-offset-2;
+    }
+    
+    /* Accent variant */
+    button[class*="bg-accent"]:focus,
+    button[class*="bg-accent"]:focus-visible,
+    a[role="button"][class*="bg-accent"]:focus,
+    a[role="button"][class*="bg-accent"]:focus-visible {
+        @apply ring-2 ring-accent/50 ring-offset-2;
+    }
+    
+    /* Destructive variant */
+    button[class*="bg-destructive"]:focus,
+    button[class*="bg-destructive"]:focus-visible,
+    a[role="button"][class*="bg-destructive"]:focus,
+    a[role="button"][class*="bg-destructive"]:focus-visible {
+        @apply ring-2 ring-destructive/50 ring-offset-2;
+    }
+    
+    /* Secondary variant */
+    button[class*="bg-secondary"]:focus,
+    button[class*="bg-secondary"]:focus-visible,
+    a[role="button"][class*="bg-secondary"]:focus,
+    a[role="button"][class*="bg-secondary"]:focus-visible {
+        @apply ring-2 ring-secondary/50 ring-offset-2;
+    }
+    
+    /* Outline variant */
+    button[class*="border-border"]:focus,
+    button[class*="border-border"]:focus-visible,
+    a[role="button"][class*="border-border"]:focus,
+    a[role="button"][class*="border-border"]:focus-visible {
+        @apply ring-2 ring-border/50 ring-offset-2;
+    }
+    
+    /* Ghost variant (uses neutral color) */
+    button[class*="hover:bg-accent"]:not([class*="bg-accent"]):focus,
+    button[class*="hover:bg-accent"]:not([class*="bg-accent"]):focus-visible,
+    a[role="button"][class*="hover:bg-accent"]:not([class*="bg-accent"]):focus,
+    a[role="button"][class*="hover:bg-accent"]:not([class*="bg-accent"]):focus-visible {
+        @apply ring-2 ring-muted/50 ring-offset-2;
+    }
+    
+    /* High contrast focus for better accessibility */
+    @media (prefers-contrast: high) {
+        button:focus,
+        button:focus-visible,
+        a[role="button"]:focus,
+        a[role="button"]:focus-visible {
+            @apply ring-4;
+        }
+    }
+    
+    /* Reduced motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+        button,
+        a[role="button"] {
             @apply transition-none;
         }
     }

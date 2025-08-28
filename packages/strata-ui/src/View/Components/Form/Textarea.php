@@ -47,7 +47,7 @@ class Textarea extends Component
      */
     public function getTextareaClasses(): string
     {
-        $classes = ['input-base', 'min-h-20'];
+        $classes = ['input-base', 'min-h-20', 'px-3'];
 
         // Add error state styling using theme tokens
         if ($this->error) {

@@ -183,13 +183,13 @@
             type="button"
             :disabled="@json($disabled)"
             {{ $attributes->except(['wire:model']) }}
-            class="input-base h-9 flex items-center justify-between pl-3"
+            class="{{ $getVariantClasses() }} flex items-center justify-between {{ $variant === 'minimal' ? '' : 'pl-3' }}"
             :class="@json($clearable) && hasSelection() ? 'pr-16' : 'pr-10'"
         >
             <div class="flex items-center gap-1 flex-1 min-w-0">
                 <template x-if="multiple && Array.isArray(value) && value.length > 0">
                     <div class="flex items-center gap-1 flex-nowrap min-w-0 overflow-hidden">
-                        <template x-for="selectedIndex in getVisibleTags()" :key="selectedIndex">
+                        <template x-for="selectedIndex in getVisibleTags()" :key="'tag-' + selectedIndex">
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 button-radius-sm bg-primary/20 text-primary text-xs flex-shrink-0">
                                 <span x-text="items[selectedIndex]" class="truncate max-w-16"></span>
                                 <button 
@@ -289,12 +289,12 @@
 
                     <!-- Filtered Items (when searchable) -->
                     <template x-if="searchable">
-                        <template x-for="(item, index) in filteredItems" :key="filteredIndices[index]">
+                        <template x-for="(item, index) in filteredItems" :key="'filtered-' + (filteredIndices[index] || index) + '-' + item">
                             <button
                                 type="button"
                                 x-on:click="multiple ? toggleSelection(filteredIndices[index]) : (value = filteredIndices[index], open = false, $refs.trigger.focus())"
                                 x-on:mouseover="highlighted = index"
-                                :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-popover-foreground'"
+                                :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-foreground'"
                                 class="w-full text-left px-3 py-2 text-sm cursor-pointer button-radius transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
                                 :disabled="multiple && maxSelections > 0 && !isSelected(filteredIndices[index]) && Array.isArray(value) && value.length >= maxSelections"
                             >
@@ -312,12 +312,12 @@
                     <!-- Static Items (when not searchable) -->
                     <template x-if="!searchable">
                         <div>
-                            <template x-for="(item, index) in Object.entries(items)" :key="index">
+                            <template x-for="(item, index) in Object.entries(items)" :key="'item-' + item[0] + '-' + index">
                                 <button
                                     type="button"
                                     x-on:click="multiple ? toggleSelection(item[0]) : (value = item[0], open = false, $refs.trigger.focus())"
                                     x-on:mouseover="highlighted = index"
-                                    :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-popover-foreground'"
+                                    :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-foreground'"
                                     class="w-full text-left px-3 py-2 text-sm cursor-pointer button-radius transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
                                     :disabled="multiple && maxSelections > 0 && !isSelected(item[0]) && Array.isArray(value) && value.length >= maxSelections"
                                 >
@@ -339,7 +339,7 @@
         @if($name)
             <template x-if="multiple">
                 <div>
-                    <template x-for="(selectedValue, index) in Array.isArray(value) ? value : []" :key="index">
+                    <template x-for="(selectedValue, index) in Array.isArray(value) ? value : []" :key="'hidden-' + selectedValue + '-' + index">
                         <input type="hidden" :name="'{{ $name }}[' + index + ']'" :value="selectedValue" />
                     </template>
                 </div>

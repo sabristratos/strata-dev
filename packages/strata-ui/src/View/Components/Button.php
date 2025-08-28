@@ -31,7 +31,6 @@ class Button extends Component
         public bool $loading = false,
         public ?string $icon = null,
         public string $iconPosition = 'left',
-        public mixed $badge = null,
     ) {}
 
     /**

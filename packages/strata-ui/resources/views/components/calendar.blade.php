@@ -26,14 +26,14 @@
     <div class="flex flex-col md:flex-row flex-1">
         @if (!empty($presets))
         <div class="shrink-0 w-full md:w-48 p-4 border-b md:border-b-0 md:border-r border-border">
-            <h4 class="text-base font-semibold mb-3 text-primary">{{ trans('strata::calendar.presets', [], $locale) }}</h4>
+            <h4 class="text-base font-semibold mb-3 text-foreground">{{ trans('strata::calendar.presets', [], $locale) }}</h4>
             <div class="flex flex-col space-y-1">
                 @foreach ($presets as $label => $dates)
                     <button
                         x-on:click="setPreset(@js($label))"
                         type="button"
                         class="px-3 py-1.5 text-left text-sm button-radius hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                        :class="{ 'bg-primary/10 font-semibold text-primary': isPresetActive(@js($label)) }"
+                        :class="{ 'bg-primary/10 font-semibold text-foreground': isPresetActive(@js($label)) }"
                     >
                         {{ $label }}
                     </button>
@@ -53,7 +53,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
-            <div class="grow text-lg font-semibold text-center text-primary" x-text="headerText"></div>
+            <div class="grow text-lg font-semibold text-center text-foreground" x-text="headerText"></div>
             <button
                 x-on:click="nextMonths()"
                 type="button"
@@ -65,27 +65,28 @@
             </button>
         </div>
 
-        <div class="grid gap-6" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))">
-            <template x-for="(monthData, index) in months" :key="index">
+        <div class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))">
+            <template x-for="(monthData, index) in months" :key="'month-' + index + '-' + monthData.monthYear">
                 <div class="w-full">
-                    <h5 class="font-semibold text-center mb-2 text-primary" x-text="monthData.monthYear" x-show="$data.config.monthsToShow > 1"></h5>
-                    <div class="grid grid-cols-7 gap-1 text-center">
+                    <h5 class="font-semibold text-center mb-2 text-foreground" x-text="monthData.monthYear" x-show="$data.config.monthsToShow > 1"></h5>
+                    <div class="grid grid-cols-7 text-center">
                         @foreach ($getDayNames() as $dayName)
                             <div class="text-xs font-medium text-muted py-2">{{ $dayName }}</div>
                         @endforeach
 
-                        <template x-for="day in monthData.days" :key="day.fullDate.getTime()">
+                        <template x-for="(day, dayIndex) in monthData.days" :key="'day-' + day.fullDate.getTime() + '-' + dayIndex">
                             <div
                                 x-on:click="selectDate(day)"
                                 :class="{
-                                    'text-secondary-400 dark:text-secondary-600': !day.isCurrentMonth,
-                                    'text-primary': day.isCurrentMonth && !day.isStartDate && !day.isEndDate && !day.isInRange && !day.isDisabled,
+                                    'text-muted-foreground opacity-60': !day.isCurrentMonth,
+                                    'text-foreground': day.isCurrentMonth && !day.isStartDate && !day.isEndDate && !day.isInRange && !day.isDisabled,
                                     'bg-primary text-primary-foreground font-semibold ring-2 ring-primary/30': day.isStartDate && !day.isDisabled,
-                                    'bg-primary-500 text-white font-semibold': day.isEndDate && !day.isDisabled,
-                                    'bg-primary-100 dark:bg-primary-900/30': day.isInRange && !day.isDisabled,
+                                    'bg-primary text-primary-foreground font-semibold': day.isEndDate && !day.isDisabled,
+                                    'bg-primary/20 text-foreground': day.isInRange && !day.isDisabled,
                                     'button-radius-sm rounded-r-none': day.isStartDate && !day.isEndDate,
                                     'button-radius-sm rounded-l-none': day.isEndDate && !day.isStartDate,
                                     'button-radius-sm': day.isStartDate && day.isEndDate,
+                                    'rounded-none': day.isInRange && !day.isStartDate && !day.isEndDate,
                                     'font-bold ring-2 ring-primary/50 button-radius-sm': day.isToday && !day.isStartDate && !day.isEndDate && !day.isInRange && !this.selecting && !day.isDisabled,
                                     'cursor-pointer hover:bg-primary-50 dark:hover:bg-primary-900/20 button-radius-sm': day.isCurrentMonth && !day.isStartDate && !day.isEndDate && !day.isInRange && !this.selecting && !this.updating && !day.isDisabled,
                                     'cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-800 button-radius-sm': day.isCurrentMonth && this.selecting && !day.isStartDate && !this.updating && !day.isDisabled,
@@ -264,11 +265,14 @@ document.addEventListener('alpine:initializing', () => {
                 days.push(this.formatDay(new Date(year, month, i), true));
             }
 
-            // Add next month's days to complete the final week only
-            const totalDaysNeeded = Math.ceil((dayOfWeek + daysInMonth) / 7) * 7;
-            while (days.length < totalDaysNeeded) {
-                const nextDate = days.length - dayOfWeek - daysInMonth + 1;
-                days.push(this.formatDay(new Date(year, month + 1, nextDate), false));
+            // Add minimal next month's days to complete the final week only
+            const currentDaysCount = dayOfWeek + daysInMonth;
+            const daysInFinalWeek = currentDaysCount % 7;
+            if (daysInFinalWeek > 0) {
+                const daysToAdd = 7 - daysInFinalWeek;
+                for (let i = 1; i <= daysToAdd; i++) {
+                    days.push(this.formatDay(new Date(year, month + 1, i), false));
+                }
             }
 
             return { monthYear, days };

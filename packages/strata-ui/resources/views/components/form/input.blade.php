@@ -80,6 +80,7 @@
             class="{{ $getWrapperClasses() }}"
             @click="$refs.input.focus()"
             :class="{ 'opacity-50': {{ $disabled ? 'true' : 'false' }} }"
+            {{ $attributes->except(['wire:model', 'id', 'name', 'placeholder', 'required', 'disabled', 'readonly', 'type']) }}
         >
             {{-- Leading Icon/Slot --}}
             @if($hasIcon || $hasLeadingSlot)
@@ -111,7 +112,6 @@
                 @if($hasDescription && !$hasError) aria-describedby="{{ $name }}-description" @endif
                 @if($hasError) aria-describedby="{{ $name }}-error" aria-invalid="true" @endif
                 @if($hasDescription && $hasError) aria-describedby="{{ $name }}-description {{ $name }}-error" @endif
-                {{ $attributes->except(['wire:model', 'id', 'name', 'placeholder', 'required', 'disabled', 'readonly']) }}
                 class="{{ $getInputClasses() }}"
             />
 

@@ -5,7 +5,7 @@
         : 'h-4 w-4 text-primary border-muted input-radius-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-white dark:bg-gray-900';
 @endphp
 
-<div class="space-y-1">
+<div>
     <div class="relative flex items-start">
         @if($name && !$attributes->wire('model'))
             <input type="hidden" name="{{ $name }}" value="0">
