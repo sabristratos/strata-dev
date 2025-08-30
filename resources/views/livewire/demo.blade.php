@@ -299,6 +299,17 @@
                         description="Select up to 5 skills"
                     />
 
+                    <x-strata::form.color-picker
+                        name="primary_color"
+                        label="Primary Brand Color"
+                        placeholder="Choose primary color"
+                        format="hex"
+                        :brandColors="true"
+                        :allowCustom="true"
+                        description="Select or customize your primary brand color"
+                    />
+
+
                     <div class="space-y-4">
                         <x-strata::form.checkbox
                             name="terms"

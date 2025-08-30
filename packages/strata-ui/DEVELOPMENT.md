@@ -10,6 +10,7 @@ This document outlines the architectural patterns and conventions used in the St
 4. [Testing Patterns](#testing-patterns)
 5. [Icon System](#icon-system)
 6. [Styling Conventions](#styling-conventions)
+7. [Build Process & Asset Management](#build-process--asset-management)
 
 ## Alpine.js Patterns
 
@@ -82,17 +83,14 @@ setValue(newValue) {
 
 ### Script Placement
 
-Alpine component definitions are placed in `<script>` tags at the bottom of Blade templates:
+**Important:** Alpine component definitions are now consolidated into the main JavaScript bundle (`resources/dist/strata-ui.iife.js`). Individual components should NOT include inline `<script>` tags.
 
-```blade
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('componentName', (config) => ({
-            // Component definition
-        }));
-    });
-</script>
-```
+All Alpine.js components are registered through the main bundle which is included via the `@strataScripts` directive in your layout.
+
+For development, if you need to modify JavaScript:
+1. Edit `resources/js/strata.js`
+2. Run `npm run build` to compile changes
+3. The compiled assets in `resources/dist/` are committed to git for distribution
 
 ## PHP Component Patterns
 
@@ -199,15 +197,11 @@ public function __construct(
     
 </div>
 
-<!-- Alpine component definition -->
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('componentName', (config) => ({
-            // Component logic
-        }));
-    });
-</script>
+<!-- Alpine component definitions are loaded from the main JavaScript bundle -->
+</div>
 ```
+
+**Note:** No inline Alpine component definitions are needed. All components are pre-registered via the main JavaScript bundle.
 
 ### Attribute Handling
 
@@ -373,5 +367,73 @@ public function getSizeClasses(): string
 - Validate input parameters in PHP constructors
 - Provide fallback values for optional properties
 - Handle edge cases gracefully in Alpine components
+
+## Build Process & Asset Management
+
+### For End Users
+
+Strata UI follows the WireUI pattern for easy installation. End users only need:
+
+```bash
+composer require strata/ui
+```
+
+Then add to their layout:
+```blade
+@livewireScripts  {{-- If using Livewire --}}
+@strataScripts
+```
+
+**No Node.js or build process is required for end users.** All compiled assets are included in the package distribution.
+
+### For Package Developers
+
+If you're contributing to Strata UI and need to modify JavaScript:
+
+#### Initial Setup
+```bash
+cd packages/strata-ui
+npm install
+```
+
+#### Development Workflow
+1. **Edit JavaScript**: Modify `resources/js/strata.js`
+2. **Build Assets**: Run `npm run build` 
+3. **Test Changes**: Verify components work in browser
+4. **Commit Changes**: Both source files AND compiled assets should be committed
+
+#### Important Files
+
+**Source Files (Edit These):**
+- `resources/js/strata.js` - Main JavaScript bundle source
+- `package.json` - Build dependencies (Alpine.js, Vite, etc.)
+- `vite.config.js` - Build configuration
+
+**Compiled Assets (Generated, But Committed):**
+- `resources/dist/strata-ui.iife.js` - Compiled JavaScript bundle
+- `resources/dist/strata-ui.iife.js.map` - Source map
+
+**Not Distributed:**
+- `node_modules/` - Excluded from package (too large, not needed by end users)
+- `package-lock.json` - Excluded from package
+
+#### Build Commands
+- `npm run build` - Build production assets
+- `npm run dev` - Build with watch mode for development
+
+#### Asset Serving Strategy
+
+The package uses a route-based asset serving approach (similar to WireUI):
+- Route: `/vendor/strata-ui/strata-ui.js` serves the compiled bundle
+- Fallback: Data URIs for development environments
+- Cache headers: 1 year cache for performance
+
+### Why This Architecture?
+
+1. **Zero Configuration**: End users don't need Node.js or build tools
+2. **Package Size**: Excluding `node_modules` reduces package size by 90%+
+3. **Distribution**: Only compiled assets are needed in production
+4. **WireUI Compatibility**: Follows established Laravel package patterns
+5. **Performance**: Pre-compiled assets load faster than runtime compilation
 
 This pattern documentation ensures consistency across all Strata UI components and provides a foundation for future development.

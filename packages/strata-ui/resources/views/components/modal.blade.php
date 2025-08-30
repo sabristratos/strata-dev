@@ -10,8 +10,7 @@
     $modalId = $name ? 'modal-' . $name : uniqid('modal-');
     $isWireModel = $attributes->has('wire:model') || $attributes->has('wire:model.self');
     
-    $backdropClasses = 'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm';
-    
+    // Modal container positioning classes
     $containerClasses = [
         'fixed inset-0 z-50 flex',
         $variant === 'flyout' && $position === 'left' ? 'justify-start' : '',
@@ -20,13 +19,38 @@
         $variant !== 'flyout' ? 'items-center justify-center p-4' : '',
     ];
     
-    $modalClasses = [
-        'relative w-full',
+    // Modal content classes
+    $contentClasses = [
+        'relative bg-card text-card-foreground shadow-xl border border-border overflow-hidden',
         $getSizeClasses(),
         $getVariantClasses(),
         $variant === 'flyout' ? $getFlyoutPositionClasses() : '',
-        $variant !== 'bare' ? 'overflow-hidden' : '',
+        $variant !== 'bare' ? 'w-full' : '',
     ];
+    
+    // Alpine transition classes based on variant
+    $enterTransitions = match($variant) {
+        'flyout' => match($position) {
+            'left' => 'transition ease-out duration-300|opacity-0 -translate-x-full|opacity-100 translate-x-0',
+            'right' => 'transition ease-out duration-300|opacity-0 translate-x-full|opacity-100 translate-x-0', 
+            'bottom' => 'transition ease-out duration-300|opacity-0 translate-y-full|opacity-100 translate-y-0',
+            default => 'transition ease-out duration-300|opacity-0 translate-x-full|opacity-100 translate-x-0',
+        },
+        default => 'transition ease-out duration-300|opacity-0 scale-95|opacity-100 scale-100'
+    };
+    
+    $leaveTransitions = match($variant) {
+        'flyout' => match($position) {
+            'left' => 'transition ease-in duration-200|opacity-100 translate-x-0|opacity-0 -translate-x-full',
+            'right' => 'transition ease-in duration-200|opacity-100 translate-x-0|opacity-0 translate-x-full',
+            'bottom' => 'transition ease-in duration-200|opacity-100 translate-y-0|opacity-0 translate-y-full', 
+            default => 'transition ease-in duration-200|opacity-100 translate-x-0|opacity-0 translate-x-full',
+        },
+        default => 'transition ease-in duration-200|opacity-100 scale-100|opacity-0 scale-95'
+    };
+    
+    [$enterClass, $enterStart, $enterEnd] = explode('|', $enterTransitions);
+    [$leaveClass, $leaveStart, $leaveEnd] = explode('|', $leaveTransitions);
 @endphp
 
 <div
@@ -35,18 +59,24 @@
         dismissible: {{ $dismissible ? 'true' : 'false' }}
     })"
     x-show="show"
+    x-cloak
+    data-variant="{{ $variant }}"
+    @if($variant === 'flyout')
+        data-position="{{ $position }}"
+    @endif
     @if($name)
+        data-modal-name="{{ $name }}"
         @strata-modal-show-{{ $name }}.window="showModal($event.detail)"
         @strata-modal-hide-{{ $name }}.window="hideModal()"
         @strata-modal-toggle-{{ $name }}.window="toggleModal($event.detail)"
     @endif
     @if($isWireModel)
-        x-model="show"
+        x-modelable="show"
     @endif
-    @keydown.escape.window="dismissible && hideModal()"
     style="display: none;"
     {{ $attributes->except(['name', 'variant', 'size', 'position', 'dismissible', 'wire:model', 'wire:model.self']) }}
 >
+    {{-- Alpine-controlled backdrop --}}
     <div 
         x-show="show"
         x-transition:enter="transition ease-out duration-300"
@@ -56,32 +86,28 @@
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         @if($dismissible)
-            @click="hideModal()"
+            @click="handleBackdropClick()"
         @endif
-        @class([$backdropClasses])
+        class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
     ></div>
     
-    <div 
-        @class(array_filter($containerClasses))
-        @if($dismissible && $variant === 'flyout')
-            @click="hideModal()"
-        @endif
-    >
+    {{-- Modal container --}}
+    <div @class(array_filter($containerClasses))>
         <div
             x-show="show"
+            x-transition:enter="{{ $enterClass }}"
+            x-transition:enter-start="{{ $enterStart }}"
+            x-transition:enter-end="{{ $enterEnd }}"
+            x-transition:leave="{{ $leaveClass }}"
+            x-transition:leave-start="{{ $leaveStart }}"
+            x-transition:leave-end="{{ $leaveEnd }}"
             @click.stop
             x-trap.noscroll="show"
             role="dialog"
             aria-modal="true"
             :aria-labelledby="name ? 'modal-title-' + name : null"
             :aria-describedby="name ? 'modal-description-' + name : null"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 {{ $variant === 'flyout' ? ($position === 'bottom' ? 'translate-y-full' : ($position === 'left' ? '-translate-x-full' : 'translate-x-full')) : 'scale-95' }}"
-            x-transition:enter-end="opacity-100 {{ $variant === 'flyout' ? 'translate-x-0 translate-y-0' : 'scale-100' }}"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 {{ $variant === 'flyout' ? 'translate-x-0 translate-y-0' : 'scale-100' }}"
-            x-transition:leave-end="opacity-0 {{ $variant === 'flyout' ? ($position === 'bottom' ? 'translate-y-full' : ($position === 'left' ? '-translate-x-full' : 'translate-x-full')) : 'scale-95' }}"
-            @class(array_filter($modalClasses))
+            @class(array_filter($contentClasses))
         >
             @if($dismissible && $variant !== 'bare')
                 <div class="absolute right-4 top-4 z-10">
@@ -106,88 +132,6 @@
         </div>
     </div>
 </div>
-
-
-@once
-<script>
-document.addEventListener('alpine:initializing', () => {
-    
-    /**
-     * Strata Modal Component
-     * @param {Object} config - Configuration object
-     * @param {string|null} config.name - Unique modal identifier
-     * @param {boolean} config.dismissible - Whether modal can be dismissed
-     * @returns {Object} Alpine component object
-     */
-    Alpine.data('strataModal', (config) => ({
-        show: false,
-        name: config.name || null,
-        dismissible: config.dismissible !== false,
-
-        /**
-         * Initialize component
-         */
-        init() {
-            if (this.$wire && this.$el.hasAttribute('x-model')) {
-                this.$watch('show', value => {
-                    this.$wire.set(this.$el.getAttribute('x-model'), value);
-                });
-            }
-        },
-
-        /**
-         * Show the modal
-         * @param {Object} data - Optional data to pass with modal opening
-         */
-        showModal(data = {}) {
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            
-            document.body.style.overflow = 'hidden';
-            if (scrollbarWidth > 0) {
-                document.body.style.paddingRight = `${scrollbarWidth}px`;
-            }
-            
-            this.show = true;
-            this.$dispatch('strata-modal-opened', { name: this.name, data });
-            
-            this.$nextTick(() => {
-                const focusable = this.$el.querySelector(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                );
-                if (focusable) {
-                    focusable.focus();
-                }
-            });
-        },
-
-        /**
-         * Hide the modal
-         */
-        hideModal() {
-            this.show = false;
-            this.$dispatch('strata-modal-closed', { name: this.name });
-            this.$dispatch('close');
-            this.$dispatch('cancel');
-            
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        },
-
-        /**
-         * Toggle modal visibility
-         * @param {Object} data - Optional data to pass when opening
-         */
-        toggleModal(data = {}) {
-            if (this.show) {
-                this.hideModal();
-            } else {
-                this.showModal(data);
-            }
-        }
-    }));
-});
-</script>
-@endonce
 
 {{-- Session modal data for JavaScript API --}}
 @if (session()->has('strata_modal'))

@@ -279,4 +279,67 @@ class StrataUIService
             }
         };
     }
+
+    /**
+     * Render the Strata UI scripts with optional attributes.
+     */
+    public function renderScripts(array $attributes = []): string
+    {
+        $assetPath = $this->getAssetPath();
+        
+        if (! $assetPath) {
+            return '<!-- Strata UI: JavaScript bundle not found. Please run: cd packages/strata-ui && npm run build -->';
+        }
+        
+        // Set default attributes
+        $attributes = array_merge(['defer' => true], $attributes);
+        
+        $attributeString = $this->buildAttributes($attributes);
+        
+        return sprintf(
+            '<script src="%s"%s></script>',
+            $assetPath,
+            $attributeString
+        );
+    }
+
+    /**
+     * Get the asset path for the compiled JavaScript bundle.
+     */
+    protected function getAssetPath(): ?string
+    {
+        // Try published assets first (production)
+        $publishedPath = public_path('vendor/strata-ui/strata-ui.iife.js');
+        if (file_exists($publishedPath)) {
+            return asset('vendor/strata-ui/strata-ui.iife.js');
+        }
+        
+        // Fall back to package assets (development)
+        $packagePath = __DIR__.'/../resources/dist/strata-ui.iife.js';
+        if (file_exists($packagePath)) {
+            // Create a data URI for the script content
+            $content = file_get_contents($packagePath);
+            return 'data:application/javascript;base64,' . base64_encode($content);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Build HTML attributes string from array.
+     */
+    protected function buildAttributes(array $attributes): string
+    {
+        $attributePairs = [];
+        
+        foreach ($attributes as $key => $value) {
+            if (is_bool($value)) {
+                $attributePairs[] = $value ? $key : '';
+            } else {
+                $attributePairs[] = sprintf('%s="%s"', $key, htmlspecialchars($value));
+            }
+        }
+        
+        return $attributePairs ? ' ' . implode(' ', array_filter($attributePairs)) : '';
+    }
 }

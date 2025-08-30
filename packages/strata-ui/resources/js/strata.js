@@ -1,9 +1,8 @@
 /**
  * Strata UI - Main JavaScript Bundle
  * 
- * This file provides Alpine.js with necessary plugins for Strata UI components.
- * It intelligently detects if Alpine.js is already loaded (e.g., by Livewire)
- * and avoids conflicts while ensuring required plugins are available.
+ * Provides Alpine.js components and global API for Strata UI.
+ * Uses modular utilities for maintainable, reusable code.
  */
 
 import Alpine from 'alpinejs'
@@ -11,181 +10,171 @@ import collapse from '@alpinejs/collapse'
 import anchor from '@alpinejs/anchor'
 import focus from '@alpinejs/focus'
 
-// Register core plugins with our Alpine instance (for standalone mode)
-Alpine.plugin(collapse)
-Alpine.plugin(anchor)
-Alpine.plugin(focus)
+// Import utilities
+import { safePluginRegistration, registerAlpineComponent, registerAlpineMagic } from './utilities/alpine.js'
+import { createBaseModal, closeAllModals } from './components/BaseModal.js'
+import { createBaseEditor } from './components/BaseEditor.js'
+import { createBaseCalendar } from './components/BaseCalendar.js'
+import { createBaseFileUpload } from './components/BaseFileUpload.js'
+import { createBaseSelect } from './components/BaseSelect.js'
+import { createBaseColorPicker } from './components/BaseColorPicker.js'
+import { dispatchModalEvent, dispatchToastEvent, EVENTS } from './utilities/events.js'
 
-/**
- * Safely register a plugin if it's not already registered
- * @param {Object} Alpine - The Alpine.js instance
- * @param {Function} plugin - The plugin to register
- * @param {string} pluginName - The name of the plugin for checking registration
- */
-function registerPluginSafely(Alpine, plugin, pluginName) {
-    const alreadyRegistered = 
-        (pluginName === 'collapse' && Alpine.directive && Alpine.directive.collapse) ||
-        (pluginName === 'anchor' && Alpine.anchor) ||
-        (pluginName === 'focus' && Alpine.$focus) ||
-        false;
-    
-    if (!alreadyRegistered) {
-        Alpine.plugin(plugin)
-    }
+// Register Strata components
+function registerStrataComponents(Alpine) {
+    // Register Modal Component using base modal class
+    registerAlpineComponent(Alpine, 'strataModal', (config) => {
+        return createBaseModal(config);
+    });
+
+    // Register Editor Component using base editor class
+    registerAlpineComponent(Alpine, 'strataEditor', (config) => {
+        return createBaseEditor(config);
+    });
+
+    // Register Calendar Component using base calendar class
+    registerAlpineComponent(Alpine, 'strataDateRangePicker', (config) => {
+        return createBaseCalendar(config);
+    });
+
+    // Register File Upload Component using base file upload class
+    registerAlpineComponent(Alpine, 'strataFileUpload', (config) => {
+        return createBaseFileUpload(config);
+    });
+
+    // Register Select Component using base select class
+    registerAlpineComponent(Alpine, 'strataSelect', (config) => {
+        return createBaseSelect(config);
+    });
+
+    // Register Color Picker Component using base color picker class
+    registerAlpineComponent(Alpine, 'strataColorPicker', (config) => {
+        return createBaseColorPicker(config);
+    });
+
+    // Register Alpine magic property using utility
+    registerAlpineMagic(Alpine, 'strata', () => ({
+        modal(name) {
+            return {
+                show(data = {}) {
+                    dispatchModalEvent('show', name, data);
+                },
+                hide() {
+                    dispatchModalEvent('hide', name);
+                },
+                toggle(data = {}) {
+                    dispatchModalEvent('toggle', name, data);
+                }
+            };
+        },
+        modals() {
+            return {
+                close() {
+                    closeAllModals();
+                }
+            };
+        },
+        toast(detail) {
+            dispatchToastEvent('show', detail);
+        }
+    }));
 }
 
-
-/**
- * Register Strata magic methods and global API
- */
-function registerStrataAPI() {
-    
-    if (typeof Alpine !== 'undefined') {
-        Alpine.magic('strata', (el) => ({
-            // Modal functionality
-            modal(name) {
-                return {
-                    show(data = {}) {
-                        window.dispatchEvent(new CustomEvent(`strata-modal-show-${name}`, { detail: data }));
-                    },
-                    hide() {
-                        window.dispatchEvent(new CustomEvent(`strata-modal-hide-${name}`));
-                    },
-                    toggle(data = {}) {
-                        window.dispatchEvent(new CustomEvent(`strata-modal-toggle-${name}`, { detail: data }));
-                    }
-                };
-            },
-            modals() {
-                return {
-                    close() {
-                        document.querySelectorAll('[x-data*="strataModal"]').forEach(el => {
-                            const modalName = el.getAttribute('x-data').match(/name:\s*'([^']*)'/);
-                            if (modalName && modalName[1]) {
-                                window.dispatchEvent(new CustomEvent(`strata-modal-hide-${modalName[1]}`));
-                            } else {
-                                if (el.__x && el.__x.$data && el.__x.$data.hideModal) {
-                                    el.__x.$data.hideModal();
-                                }
-                            }
-                        });
-                        document.body.style.overflow = '';
-                    }
-                };
-            },
-            // Toast functionality
-            toast(detail) {
-                window.dispatchEvent(new CustomEvent('strata-toast-show', { detail }));
-            }
-        }));
-    } else {
-    }
-
+// Create Global Strata API (vanilla JavaScript)
+function createGlobalStrataAPI() {
     window.Strata = window.Strata || {};
     
-    // Modal API
+    // Modal API using utilities
     window.Strata.modal = function(name) {
         return {
             show(data = {}) {
-                window.dispatchEvent(new CustomEvent(`strata-modal-show-${name}`, { detail: data }));
+                dispatchModalEvent('show', name, data);
             },
             hide() {
-                window.dispatchEvent(new CustomEvent(`strata-modal-hide-${name}`));
+                dispatchModalEvent('hide', name);
             },
             toggle(data = {}) {
-                window.dispatchEvent(new CustomEvent(`strata-modal-toggle-${name}`, { detail: data }));
+                dispatchModalEvent('toggle', name, data);
             }
         };
     };
 
+    // Modals API using utilities
     window.Strata.modals = function() {
         return {
             close() {
-                document.querySelectorAll('[x-data*="strataModal"]').forEach(el => {
-                    const modalName = el.getAttribute('x-data').match(/name:\s*'([^']*)'/);
-                    if (modalName && modalName[1]) {
-                        window.dispatchEvent(new CustomEvent(`strata-modal-hide-${modalName[1]}`));
-                    } else {
-                        if (el.__x && el.__x.$data && el.__x.$data.hideModal) {
-                            el.__x.$data.hideModal();
-                        }
-                    }
-                });
-                document.body.style.overflow = '';
+                closeAllModals();
             }
         };
     };
 
-    // Toast API
+    // Toast API using utilities
     window.Strata.toast = function(detail) {
-        window.dispatchEvent(new CustomEvent('strata-toast-show', { detail }));
+        dispatchToastEvent('show', detail);
     };
-    
 }
 
-/**
- * Initialize Strata UI (fallback for non-Livewire scenarios)
- */
-function initializeStrataUI() {
-    
+// Initialize Strata UI with utilities
+function init() {
     if (window.Alpine) {
-        registerPluginSafely(window.Alpine, collapse, 'collapse')
-        registerPluginSafely(window.Alpine, anchor, 'anchor')
-        registerPluginSafely(window.Alpine, focus, 'focus')
+        // Alpine.js already loaded (e.g., by Livewire)
+        safePluginRegistration(window.Alpine, { collapse, anchor, focus });
+        registerStrataComponents(window.Alpine);
+        createGlobalStrataAPI();
     } else {
-        window.Alpine = Alpine
-        Alpine.start()
+        // No Alpine.js found, use our own instance
+        safePluginRegistration(Alpine, { collapse, anchor, focus });
+        registerStrataComponents(Alpine);
+        
+        window.Alpine = Alpine;
+        Alpine.start();
+        
+        createGlobalStrataAPI();
     }
 }
 
-document.addEventListener('alpine:init', () => {
-    
-    window.Strata = window.Strata || {};
-    
-    // Modal API
-    window.Strata.modal = function(name) {
-        return {
-            show(data = {}) {
-                window.dispatchEvent(new CustomEvent(`strata-modal-show-${name}`, { detail: data }));
-            },
-            hide() {
-                window.dispatchEvent(new CustomEvent(`strata-modal-hide-${name}`));
-            },
-            toggle(data = {}) {
-                window.dispatchEvent(new CustomEvent(`strata-modal-toggle-${name}`, { detail: data }));
+// Handle session modals from Laravel
+function handleSessionModals() {
+    const sessionModalScript = document.querySelector('script[data-strata-session-modal]');
+    if (sessionModalScript) {
+        try {
+            const modalData = JSON.parse(sessionModalScript.textContent);
+            if (modalData.id) {
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent(`strata-modal-show-${modalData.id}`, { detail: modalData }));
+                }, 100);
             }
-        };
-    };
+        } catch (e) {
+            console.warn('Failed to parse session modal data:', e);
+        }
+    }
+}
 
-    window.Strata.modals = function() {
-        return {
-            close() {
-                document.querySelectorAll('[x-data*="strataModal"]').forEach(el => {
-                    const modalName = el.getAttribute('x-data').match(/name:\s*'([^']*)'/);
-                    if (modalName && modalName[1]) {
-                        window.dispatchEvent(new CustomEvent(`strata-modal-hide-${modalName[1]}`));
-                    } else {
-                        if (el.__x && el.__x.$data && el.__x.$data.hideModal) {
-                            el.__x.$data.hideModal();
-                        }
-                    }
-                });
-                document.body.style.overflow = '';
-            }
-        };
-    };
-
-    // Toast API
-    window.Strata.toast = function(detail) {
-        window.dispatchEvent(new CustomEvent('strata-toast-show', { detail }));
-    };
-    
-});
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeStrataUI)
+// Initialize based on Alpine.js availability  
+if (window.Alpine && window.Alpine.version) {
+    // Alpine is already loaded
+    init();
 } else {
-    initializeStrataUI()
+    // Wait for Alpine to be available
+    document.addEventListener('alpine:init', () => {
+        init();
+    });
+    
+    // Fallback if alpine:init doesn't fire
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(init, 50);
+        });
+    } else {
+        setTimeout(init, 50);
+    }
+}
+
+// Handle session modals
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', handleSessionModals);
+} else {
+    handleSessionModals();
 }
 
 export default Alpine

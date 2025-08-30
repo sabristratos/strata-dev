@@ -8,167 +8,19 @@
 <div>
 
     <div
-        x-data="{
-            open: false,
+        x-data="strataSelect({
             highlighted: @js($multiple ? 0 : ($selected ?? 0)),
             count: {{ $itemCount }},
             multiple: {{ $multiple ? 'true' : 'false' }},
             maxSelections: {{ $maxSelections }},
-            value: @if($attributes->wire('model')) @entangle($attributes->wire('model')) @else @js($initialSelected) @endif,
+            @if($attributes->wire('model'))
+            value: @entangle($attributes->wire('model')),
+            @else
+            initialSelected: @js($initialSelected),
+            @endif
             items: @js($items),
-            searchable: {{ $isSearchable ? 'true' : 'false' }},
-            searchQuery: '',
-            filteredItems: @js($items),
-            filteredIndices: @js(array_keys($items)),
-
-            next() {
-                const maxIndex = this.searchable ? this.filteredItems.length - 1 : this.count - 1;
-                this.highlighted = Math.min(this.highlighted + 1, maxIndex);
-            },
-
-            previous() {
-                this.highlighted = Math.max(this.highlighted - 1, 0);
-            },
-
-            select() {
-                if (this.multiple) {
-                    const actualIndex = this.searchable ? this.filteredIndices[this.highlighted] : this.highlighted;
-                    this.toggleSelection(actualIndex);
-                } else {
-                    const actualIndex = this.searchable ? this.filteredIndices[this.highlighted] : this.highlighted;
-                    this.value = actualIndex;
-                    this.open = false;
-                    this.$refs.trigger.focus();
-                }
-            },
-
-            toggleSelection(index) {
-                if (!Array.isArray(this.value)) {
-                    this.value = [];
-                }
-                
-                const selectedIndex = this.value.indexOf(index);
-                
-                if (selectedIndex > -1) {
-                    this.value.splice(selectedIndex, 1);
-                } else if (this.maxSelections === 0 || this.value.length < this.maxSelections) {
-                    this.value.push(index);
-                }
-            },
-
-            isSelected(index) {
-                if (this.multiple) {
-                    return Array.isArray(this.value) && this.value.includes(index);
-                }
-                return this.value === index;
-            },
-
-            getDisplayText() {
-                if (this.multiple) {
-                    if (!Array.isArray(this.value) || this.value.length === 0) {
-                        return '';
-                    }
-                    return this.value.length + ' selected';
-                }
-                return this.value !== null && this.value !== '' ? (this.items[this.value] || '') : '';
-            },
-
-            getVisibleTags() {
-                if (!Array.isArray(this.value) || this.value.length === 0) {
-                    return [];
-                }
-                // Show max 2 tags to prevent layout issues
-                return this.value.slice(0, 2);
-            },
-
-            getRemainingCount() {
-                if (!Array.isArray(this.value) || this.value.length <= 2) {
-                    return 0;
-                }
-                return this.value.length - 2;
-            },
-
-            filterItems() {
-                if (!this.searchQuery.trim()) {
-                    this.filteredItems = this.items;
-                    this.filteredIndices = Object.keys(this.items);
-                } else {
-                    const query = this.searchQuery.toLowerCase();
-                    this.filteredItems = [];
-                    this.filteredIndices = [];
-                    
-                    Object.keys(this.items).forEach((key) => {
-                        if (this.items[key].toLowerCase().includes(query)) {
-                            this.filteredItems.push(this.items[key]);
-                            this.filteredIndices.push(key);
-                        }
-                    });
-                }
-                
-                // Reset highlighted to first item
-                this.highlighted = 0;
-            },
-
-            clearSearch() {
-                this.searchQuery = '';
-                this.filterItems();
-                if (this.searchable && this.$refs.searchInput) {
-                    this.$refs.searchInput.focus();
-                }
-            },
-
-            handleSearchKeydown(event) {
-                if (event.key === 'ArrowDown') {
-                    event.preventDefault();
-                    this.next();
-                } else if (event.key === 'ArrowUp') {
-                    event.preventDefault();
-                    this.previous();
-                } else if (event.key === 'Enter') {
-                    event.preventDefault();
-                    if (this.filteredItems.length > 0) {
-                        this.select();
-                    }
-                } else if (event.key === 'Escape') {
-                    if (this.searchQuery) {
-                        this.clearSearch();
-                    } else {
-                        this.close();
-                    }
-                }
-            },
-
-            close() {
-                this.open = false;
-            },
-
-            toggle() {
-                this.open = !this.open;
-                if (this.open && this.searchable) {
-                    this.$nextTick(() => {
-                        if (this.$refs.searchInput) {
-                            this.$refs.searchInput.focus();
-                        }
-                    });
-                }
-            },
-
-            clearSelection() {
-                if (this.multiple) {
-                    this.value = [];
-                } else {
-                    this.value = null;
-                }
-                this.$refs.trigger.focus();
-            },
-
-            hasSelection() {
-                if (this.multiple) {
-                    return Array.isArray(this.value) && this.value.length > 0;
-                }
-                return this.value !== null && this.value !== '';
-            }
-        }"
+            searchable: {{ $isSearchable ? 'true' : 'false' }}
+        })"
         @click.outside="close()"
         @keydown.escape.window="close()"
         class="relative"
@@ -176,10 +28,7 @@
         <button
             x-ref="trigger"
             @click="toggle()"
-            @keydown.arrow-down.prevent="open ? next() : (open = true)"
-            @keydown.arrow-up.prevent="open ? previous() : (open = true)"
-            @keydown.enter.prevent="open ? select() : toggle()"
-            @keydown.space.prevent="toggle()"
+            @keydown="handleTriggerKeydown($event)"
             type="button"
             :disabled="@json($disabled)"
             {{ $attributes->except(['wire:model']) }}
@@ -292,11 +141,11 @@
                         <template x-for="(item, index) in filteredItems" :key="'filtered-' + (filteredIndices[index] || index) + '-' + item">
                             <button
                                 type="button"
-                                x-on:click="multiple ? toggleSelection(filteredIndices[index]) : (value = filteredIndices[index], open = false, $refs.trigger.focus())"
-                                x-on:mouseover="highlighted = index"
+                                x-on:click="multiple ? selectMultiple(filteredIndices[index]) : selectSingle(filteredIndices[index])"
+                                x-on:mouseover="highlightOption(index)"
                                 :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-foreground'"
                                 class="w-full text-left px-3 py-2 text-sm cursor-pointer button-radius transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
-                                :disabled="multiple && maxSelections > 0 && !isSelected(filteredIndices[index]) && Array.isArray(value) && value.length >= maxSelections"
+                                :disabled="isOptionDisabled(filteredIndices[index])"
                             >
                                 <span x-text="item"></span>
                                 <x-icon
@@ -315,11 +164,11 @@
                             <template x-for="(item, index) in Object.entries(items)" :key="'item-' + item[0] + '-' + index">
                                 <button
                                     type="button"
-                                    x-on:click="multiple ? toggleSelection(item[0]) : (value = item[0], open = false, $refs.trigger.focus())"
-                                    x-on:mouseover="highlighted = index"
+                                    x-on:click="multiple ? selectMultiple(item[0]) : selectSingle(item[0])"
+                                    x-on:mouseover="highlightOption(index)"
                                     :class="highlighted === index ? 'bg-accent text-accent-foreground' : 'text-foreground'"
                                     class="w-full text-left px-3 py-2 text-sm cursor-pointer button-radius transition-colors duration-150 flex items-center justify-between hover:bg-accent hover:text-accent-foreground"
-                                    :disabled="multiple && maxSelections > 0 && !isSelected(item[0]) && Array.isArray(value) && value.length >= maxSelections"
+                                    :disabled="isOptionDisabled(item[0])"
                                 >
                                     <span x-text="item[1]"></span>
                                     <x-icon

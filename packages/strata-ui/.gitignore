@@ -31,3 +31,6 @@ coverage/
 # Package specific
 composer.lock
 package-lock.json
+
+# Note: node_modules is excluded from distribution
+# Compiled assets in /resources/dist are included for end users

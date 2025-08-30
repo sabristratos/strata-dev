@@ -5,7 +5,8 @@
       "Bash(do sed -i 's/extends Component/extends FormComponent/g' \"$file\")",
       "Bash(sed:*)",
       "Bash(done)",
-      "Bash(do sed -i 's/extends Component/extends BaseComponent/g' \"$file\")"
+      "Bash(do sed -i 's/extends Component/extends BaseComponent/g' \"$file\")",
+      "Bash(cmd //c:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

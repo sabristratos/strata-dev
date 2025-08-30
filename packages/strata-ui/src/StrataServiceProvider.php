@@ -11,6 +11,7 @@ use Livewire\Livewire;
 use Strata\UI\Facades\Strata;
 use Strata\UI\Synthesizers\DateRangeSynth;
 use Strata\UI\View\Components\Form\Editor;
+use Strata\UI\View\Components\Form\ColorPicker;
 
 class StrataServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,7 @@ class StrataServiceProvider extends ServiceProvider
         Blade::componentNamespace('Strata\\UI\\View\\Components', 'strata');
 
         Blade::component('strata::editor', Editor::class);
+        Blade::component('strata::form.color-picker', ColorPicker::class);
 
         Livewire::propertySynthesizer(DateRangeSynth::class);
 
@@ -71,10 +73,20 @@ class StrataServiceProvider extends ServiceProvider
      */
     protected function registerBladeDirectives(): void
     {
-        Blade::directive('strataScripts', function () {
-            $route = route('strata.scripts');
-
-            return "<?php echo '<script src=\"{$route}\" defer></script>'; ?>";
+        Blade::directive('strataScripts', function ($expression) {
+            return '<?php
+                $publishedPath = public_path("vendor/strata-ui/strata-ui.iife.js");
+                if (file_exists($publishedPath)) {
+                    $version = filemtime($publishedPath);
+                    $assetUrl = asset("vendor/strata-ui/strata-ui.iife.js") . "?v=" . $version;
+                    echo "<!-- Strata UI Debug: Loading from " . $assetUrl . " -->";
+                    echo "<script src=\"" . $assetUrl . "\" defer></script>";
+                    echo "<script>console.log(\"Strata UI: Script loaded from " . $assetUrl . "\");</script>";
+                } else {
+                    echo "<!-- Strata UI: JavaScript bundle not found at " . $publishedPath . " -->";
+                    echo "<script>console.error(\"Strata UI: JavaScript bundle not found. Please run: php artisan vendor:publish --tag=strata-ui-assets\");</script>";
+                }
+            ?>';
         });
     }
 }
