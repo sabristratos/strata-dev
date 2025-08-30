@@ -31,7 +31,7 @@
     {{ $attributes->except(['variant', 'size', 'autoplay', 'interval', 'loop', 'showArrows', 'showDots', 'itemsPerView', 'gap', 'snapAlign', 'hideScrollbar', 'wire:model', 'wire:model.self'])->merge([
         'class' => $getContainerClasses()
     ]) }}
-    x-show="totalSlides > 0 || $slots.default"
+    x-show="totalSlides > 0"
 >
     {{-- Scroll Container --}}
     <div
@@ -52,31 +52,10 @@
         aria-label="Carousel"
         aria-live="polite"
         tabindex="0"
-        @keydown.window="
-            if ($el.contains(document.activeElement)) {
-                const mode = getNavigationMode();
-                switch ($event.key) {
-                    case 'ArrowLeft':
-                        $event.preventDefault();
-                        previousSlide();
-                        announceSlideChange();
-                        break;
-                    case 'ArrowRight':
-                        $event.preventDefault();
-                        nextSlide();
-                        announceSlideChange();
-                        break;
-                    case 'Home':
-                        $event.preventDefault();
-                        goToSlide(0, { reason: 'keyboard' });
-                        break;
-                    case 'End':
-                        $event.preventDefault();
-                        goToSlide(totalSlides - 1, { reason: 'keyboard' });
-                        break;
-                }
-            }
-        "
+        @keydown.arrow-left.prevent="previousSlide()"
+        @keydown.arrow-right.prevent="nextSlide()"
+        @keydown.home.prevent="goToSlide(0)"
+        @keydown.end.prevent="goToSlide(totalSlides - 1)"
         @mouseenter="pauseAutoplay"
         @mouseleave="resumeAutoplay"
         @focusin="pauseAutoplay"
@@ -104,7 +83,7 @@
                         aria-label="Carousel navigation"
                     >
                         {{-- Navigation mode aware dots --}}
-                        <template x-show="getNavigationMode() === 'page'" x-for="page in Math.min(totalPages, 10)" :key="page">
+                        <template x-show="state && state.navigation && state.navigation.mode === 'page'" x-for="page in Math.min(totalPages, 10)" :key="page">
                             <button
                                 type="button"
                                 @click="goToPage(page - 1, (page - 1) > currentPage ? 'next' : 'prev')"
@@ -118,7 +97,7 @@
                         </template>
                         
                         {{-- Slide mode dots --}}
-                        <template x-show="getNavigationMode() === 'slide'" x-for="slide in Math.min(totalSlides, 10)" :key="slide">
+                        <template x-show="!state || !state.navigation || state.navigation.mode !== 'page'" x-for="slide in Math.min(totalSlides, 10)" :key="slide">
                             <button
                                 type="button"
                                 @click="goToSlide(slide - 1, { reason: 'user' })"
@@ -154,7 +133,7 @@
                             @click="previousSlide"
                             :disabled="!canGoPrevious"
                             class="{{ $getArrowClasses() }}"
-                            :aria-label="getNavigationMode() === 'page' ? 'Previous page' : 'Previous slide'"
+                            :aria-label="(state && state.navigation && state.navigation.mode === 'page') ? 'Previous page' : 'Previous slide'"
                             data-carousel-control
                         >
                             <x-strata::icon name="heroicon-o-chevron-left" class="w-4 h-4" />
@@ -167,7 +146,7 @@
                             @click="nextSlide"
                             :disabled="!canGoNext"
                             class="{{ $getArrowClasses() }}"
-                            :aria-label="getNavigationMode() === 'page' ? 'Next page' : 'Next slide'"
+                            :aria-label="(state && state.navigation && state.navigation.mode === 'page') ? 'Next page' : 'Next slide'"
                             data-carousel-control
                         >
                             <x-strata::icon name="heroicon-o-chevron-right" class="w-4 h-4" />
