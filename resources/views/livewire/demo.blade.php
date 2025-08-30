@@ -572,6 +572,208 @@
                 </div>
             </div>
 
+            {{-- Carousel --}}
+            <div class="space-y-4">
+                <h3 class="text-xl font-semibold">Carousel</h3>
+                
+                {{-- Basic Carousel --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Basic Image Carousel</h4>
+                    <x-strata::carousel size="lg" autoplay :interval="4000" class="max-w-4xl">
+                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-8 text-white text-center">
+                            <h3 class="text-2xl font-bold mb-2">Welcome to Strata UI</h3>
+                            <p class="text-lg opacity-90">Beautiful components for modern Laravel applications</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-8 text-white text-center">
+                            <h3 class="text-2xl font-bold mb-2">CSS Scroll-Snap</h3>
+                            <p class="text-lg opacity-90">Built with modern CSS for optimal performance</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-lg p-8 text-white text-center">
+                            <h3 class="text-2xl font-bold mb-2">Fully Accessible</h3>
+                            <p class="text-lg opacity-90">Complete keyboard navigation and screen reader support</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg p-8 text-white text-center">
+                            <h3 class="text-2xl font-bold mb-2">Touch Friendly</h3>
+                            <p class="text-lg opacity-90">Native swipe gestures and touch interactions</p>
+                        </div>
+                    </x-strata::carousel>
+                </div>
+
+                {{-- Multi-item Responsive Gallery --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Multi-item Responsive Gallery</h4>
+                    <p class="text-sm text-muted-foreground">Shows 1 item on mobile, 2 on tablet, 3 on desktop</p>
+                    <x-strata::carousel 
+                        variant="gallery" 
+                        :itemsPerView="['default' => 1, 'md' => 2, 'lg' => 3]" 
+                        gap="md"
+                        :showDots="true"
+                        size="sm"
+                        class="max-w-5xl"
+                    >
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop" alt="Mountain landscape" class="w-full h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=200&fit=crop" alt="Forest lake" class="w-full h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1500759104159-2b3b37dfdd53?w=400&h=200&fit=crop" alt="Ocean waves" class="w-full h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&h=200&fit=crop" alt="Desert sunset" class="w-full h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1515623446455-0a6dd49e4b84?w=400&h=200&fit=crop" alt="City skyline" class="w-full h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=200&fit=crop" alt="Forest path" class="w-full h-40 object-cover rounded-lg" />
+                    </x-strata::carousel>
+                </div>
+
+                {{-- Cards Variant --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Product Cards Carousel</h4>
+                    <p class="text-sm text-muted-foreground">Shows 1 item on mobile, 2 on tablet, 4 on desktop</p>
+                    <x-strata::carousel 
+                        variant="cards"
+                        :itemsPerView="['default' => 1, 'md' => 2, 'lg' => 4]"
+                        snapAlign="start"
+                        gap="sm"
+                        class="max-w-6xl"
+                    >
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=200&fit=crop" alt="Product 1" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">Wireless Headphones</h4>
+                            <p class="text-sm text-muted-foreground mb-3">Premium noise-canceling headphones</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$299</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                        
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=200&fit=crop" alt="Product 2" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">Smart Watch</h4>
+                            <p class="text-sm text-muted-foreground mb-3">Track your fitness and health</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$399</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                        
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=400&h=200&fit=crop" alt="Product 3" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">Laptop Stand</h4>
+                            <p class="text-sm text-muted-foreground mb-3">Ergonomic aluminum laptop stand</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$79</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                        
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=200&fit=crop" alt="Product 4" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">Keyboard</h4>
+                            <p class="text-sm text-muted-foreground mb-3">Mechanical gaming keyboard</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$159</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                        
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=400&h=200&fit=crop" alt="Product 5" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">Wireless Mouse</h4>
+                            <p class="text-sm text-muted-foreground mb-3">Ergonomic wireless mouse with RGB</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$89</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                        
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=200&fit=crop" alt="Product 6" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">Studio Headphones</h4>
+                            <p class="text-sm text-muted-foreground mb-3">Professional studio monitoring</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$249</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                        
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=400&h=200&fit=crop" alt="Product 7" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">Laptop Backpack</h4>
+                            <p class="text-sm text-muted-foreground mb-3">Waterproof laptop backpack</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$69</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                        
+                        <x-strata::card>
+                            <img src="https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=400&h=200&fit=crop" alt="Product 8" class="w-full h-32 object-cover mb-4 rounded" />
+                            <h4 class="font-semibold mb-2">USB-C Hub</h4>
+                            <p class="text-sm text-muted-foreground mb-3">7-in-1 USB-C multiport hub</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-primary">$45</span>
+                                <x-strata::button size="sm">Add to Cart</x-strata::button>
+                            </div>
+                        </x-strata::card>
+                    </x-strata::carousel>
+                </div>
+
+                {{-- Testimonials --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Customer Testimonials</h4>
+                    <x-strata::carousel 
+                        size="md" 
+                        autoplay 
+                        :interval="6000"
+                        :showArrows="false" 
+                        class="max-w-2xl"
+                    >
+                        <div class="text-center p-6 bg-card rounded-lg border">
+                            <div class="mb-4">
+                                <x-strata::form.rating :value="5" readonly :clearable="false" class="justify-center" />
+                            </div>
+                            <blockquote class="text-lg italic mb-4">
+                                "Strata UI has completely transformed how we build Laravel applications. The components are beautiful and incredibly easy to use."
+                            </blockquote>
+                            <div class="flex items-center justify-center gap-3">
+                                <x-strata::avatar size="sm" initials="JS" />
+                                <div class="text-left">
+                                    <div class="font-semibold">John Smith</div>
+                                    <div class="text-sm text-muted-foreground">Lead Developer</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center p-6 bg-card rounded-lg border">
+                            <div class="mb-4">
+                                <x-strata::form.rating :value="5" readonly :clearable="false" class="justify-center" />
+                            </div>
+                            <blockquote class="text-lg italic mb-4">
+                                "The accessibility features are outstanding. Our users love the keyboard navigation and screen reader support."
+                            </blockquote>
+                            <div class="flex items-center justify-center gap-3">
+                                <x-strata::avatar size="sm" initials="MJ" />
+                                <div class="text-left">
+                                    <div class="font-semibold">Maria Johnson</div>
+                                    <div class="text-sm text-muted-foreground">UX Designer</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center p-6 bg-card rounded-lg border">
+                            <div class="mb-4">
+                                <x-strata::form.rating :value="4" readonly :clearable="false" class="justify-center" />
+                            </div>
+                            <blockquote class="text-lg italic mb-4">
+                                "Performance is incredible with the CSS scroll-snap implementation. Smooth as butter on all devices."
+                            </blockquote>
+                            <div class="flex items-center justify-center gap-3">
+                                <x-strata::avatar size="sm" initials="RW" />
+                                <div class="text-left">
+                                    <div class="font-semibold">Robert Wilson</div>
+                                    <div class="text-sm text-muted-foreground">Frontend Architect</div>
+                                </div>
+                            </div>
+                        </div>
+                    </x-strata::carousel>
+                </div>
+            </div>
+
             {{-- Calendar --}}
             <div class="space-y-4">
                 <h3 class="text-xl font-semibold">Calendar</h3>

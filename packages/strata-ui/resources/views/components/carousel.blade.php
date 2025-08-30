@@ -83,7 +83,7 @@
                         aria-label="Carousel navigation"
                     >
                         {{-- Navigation mode aware dots --}}
-                        <template x-show="state && state.navigation && state.navigation.mode === 'page'" x-for="page in Math.min(totalPages, 10)" :key="page">
+                        <template x-show="getCurrentItemsPerView() > 1" x-for="page in Math.min(totalPages, 10)" :key="page">
                             <button
                                 type="button"
                                 @click="goToPage(page - 1, (page - 1) > currentPage ? 'next' : 'prev')"
@@ -97,7 +97,7 @@
                         </template>
                         
                         {{-- Slide mode dots --}}
-                        <template x-show="!state || !state.navigation || state.navigation.mode !== 'page'" x-for="slide in Math.min(totalSlides, 10)" :key="slide">
+                        <template x-show="getCurrentItemsPerView() === 1" x-for="slide in Math.min(totalSlides, 10)" :key="slide">
                             <button
                                 type="button"
                                 @click="goToSlide(slide - 1, { reason: 'user' })"
@@ -133,7 +133,7 @@
                             @click="previousSlide"
                             :disabled="!canGoPrevious"
                             class="{{ $getArrowClasses() }}"
-                            :aria-label="(state && state.navigation && state.navigation.mode === 'page') ? 'Previous page' : 'Previous slide'"
+                            :aria-label="getCurrentItemsPerView() > 1 ? 'Previous page' : 'Previous slide'"
                             data-carousel-control
                         >
                             <x-strata::icon name="heroicon-o-chevron-left" class="w-4 h-4" />
@@ -146,7 +146,7 @@
                             @click="nextSlide"
                             :disabled="!canGoNext"
                             class="{{ $getArrowClasses() }}"
-                            :aria-label="(state && state.navigation && state.navigation.mode === 'page') ? 'Next page' : 'Next slide'"
+                            :aria-label="getCurrentItemsPerView() > 1 ? 'Next page' : 'Next slide'"
                             data-carousel-control
                         >
                             <x-strata::icon name="heroicon-o-chevron-right" class="w-4 h-4" />

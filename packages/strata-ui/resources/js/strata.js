@@ -18,6 +18,7 @@ import { createBaseCalendar } from './components/BaseCalendar.js'
 import { createBaseFileUpload } from './components/BaseFileUpload.js'
 import { createBaseSelect } from './components/BaseSelect.js'
 import { createBaseColorPicker } from './components/BaseColorPicker.js'
+import { createCarouselComponent } from './components/BaseCarousel.js'
 import { dispatchModalEvent, dispatchToastEvent, EVENTS } from './utilities/events.js'
 
 // Register Strata components
@@ -50,6 +51,11 @@ function registerStrataComponents(Alpine) {
     // Register Color Picker Component using base color picker class
     registerAlpineComponent(Alpine, 'strataColorPicker', (config) => {
         return createBaseColorPicker(config);
+    });
+
+    // Register Carousel Component using base carousel class
+    registerAlpineComponent(Alpine, 'strataCarousel', (config) => {
+        return createCarouselComponent(config);
     });
 
     // Register Alpine magic property using utility

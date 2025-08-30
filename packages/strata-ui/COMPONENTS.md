@@ -26,6 +26,7 @@ This document provides comprehensive documentation for all components in the Str
   - [Choice Group](#choice-group)
   - [Form Utility Components](#form-utility-components)
 - [Advanced Components](#advanced-components)
+  - [Carousel](#carousel)
   - [Calendar](#calendar)
   - [Modal](#modal)
   - [Table](#table)
@@ -990,6 +991,150 @@ Container for grouping radio buttons or checkboxes.
 ---
 
 ## Advanced Components
+
+### Carousel
+
+Modern CSS scroll-snap carousel component with automatic rotation, touch gestures, and full accessibility support.
+
+**Props:**
+- `variant` (string, default: `'default'`): Visual style - `'default'`, `'gallery'`, `'cards'`
+- `size` (string, default: `'md'`): Height size - `'sm'`, `'md'`, `'lg'`
+- `autoplay` (bool, default: `false`): Enable automatic slide progression
+- `interval` (int, default: `3000`): Autoplay interval in milliseconds
+- `loop` (bool, default: `true`): Enable infinite looping
+- `showArrows` (bool, default: `true`): Show navigation arrows
+- `showDots` (bool, default: `true`): Show navigation dots
+- `itemsPerView` (array|string|int, default: `1`): Number of visible slides (supports responsive config)
+- `gap` (string, default: `'md'`): Gap between slides - `'sm'`, `'md'`, `'lg'`
+- `snapAlign` (string, default: `'center'`): Scroll snap alignment - `'start'`, `'center'`, `'end'`
+- `hideScrollbar` (bool, default: `true`): Hide scrollbar for cleaner appearance
+
+**Slots:**
+- `default`: Carousel content/slides
+- `arrows`: Custom navigation arrows (optional)
+- `dots`: Custom navigation dots (optional)
+
+**Basic Usage:**
+```blade
+{{-- Basic image carousel --}}
+<x-strata::carousel size="lg" autoplay :interval="5000">
+    <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-8 text-white text-center">
+        <h3 class="text-2xl font-bold">Slide 1</h3>
+        <p>Beautiful gradient slide</p>
+    </div>
+    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-8 text-white text-center">
+        <h3 class="text-2xl font-bold">Slide 2</h3>
+        <p>Another amazing slide</p>
+    </div>
+    <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-lg p-8 text-white text-center">
+        <h3 class="text-2xl font-bold">Slide 3</h3>
+        <p>The final slide</p>
+    </div>
+</x-strata::carousel>
+
+{{-- Gallery variant with multiple items --}}
+<x-strata::carousel 
+    variant="gallery" 
+    :itemsPerView="3" 
+    gap="lg"
+    :showDots="false"
+>
+    @foreach($images as $image)
+        <img src="{{ $image->url }}" alt="{{ $image->alt }}" class="w-full h-48 object-cover rounded-lg" />
+    @endforeach
+</x-strata::carousel>
+
+{{-- Card carousel with responsive items --}}
+<x-strata::carousel 
+    variant="cards"
+    :itemsPerView="[
+        'default' => 1,
+        'sm' => 2, 
+        'md' => 3,
+        'lg' => 4
+    ]"
+    snapAlign="start"
+>
+    @foreach($products as $product)
+        <x-strata::card>
+            <img src="{{ $product->image }}" class="w-full h-32 object-cover" />
+            <div class="p-4">
+                <h3 class="font-semibold">{{ $product->name }}</h3>
+                <p class="text-sm text-gray-600">${{ $product->price }}</p>
+            </div>
+        </x-strata::card>
+    @endforeach
+</x-strata::carousel>
+
+{{-- Custom arrows and dots --}}
+<x-strata::carousel>
+    <x-slot name="arrows">
+        <button class="carousel-prev-custom">← Previous</button>
+        <button class="carousel-next-custom">Next →</button>
+    </x-slot>
+    
+    <x-slot name="dots">
+        <div class="custom-dots-container">
+            <!-- Custom dot implementation -->
+        </div>
+    </x-slot>
+    
+    <!-- Slides content -->
+</x-strata::carousel>
+
+{{-- Livewire integration --}}
+<x-strata::carousel wire:model="currentSlide" autoplay>
+    @foreach($slides as $slide)
+        <div class="slide-content">{{ $slide->content }}</div>
+    @endforeach
+</x-strata::carousel>
+```
+
+**Helper Methods:**
+- `getVariantClasses()`: Returns variant-specific CSS classes
+- `getSizeClasses()`: Returns height classes based on size
+- `getContainerClasses()`: Returns complete container CSS classes
+- `getScrollContainerClasses()`: Returns scroll container classes with snap behavior
+- `getItemClasses()`: Returns individual slide classes including width calculations
+- `getGapClasses()`: Returns gap spacing classes
+- `getSnapAlignClasses()`: Returns scroll-snap alignment classes
+- `getItemWidthClasses()`: Calculates width classes based on itemsPerView
+- `getArrowClasses()`: Returns navigation arrow styling classes
+- `getDotsContainerClasses()`: Returns dots container positioning classes
+- `getDotClasses()`: Returns individual dot styling classes
+- `getActiveDotClasses()`: Returns active dot state classes
+- `getCarouselId()`: Generates unique carousel identifier
+- `getAutoplayConfig()`: Returns autoplay configuration as JSON
+- `getItemsPerViewConfig()`: Returns responsive itemsPerView as JSON
+
+**Considerations:**
+- Uses modern CSS scroll-snap for optimal performance and native feel
+- Progressive enhancement with advanced CSS features (::scroll-button, ::scroll-marker for Chrome 135+)
+- Full accessibility support with ARIA attributes, keyboard navigation, and screen reader compatibility
+- Touch and swipe gesture support with momentum scrolling
+- Autoplay functionality with pause on hover/focus and progress indicators
+- Responsive itemsPerView configuration supports different breakpoints
+- Supports both traditional form submission and Livewire binding with `wire:model`
+- Custom slots allow complete customization of navigation elements
+- Reduced motion support respects user preferences
+- Smooth scroll animations with fallback for older browsers
+- Event system dispatches `carousel-change` events for external integration
+
+**Events:**
+- `carousel-change`: Dispatched when slide changes (includes currentSlide, previousSlide, totalSlides)
+- `carousel-autoplay-start`: When autoplay begins
+- `carousel-autoplay-pause`: When autoplay is paused
+- `carousel-autoplay-resume`: When autoplay resumes
+- `carousel-swipe`: When user performs swipe gesture (includes direction and distance)
+
+**Keyboard Navigation:**
+- `← Left Arrow`: Previous slide
+- `→ Right Arrow`: Next slide  
+- `Home`: Go to first slide
+- `End`: Go to last slide
+- `Space/Enter`: Activate focused navigation elements
+
+---
 
 ### Calendar
 
