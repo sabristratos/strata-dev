@@ -10,8 +10,9 @@ use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Strata\UI\Facades\Strata;
 use Strata\UI\Synthesizers\DateRangeSynth;
-use Strata\UI\View\Components\Form\Editor;
+use Strata\UI\View\Components\Carousel;
 use Strata\UI\View\Components\Form\ColorPicker;
+use Strata\UI\View\Components\Form\Editor;
 
 class StrataServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,7 @@ class StrataServiceProvider extends ServiceProvider
 
         Blade::component('strata::editor', Editor::class);
         Blade::component('strata::form.color-picker', ColorPicker::class);
+        Blade::component('strata::carousel', Carousel::class);
 
         Livewire::propertySynthesizer(DateRangeSynth::class);
 
