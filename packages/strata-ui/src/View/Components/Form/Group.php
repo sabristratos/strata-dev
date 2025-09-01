@@ -17,8 +17,7 @@ class Group extends Component
         public string $for,
         public ?string $helpText = null,
         public ?string $error = null
-    ) {
-    }
+    ) {}
 
     /**
      * Get the view / contents that represent the component.

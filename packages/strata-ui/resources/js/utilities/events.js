@@ -20,10 +20,48 @@ export const EVENTS = {
     TOAST_SHOW: 'strata-toast-show',
     TOAST_HIDE: 'strata-toast-hide',
     TOAST_DISMISS: 'strata-toast-dismiss',
+    TOAST_ADDED: 'strata-toast-added',
+    TOAST_REMOVED: 'strata-toast-removed',
+    TOAST_CLEARED: 'strata-toast-cleared',
+    TOAST_ACTION_EXECUTED: 'strata-toast-action-executed',
     
     // Tab events
     TAB_CHANGE: 'strata-tab-change',
     TAB_ACTIVATED: 'strata-tab-activated',
+    
+    // Rating events
+    RATING_CHANGE: 'strata-rating-change',
+    RATING_CLEARED: 'strata-rating-cleared',
+    
+    // Video Player events
+    VIDEO_READY: 'strata-video-ready',
+    VIDEO_PLAY: 'strata-video-play',
+    VIDEO_PAUSE: 'strata-video-pause',
+    VIDEO_MUTE_TOGGLE: 'strata-video-mute-toggle',
+    VIDEO_TIME_UPDATE: 'strata-video-time-update',
+    VIDEO_VOLUME_CHANGE: 'strata-video-volume-change',
+    VIDEO_SEEK: 'strata-video-seek',
+    VIDEO_FULLSCREEN_CHANGE: 'strata-video-fullscreen-change',
+    VIDEO_ENDED: 'strata-video-ended',
+    VIDEO_ERROR: 'strata-video-error',
+    VIDEO_LOADING: 'strata-video-loading',
+    VIDEO_LOADED: 'strata-video-loaded',
+    VIDEO_SOURCE_CHANGE: 'strata-video-source-change',
+    
+    // Carousel events
+    CAROUSEL_SLIDE_CHANGE: 'strata-carousel-slide-change',
+    CAROUSEL_NEXT: 'strata-carousel-next',
+    CAROUSEL_PREVIOUS: 'strata-carousel-previous',
+    
+    // Accordion events
+    ACCORDION_ITEM_TOGGLE: 'strata-accordion-item-toggle',
+    ACCORDION_ITEM_OPENED: 'strata-accordion-item-opened',
+    ACCORDION_ITEM_CLOSED: 'strata-accordion-item-closed',
+    
+    // Select events
+    SELECT_OPTION_CHANGE: 'strata-select-option-change',
+    SELECT_OPENED: 'strata-select-opened',
+    SELECT_CLOSED: 'strata-select-closed',
     
     // Form events
     FORM_CHANGE: 'strata-form-change',

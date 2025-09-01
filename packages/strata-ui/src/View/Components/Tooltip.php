@@ -13,8 +13,7 @@ class Tooltip extends Component
         public string $text,
         public string $position = 'top',
         public int $offset = 8
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

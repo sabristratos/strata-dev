@@ -12,8 +12,7 @@ class ChoiceGroup extends Component
     public function __construct(
         public string $label,
         public bool $inline = false
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

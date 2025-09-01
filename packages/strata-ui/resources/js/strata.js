@@ -19,7 +19,13 @@ import { createBaseFileUpload } from './components/BaseFileUpload.js'
 import { createBaseSelect } from './components/BaseSelect.js'
 import { createBaseColorPicker } from './components/BaseColorPicker.js'
 import { createCarouselComponent } from './components/BaseCarousel.js'
-import { dispatchModalEvent, dispatchToastEvent, EVENTS } from './utilities/events.js'
+import { createAccordionComponent } from './components/BaseAccordion.js'
+import { createTabsComponent } from './components/BaseTabs.js'
+import { createToastGroupComponent, createToastItemComponent } from './components/BaseToast.js'
+import { createRatingComponent } from './components/BaseRating.js'
+import { createVideoPlayerComponent } from './components/BaseVideoPlayer.js'
+import { createSidebarComponent, closeAllSidebars } from './components/BaseSidebar.js'
+import { dispatchModalEvent, dispatchToastEvent, dispatchGlobalEvent, EVENTS } from './utilities/events.js'
 
 // Register Strata components
 function registerStrataComponents(Alpine) {
@@ -58,6 +64,41 @@ function registerStrataComponents(Alpine) {
         return createCarouselComponent(config);
     });
 
+    // Register Accordion Component using base accordion class
+    registerAlpineComponent(Alpine, 'strataAccordion', (config) => {
+        return createAccordionComponent(config);
+    });
+
+    // Register Tabs Component using base tabs class
+    registerAlpineComponent(Alpine, 'strataTabs', (config) => {
+        return createTabsComponent(config);
+    });
+
+    // Register Toast Group Component using base toast class
+    registerAlpineComponent(Alpine, 'strataToastGroup', (config) => {
+        return createToastGroupComponent(config);
+    });
+
+    // Register Toast Item Component using base toast item class
+    registerAlpineComponent(Alpine, 'strataToastItem', (config) => {
+        return createToastItemComponent(config);
+    });
+
+    // Register Rating Component using base rating class
+    registerAlpineComponent(Alpine, 'strataRating', (config) => {
+        return createRatingComponent(config);
+    });
+
+    // Register Video Player Component using base video player class
+    registerAlpineComponent(Alpine, 'strataVideoPlayer', (config) => {
+        return createVideoPlayerComponent(config);
+    });
+
+    // Register Sidebar Component using base sidebar class
+    registerAlpineComponent(Alpine, 'strataSidebar', (config) => {
+        return createSidebarComponent(config);
+    });
+
     // Register Alpine magic property using utility
     registerAlpineMagic(Alpine, 'strata', () => ({
         modal(name) {
@@ -77,6 +118,26 @@ function registerStrataComponents(Alpine) {
             return {
                 close() {
                     closeAllModals();
+                }
+            };
+        },
+        sidebar(name) {
+            return {
+                show() {
+                    dispatchGlobalEvent(`strata-sidebar-show-${name}`);
+                },
+                hide() {
+                    dispatchGlobalEvent(`strata-sidebar-hide-${name}`);
+                },
+                toggle() {
+                    dispatchGlobalEvent(`strata-sidebar-toggle-${name}`);
+                }
+            };
+        },
+        sidebars() {
+            return {
+                closeAll() {
+                    closeAllSidebars();
                 }
             };
         },
@@ -156,6 +217,14 @@ function handleSessionModals() {
     }
 }
 
+// Handle session toasts from Laravel
+function handleSessionToasts() {
+    // Check if there's a session toast to display
+    if (window.strataSessionToast) {
+        dispatchToastEvent('show', window.strataSessionToast);
+    }
+}
+
 // Initialize based on Alpine.js availability  
 if (window.Alpine && window.Alpine.version) {
     // Alpine is already loaded
@@ -176,11 +245,15 @@ if (window.Alpine && window.Alpine.version) {
     }
 }
 
-// Handle session modals
+// Handle session modals and toasts
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', handleSessionModals);
+    document.addEventListener('DOMContentLoaded', () => {
+        handleSessionModals();
+        handleSessionToasts();
+    });
 } else {
     handleSessionModals();
+    handleSessionToasts();
 }
 
 export default Alpine

@@ -5,7 +5,8 @@
  */
 
 import { createFormComponent, extendComponent } from './BaseComponent.js';
-import { EVENTS } from '../utilities/events.js';
+import { addEventListener, EVENTS } from '../utilities/events.js';
+import { focusFirst, findFirstFocusable } from '../utilities/focus.js';
 
 /**
  * Create a select component
@@ -68,10 +69,8 @@ export function createBaseSelect(config = {}) {
                 }
             };
             
-            window.addEventListener('keydown', escapeHandler);
-            this.addCleanup(() => {
-                window.removeEventListener('keydown', escapeHandler);
-            });
+            const cleanup = addEventListener(window, 'keydown', escapeHandler);
+            this.addCleanup(cleanup);
         },
 
         /**
@@ -279,6 +278,7 @@ export function createBaseSelect(config = {}) {
          */
         close() {
             this.open = false;
+            this.dispatchComponentEvent(EVENTS.SELECT_CLOSED);
         },
 
         /**
@@ -286,12 +286,23 @@ export function createBaseSelect(config = {}) {
          */
         toggle() {
             this.open = !this.open;
-            if (this.open && this.searchable) {
+            
+            if (this.open) {
+                // Enhanced focus management when opening
                 this.$nextTick(() => {
-                    if (this.$refs.searchInput) {
+                    if (this.searchable && this.$refs.searchInput) {
                         this.$refs.searchInput.focus();
+                    } else if (this.$refs.dropdown) {
+                        // Focus first focusable element in dropdown using utility
+                        focusFirst(this.$refs.dropdown);
                     }
                 });
+                
+                // Dispatch opened event
+                this.dispatchComponentEvent(EVENTS.SELECT_OPENED);
+            } else {
+                // Dispatch closed event
+                this.dispatchComponentEvent(EVENTS.SELECT_CLOSED);
             }
         },
 

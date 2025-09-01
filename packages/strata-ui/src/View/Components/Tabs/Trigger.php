@@ -24,4 +24,28 @@ class Trigger extends Component
     {
         return view('strata::components.tabs.trigger');
     }
+
+    /**
+     * Get the CSS classes for the tab trigger.
+     */
+    public function getTriggerClasses(): string
+    {
+        $baseClasses = [
+            'inline-flex items-center justify-center',
+            'px-4 py-2',
+            'text-sm font-medium',
+            'transition-all duration-200',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'whitespace-nowrap',
+            'text-muted-foreground'
+        ];
+
+        if ($this->disabled) {
+            $baseClasses[] = 'opacity-50 pointer-events-none cursor-not-allowed';
+        } else {
+            $baseClasses[] = 'cursor-pointer';
+        }
+
+        return implode(' ', $baseClasses);
+    }
 }

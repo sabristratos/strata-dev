@@ -16,6 +16,7 @@
     $carouselId = $getCarouselId();
     $isWireModel = $attributes->has('wire:model') || $attributes->has('wire:model.self');
     $carouselConfig = $getCarouselConfig();
+    $shouldShowDots = $shouldShowDots();
 @endphp
 
 {{-- Main Carousel Container --}}
@@ -27,33 +28,32 @@
     @endif
     data-carousel-id="{{ $carouselId }}"
     data-variant="{{ $variant }}"
-    data-navigation-mode="{{ $getNavigationMode() }}"
     {{ $attributes->except(['variant', 'size', 'autoplay', 'interval', 'loop', 'showArrows', 'showDots', 'itemsPerView', 'gap', 'snapAlign', 'hideScrollbar', 'wire:model', 'wire:model.self'])->merge([
         'class' => $getContainerClasses()
     ]) }}
     x-show="totalSlides > 0"
 >
-    {{-- Scroll Container --}}
+    {{-- Scroll Container with Container Query Support --}}
     <div
         x-ref="scrollContainer"
         @if($hideScrollbar)
-            style="scrollbar-width: none; -ms-overflow-style: none;"
+            style="scrollbar-width: none; -ms-overflow-style: none; {{ $getItemStyles() }}"
+        @else
+            style="{{ $getItemStyles() }}"
         @endif
         @class([
             $getScrollContainerClasses(),
             'h-full',
+            '[container-type:inline-size]',
             $hideScrollbar ? '[&::-webkit-scrollbar]:hidden' : ''
         ])
         @scroll="handleScroll"
-        @touchstart="handleTouchStart"
-        @touchmove="handleTouchMove"
-        @touchend="handleTouchEnd"
         role="region"
         aria-label="Carousel"
         aria-live="polite"
         tabindex="0"
-        @keydown.arrow-left.prevent="previousSlide()"
-        @keydown.arrow-right.prevent="nextSlide()"
+        @keydown.arrow-left.prevent="previousSlide"
+        @keydown.arrow-right.prevent="nextSlide"
         @keydown.home.prevent="goToSlide(0)"
         @keydown.end.prevent="goToSlide(totalSlides - 1)"
         @mouseenter="pauseAutoplay"
@@ -65,42 +65,23 @@
         {{ $slot }}
     </div>
 
-    {{-- Combined Navigation Container --}}
-    @if($showDots || $showArrows)
-        <div class="{{ $getNavigationContainerClasses() }}">
+    {{-- Navigation Container --}}
+    @if($shouldShowDots || $showArrows)
+        <div class="flex items-center justify-between mt-4">
             {{-- Navigation Dots --}}
-            @if($showDots)
+            @if($shouldShowDots)
                 @if(isset($dots))
                     {{-- Custom Dots Slot --}}
                     <div class="carousel-custom-dots">
                         {{ $dots }}
                     </div>
                 @else
-                    {{-- Default Dots --}}
-                    <div
-                        class="{{ $getDotsContainerClasses() }}"
-                        role="tablist"
-                        aria-label="Carousel navigation"
-                    >
-                        {{-- Navigation mode aware dots --}}
-                        <template x-show="getCurrentItemsPerView() > 1" x-for="page in Math.min(totalPages, 10)" :key="page">
+                    {{-- Default Dots - Only for single-item carousels --}}
+                    <div class="flex gap-1.5" role="tablist" aria-label="Carousel navigation">
+                        <template x-for="slide in Math.min(totalSlides, 10)" :key="slide">
                             <button
                                 type="button"
-                                @click="goToPage(page - 1, (page - 1) > currentPage ? 'next' : 'prev')"
-                                :class="currentPage === (page - 1) ? '{{ $getDotClasses() }} {{ $getActiveDotClasses() }}' : '{{ $getDotClasses() }}'"
-                                :aria-selected="currentPage === (page - 1) ? 'true' : 'false'"
-                                :aria-label="`Go to page ${page}`"
-                                role="tab"
-                                :tabindex="currentPage === (page - 1) ? 0 : -1"
-                                data-carousel-control
-                            ></button>
-                        </template>
-                        
-                        {{-- Slide mode dots --}}
-                        <template x-show="getCurrentItemsPerView() === 1" x-for="slide in Math.min(totalSlides, 10)" :key="slide">
-                            <button
-                                type="button"
-                                @click="goToSlide(slide - 1, { reason: 'user' })"
+                                @click="goToSlide(slide - 1)"
                                 :class="currentSlide === (slide - 1) ? '{{ $getDotClasses() }} {{ $getActiveDotClasses() }}' : '{{ $getDotClasses() }}'"
                                 :aria-selected="currentSlide === (slide - 1) ? 'true' : 'false'"
                                 :aria-label="`Go to slide ${slide}`"
@@ -125,7 +106,7 @@
                     </div>
                 @else
                     {{-- Default Arrows --}}
-                    <div class="{{ $getArrowContainerClasses() }}">
+                    <div class="flex items-center gap-2">
                         {{-- Previous Arrow --}}
                         <button
                             type="button"
@@ -133,7 +114,7 @@
                             @click="previousSlide"
                             :disabled="!canGoPrevious"
                             class="{{ $getArrowClasses() }}"
-                            :aria-label="getCurrentItemsPerView() > 1 ? 'Previous page' : 'Previous slide'"
+                            aria-label="Previous slide"
                             data-carousel-control
                         >
                             <x-strata::icon name="heroicon-o-chevron-left" class="w-4 h-4" />
@@ -146,7 +127,7 @@
                             @click="nextSlide"
                             :disabled="!canGoNext"
                             class="{{ $getArrowClasses() }}"
-                            :aria-label="getCurrentItemsPerView() > 1 ? 'Next page' : 'Next slide'"
+                            aria-label="Next slide"
                             data-carousel-control
                         >
                             <x-strata::icon name="heroicon-o-chevron-right" class="w-4 h-4" />
@@ -157,16 +138,6 @@
         </div>
     @endif
 
-    {{-- Progress Bar (Optional) --}}
-    <div
-        x-show="autoplayEnabled && showProgress"
-        class="mt-2 w-16 h-1 bg-black/10 dark:bg-white/20 rounded-full overflow-hidden mx-auto"
-    >
-        <div
-            class="h-full bg-primary transition-all duration-100 ease-linear rounded-full"
-            :style="`width: ${autoplayProgress}%`"
-        ></div>
-    </div>
 
     {{-- Screen Reader Status --}}
     <div
@@ -190,7 +161,7 @@
     </div>
 </div>
 
-{{-- Styles for Modern CSS Features --}}
+{{-- Essential carousel styles with container queries --}}
 @once
 <style>
 /* Hide scrollbars while maintaining accessibility */
@@ -202,40 +173,38 @@
     display: none;
 }
 
-/* Progressive enhancement for modern browsers */
-@supports (scroll-snap-type: x mandatory) {
-    .carousel-scroll-container {
-        scroll-snap-type: x mandatory;
-    }
-    
-    .carousel-scroll-container > * {
-        scroll-snap-align: var(--carousel-snap-align, center);
+/* Container query support */
+.\[container-type\:inline-size\] {
+    container-type: inline-size;
+}
+
+/* Container query based widths - target the scroll container's direct children */
+[data-carousel-id] [x-ref="scrollContainer"] > * {
+    width: var(--carousel-item-width, 100cqw) !important;
+}
+
+/* Responsive container query widths */
+@container (min-width: 640px) {
+    [data-carousel-id] [x-ref="scrollContainer"] > * {
+        width: var(--carousel-item-width-sm, var(--carousel-item-width, 100cqw)) !important;
     }
 }
 
-/* Modern CSS scroll buttons (Chrome 135+) */
-@supports (::scroll-button(left)) {
-    .carousel-scroll-container::scroll-button(left) {
-        content: "⬅" / "Previous slide";
-    }
-    
-    .carousel-scroll-container::scroll-button(right) {
-        content: "➡" / "Next slide"; 
+@container (min-width: 768px) {
+    [data-carousel-id] [x-ref="scrollContainer"] > * {
+        width: var(--carousel-item-width-md, var(--carousel-item-width, 100cqw)) !important;
     }
 }
 
-/* CSS Scroll Markers (Chrome 135+) */
-@supports (scroll-marker-group: after) {
-    .carousel-with-markers {
-        scroll-marker-group: after;
+@container (min-width: 1024px) {
+    [data-carousel-id] [x-ref="scrollContainer"] > * {
+        width: var(--carousel-item-width-lg, var(--carousel-item-width, 100cqw)) !important;
     }
-    
-    .carousel-with-markers > *::scroll-marker {
-        content: ' ';
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
+}
+
+@container (min-width: 1280px) {
+    [data-carousel-id] [x-ref="scrollContainer"] > * {
+        width: var(--carousel-item-width-xl, var(--carousel-item-width, 100cqw)) !important;
     }
 }
 
@@ -248,40 +217,22 @@
     @apply bg-white rounded-lg shadow-md;
 }
 
-
-/* Native scroll optimizations */
+/* Accessibility and performance */
 .carousel-scroll-container {
-    /* Ensure smooth native scrolling */
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
+    -webkit-overflow-scrolling: touch;
 }
 
 .carousel-scroll-container img {
     pointer-events: none;
     user-select: none;
     -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-}
-
-/* Touch device optimizations */
-@media (hover: none) {
-    .carousel-arrows button {
-        @apply opacity-100;
-    }
 }
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .carousel-scroll-container {
         scroll-behavior: auto;
-    }
-    
-    .carousel-scroll-container * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
     }
 }
 </style>

@@ -3506,21 +3506,28 @@
             "dist": {
                 "type": "path",
                 "url": "packages/strata-ui",
-                "reference": "1b7d2c75a9e5918a1ff973a5f919d2edb3ba826f"
+                "reference": "3d57c64c2cdd01ea33be32619cce2487a35b949c"
             },
             "require": {
                 "blade-ui-kit/blade-heroicons": "^2.0",
                 "blade-ui-kit/blade-icons": "^1.5",
-                "illuminate/support": "^12.0",
-                "laravel/framework": "^12.0",
+                "illuminate/support": "^11.0|^12.0",
+                "laravel/framework": "^11.0|^12.0",
                 "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "pestphp/pest": "^3.0"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
                         "Strata\\UI\\StrataServiceProvider"
-                    ]
+                    ],
+                    "aliases": {
+                        "Strata": "Strata\\UI\\Facades\\Strata"
+                    }
                 }
             },
             "autoload": {
@@ -3528,15 +3535,43 @@
                     "Strata\\UI\\": "src/"
                 }
             },
+            "autoload-dev": {
+                "psr-4": {
+                    "Strata\\UI\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "vendor/bin/pest"
+                ],
+                "test-coverage": [
+                    "vendor/bin/pest --coverage"
+                ]
+            },
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Strata Team"
+                    "name": "Sabri Ben Chaabane",
+                    "email": "sabri@stratosdigital.io"
                 }
             ],
-            "description": "A zero-config UI component library for Laravel with CSS variables and Tailwind CSS v4",
+            "description": "A comprehensive Laravel Blade component library built with Tailwind CSS v4, Alpine.js, and full Livewire integration",
+            "homepage": "https://github.com/sabristratos/strata-ui",
+            "keywords": [
+                "alpinejs",
+                "blade",
+                "components",
+                "laravel",
+                "livewire",
+                "tailwindcss",
+                "ui"
+            ],
+            "support": {
+                "issues": "https://github.com/sabristratos/strata-ui/issues",
+                "source": "https://github.com/sabristratos/strata-ui"
+            },
             "transport-options": {
                 "relative": true
             }

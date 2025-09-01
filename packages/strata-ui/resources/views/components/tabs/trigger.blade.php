@@ -3,24 +3,6 @@
     'disabled' => false
 ])
 
-@php
-    $baseClasses = [
-        'inline-flex items-center justify-center',
-        'px-4 py-2',
-        'text-sm font-medium',
-        'transition-all duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        'disabled:opacity-50 disabled:pointer-events-none',
-        'whitespace-nowrap',
-        'cursor-pointer',
-        'text-muted-foreground'
-    ];
-    
-    if ($disabled) {
-        $baseClasses[] = 'cursor-not-allowed';
-    }
-@endphp
-
 <button
     type="button"
     role="tab"
@@ -34,7 +16,7 @@
         aria-disabled="true"
     @endif
     {{ $attributes->except(['value', 'disabled'])->merge([
-        'class' => implode(' ', array_filter($baseClasses))
+        'class' => $getTriggerClasses()
     ]) }}
 >
     {{ $slot }}

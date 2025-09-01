@@ -1,8 +1,16 @@
-<div class="min-h-screen bg-background text-foreground">
-    <div class="container mx-auto p-8 space-y-16">
+<x-strata::main-content>
+    <div class="container mx-auto space-y-16">
         {{-- Header --}}
         <div class="text-center space-y-4">
-            <h1 class="text-4xl font-bold">Strata UI Components</h1>
+            <div class="flex items-center justify-center gap-4">
+                <div class="flex-1 text-center">
+                    <h1 class="text-4xl font-bold">Strata UI Components</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-muted-foreground">Theme:</span>
+                    <x-dark-mode-toggle />
+                </div>
+            </div>
             <p class="text-xl text-muted-foreground">Complete Design System Demo</p>
             <p class="text-muted-foreground">Showcasing all available components with their variants and features</p>
         </div>
@@ -130,9 +138,9 @@
                 </div>
             </div>
 
-            {{-- Toast Testing --}}
+            {{-- Toast --}}
             <div class="space-y-4">
-                <h3 class="text-xl font-semibold">Toast Notifications</h3>
+                <h3 class="text-xl font-semibold">Toast</h3>
                 <div class="flex flex-wrap gap-3">
                     <x-strata::button wire:click="showToast('success')" variant="outline" color="success">
                         Success Toast
@@ -375,6 +383,200 @@
                 <p class="text-muted-foreground">Complex interactive components</p>
             </div>
 
+            {{-- Accordion --}}
+            <div class="space-y-6">
+                <h3 class="text-xl font-semibold">Accordion</h3>
+
+                {{-- Default Single Accordion --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Single Selection (Default)</h4>
+                    <p class="text-sm text-muted-foreground">Only one item can be open at a time</p>
+                    <x-strata::accordion type="single" defaultValue="item-1" class="max-w-2xl">
+                        <x-strata::accordion.item value="item-1" title="What is Strata UI?">
+                            <p class="text-muted-foreground">Strata UI is a comprehensive Laravel component library built with Tailwind CSS and Alpine.js. It provides modern, accessible, and highly customizable components for building beautiful web applications.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="item-2" title="How do I install it?">
+                            <div class="space-y-2">
+                                <p class="text-muted-foreground">Installation is simple with Composer:</p>
+                                <code class="block bg-muted p-2 rounded text-sm">composer require strata/ui</code>
+                                <p class="text-muted-foreground">Then publish the assets and you're ready to go!</p>
+                            </div>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="item-3" title="Is it accessible?">
+                            <div class="space-y-3">
+                                <p class="text-muted-foreground">Yes! Strata UI components are built with accessibility in mind:</p>
+                                <ul class="space-y-1 text-sm text-muted-foreground ml-4">
+                                    <li>• Full ARIA support</li>
+                                    <li>• Keyboard navigation</li>
+                                    <li>• Screen reader compatibility</li>
+                                    <li>• Focus management</li>
+                                </ul>
+                            </div>
+                        </x-strata::accordion.item>
+                    </x-strata::accordion>
+                </div>
+
+                {{-- Multiple Selection Accordion --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Multiple Selection</h4>
+                    <p class="text-sm text-muted-foreground">Multiple items can be open simultaneously</p>
+                    <x-strata::accordion type="multiple" :defaultValue="['faq-1', 'faq-3']" class="max-w-2xl">
+                        <x-strata::accordion.item value="faq-1" title="Can I customize the styling?">
+                            <p class="text-muted-foreground">Absolutely! All components are built with Tailwind CSS and can be easily customized through CSS classes, variants, and configuration options.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="faq-2" title="Does it work with Livewire?">
+                            <p class="text-muted-foreground">Yes, Strata UI components are designed to work seamlessly with Livewire, including two-way data binding and reactive updates.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="faq-3" title="What about Alpine.js integration?">
+                            <p class="text-muted-foreground">All interactive components use Alpine.js for client-side functionality, providing smooth animations and responsive interactions.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="faq-4" title="Is there TypeScript support?">
+                            <p class="text-muted-foreground">While the components themselves are built with PHP and JavaScript, they work perfectly with TypeScript projects and provide proper type definitions.</p>
+                        </x-strata::accordion.item>
+                    </x-strata::accordion>
+                </div>
+
+                {{-- Bordered Variant --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Bordered Variant</h4>
+                    <p class="text-sm text-muted-foreground">Contained style with borders</p>
+                    <x-strata::accordion variant="bordered" size="lg" class="max-w-2xl">
+                        <x-strata::accordion.item value="feature-1" title="Advanced Components">
+                            <p class="text-muted-foreground">Includes complex components like carousels, calendars, modals, and data tables with full customization options.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="feature-2" title="Form Components">
+                            <p class="text-muted-foreground">Complete form component suite including inputs, selects, checkboxes, file uploads, and validation support.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="feature-3" title="Layout Components" disabled>
+                            <p class="text-muted-foreground">This item is disabled to demonstrate the disabled state functionality.</p>
+                        </x-strata::accordion.item>
+                    </x-strata::accordion>
+                </div>
+
+                {{-- Flush Variant --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Flush Variant (No Borders)</h4>
+                    <p class="text-sm text-muted-foreground">Clean style without borders or background</p>
+                    <x-strata::accordion variant="flush" iconPosition="start" class="max-w-2xl">
+                        <x-strata::accordion.item value="tip-1" title="Performance Optimization">
+                            <p class="text-muted-foreground">Built with modern CSS techniques like scroll-snap for optimal performance across all devices.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="tip-2" title="Developer Experience">
+                            <p class="text-muted-foreground">Intuitive API design with sensible defaults and comprehensive documentation.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="tip-3" title="Browser Support">
+                            <p class="text-muted-foreground">Compatible with all modern browsers and gracefully degrades on older ones.</p>
+                        </x-strata::accordion.item>
+                    </x-strata::accordion>
+                </div>
+
+                {{-- Filled Variant --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Filled Variant</h4>
+                    <p class="text-sm text-muted-foreground">Filled background style</p>
+                    <x-strata::accordion variant="filled" size="sm" class="max-w-2xl">
+                        <x-strata::accordion.item value="compact-1" title="Compact Design">
+                            <p class="text-muted-foreground text-sm">Perfect for dense layouts with small size option.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="compact-2" title="Responsive">
+                            <p class="text-muted-foreground text-sm">Works beautifully on mobile, tablet, and desktop.</p>
+                        </x-strata::accordion.item>
+                        <x-strata::accordion.item value="compact-3" title="Customizable">
+                            <p class="text-muted-foreground text-sm">Easy to customize with Tailwind classes and variants.</p>
+                        </x-strata::accordion.item>
+                    </x-strata::accordion>
+                </div>
+            </div>
+
+            {{-- Video Player --}}
+            <div class="space-y-6">
+                <h3 class="text-xl font-semibold">Video Player</h3>
+
+                {{-- Default Video Player --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Default Video Player</h4>
+                    <p class="text-sm text-muted-foreground">Full-featured video player with controls and keyboard navigation</p>
+                    <div class="max-w-2xl">
+                        <x-strata::video-player
+                            :sources="[
+                                'mp4' => [
+                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                                    'type' => 'video/mp4',
+                                    'label' => '720p'
+                                ]
+                            ]"
+                            poster="https://images.unsplash.com/photo-1611095790444-1dfa35be8c1d?w=1280&h=720&fit=crop"
+                            :controls="true"
+                        />
+                    </div>
+                </div>
+
+                {{-- Compact Video Player --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Compact Video Player</h4>
+                    <p class="text-sm text-muted-foreground">Smaller variant for inline content</p>
+                    <div class="max-w-lg">
+                        <x-strata::video-player
+                            variant="compact"
+                            size="sm"
+                            :sources="[
+                                'webm' => [
+                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                                    'type' => 'video/webm'
+                                ]
+                            ]"
+                            :autoplay="false"
+                            :muted="true"
+                            :loop="true"
+                        />
+                    </div>
+                </div>
+
+                {{-- Theater Mode Video Player --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Theater Mode</h4>
+                    <p class="text-sm text-muted-foreground">Wide format for cinematic content</p>
+                    <div class="max-w-4xl">
+                        <x-strata::video-player
+                            variant="theater"
+                            size="lg"
+                            :sources="[
+                                'hd' => [
+                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                                    'type' => 'video/mp4',
+                                    'label' => 'HD'
+                                ]
+                            ]"
+                            :volume="0.7"
+                            :autoHideControlsDelay="5000"
+                        />
+                    </div>
+                </div>
+
+                {{-- Multiple Sources Example --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Multiple Video Sources</h4>
+                    <p class="text-sm text-muted-foreground">Browser automatically selects best format</p>
+                    <div class="max-w-xl">
+                        <x-strata::video-player
+                            :sources="[
+                                'mp4' => [
+                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                                    'type' => 'video/mp4',
+                                    'label' => '360p MP4'
+                                ],
+                                'webm' => [
+                                    'src' => 'https://sample-videos.com/zip/10/webm/SampleVideo_640x360_1mb.webm',
+                                    'type' => 'video/webm',
+                                    'label' => '360p WebM'
+                                ]
+                            ]"
+                            preload="metadata"
+                        />
+                    </div>
+                </div>
+            </div>
+
             {{-- Tabs --}}
             <div class="space-y-6">
                 <h3 class="text-xl font-semibold">Tabs</h3>
@@ -572,13 +774,79 @@
                 </div>
             </div>
 
+            {{-- Sidebar --}}
+            <div class="space-y-6">
+                <h3 class="text-xl font-semibold">Sidebar</h3>
+                
+                {{-- Sidebar Toggle Examples --}}
+                <div class="space-y-4">
+                    <h4 class="font-medium">Sidebar Variants</h4>
+                    <p class="text-sm text-muted-foreground">Different sidebar types with toggle buttons</p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <x-strata::sidebar-toggle target="overlay-sidebar" variant="button">
+                            Overlay Sidebar
+                        </x-strata::sidebar-toggle>
+                        
+                        <x-strata::sidebar-toggle target="push-sidebar" variant="button">
+                            Push Content
+                        </x-strata::sidebar-toggle>
+                        
+                        <x-strata::sidebar-toggle target="right-sidebar" variant="hamburger" />
+                        
+                        <x-strata::sidebar-toggle target="collapsible-sidebar" variant="icon" icon="heroicon-o-plus" />
+                    </div>
+                </div>
+
+                {{-- Sidebar Implementation Examples --}}
+                <div class="space-y-4">
+                    <h4 class="font-medium">JavaScript API</h4>
+                    <p class="text-sm text-muted-foreground">Control sidebars programmatically</p>
+                    
+                    <div class="flex flex-wrap gap-3">
+                        <x-strata::button 
+                            variant="outline" 
+                            size="sm"
+                            @click="$strata.sidebar('overlay-sidebar').show()"
+                        >
+                            Show Overlay
+                        </x-strata::button>
+                        
+                        <x-strata::button 
+                            variant="outline" 
+                            size="sm"
+                            @click="$strata.sidebar('push-sidebar').toggle()"
+                        >
+                            Toggle Push
+                        </x-strata::button>
+                        
+                        <x-strata::button 
+                            variant="outline" 
+                            size="sm"
+                            @click="$strata.sidebars().closeAll()"
+                        >
+                            Close All
+                        </x-strata::button>
+                        
+                        <x-strata::button 
+                            variant="outline" 
+                            size="sm"
+                            onclick="Strata.sidebar('right-sidebar').show()"
+                        >
+                            Vanilla JS API
+                        </x-strata::button>
+                    </div>
+                </div>
+            </div>
+
             {{-- Carousel --}}
             <div class="space-y-4">
                 <h3 class="text-xl font-semibold">Carousel</h3>
-                
-                {{-- Basic Carousel --}}
+
+                {{-- Basic Single-Item Carousel --}}
                 <div class="space-y-2">
-                    <h4 class="font-medium">Basic Image Carousel</h4>
+                    <h4 class="font-medium">Single-Item Carousel (Auto-play)</h4>
+                    <p class="text-sm text-muted-foreground">Full-width slides with automatic progression</p>
                     <x-strata::carousel size="lg" autoplay :interval="4000" class="max-w-4xl">
                         <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-8 text-white text-center">
                             <h3 class="text-2xl font-bold mb-2">Welcome to Strata UI</h3>
@@ -599,32 +867,31 @@
                     </x-strata::carousel>
                 </div>
 
-                {{-- Multi-item Responsive Gallery --}}
+                {{-- Responsive Image Gallery --}}
                 <div class="space-y-2">
-                    <h4 class="font-medium">Multi-item Responsive Gallery</h4>
-                    <p class="text-sm text-muted-foreground">Shows 1 item on mobile, 2 on tablet, 3 on desktop</p>
-                    <x-strata::carousel 
-                        variant="gallery" 
-                        :itemsPerView="['default' => 1, 'md' => 2, 'lg' => 3]" 
+                    <h4 class="font-medium">Responsive Image Gallery</h4>
+                    <p class="text-sm text-muted-foreground">Perfect fit: 1 item mobile, 2 tablet, 3 desktop with proper gaps</p>
+                    <x-strata::carousel
+                        variant="gallery"
+                        :itemsPerView="['default' => 1, 'md' => 2, 'lg' => 3]"
                         gap="md"
-                        :showDots="true"
                         size="sm"
                         class="max-w-5xl"
                     >
-                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop" alt="Mountain landscape" class="w-full h-40 object-cover rounded-lg" />
-                        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=200&fit=crop" alt="Forest lake" class="w-full h-40 object-cover rounded-lg" />
-                        <img src="https://images.unsplash.com/photo-1500759104159-2b3b37dfdd53?w=400&h=200&fit=crop" alt="Ocean waves" class="w-full h-40 object-cover rounded-lg" />
-                        <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&h=200&fit=crop" alt="Desert sunset" class="w-full h-40 object-cover rounded-lg" />
-                        <img src="https://images.unsplash.com/photo-1515623446455-0a6dd49e4b84?w=400&h=200&fit=crop" alt="City skyline" class="w-full h-40 object-cover rounded-lg" />
-                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=200&fit=crop" alt="Forest path" class="w-full h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop" alt="Mountain landscape" class="h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=200&fit=crop" alt="Forest lake" class="h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1500759104159-2b3b37dfdd53?w=400&h=200&fit=crop" alt="Ocean waves" class="h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=400&h=200&fit=crop" alt="Desert sunset" class="h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1515623446455-0a6dd49e4b84?w=400&h=200&fit=crop" alt="City skyline" class="h-40 object-cover rounded-lg" />
+                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=200&fit=crop" alt="Forest path" class="h-40 object-cover rounded-lg" />
                     </x-strata::carousel>
                 </div>
 
-                {{-- Cards Variant --}}
+                {{-- Product Cards Showcase --}}
                 <div class="space-y-2">
                     <h4 class="font-medium">Product Cards Carousel</h4>
-                    <p class="text-sm text-muted-foreground">Shows 1 item on mobile, 2 on tablet, 4 on desktop</p>
-                    <x-strata::carousel 
+                    <p class="text-sm text-muted-foreground">Exact fit: 1 mobile, 2 tablet, 4 desktop - no overflow or partial items</p>
+                    <x-strata::carousel
                         variant="cards"
                         :itemsPerView="['default' => 1, 'md' => 2, 'lg' => 4]"
                         snapAlign="start"
@@ -632,7 +899,7 @@
                         class="max-w-6xl"
                     >
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=200&fit=crop" alt="Product 1" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=200&fit=crop" alt="Product 1" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">Wireless Headphones</h4>
                             <p class="text-sm text-muted-foreground mb-3">Premium noise-canceling headphones</p>
                             <div class="flex justify-between items-center">
@@ -640,9 +907,9 @@
                                 <x-strata::button size="sm">Add to Cart</x-strata::button>
                             </div>
                         </x-strata::card>
-                        
+
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=200&fit=crop" alt="Product 2" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=200&fit=crop" alt="Product 2" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">Smart Watch</h4>
                             <p class="text-sm text-muted-foreground mb-3">Track your fitness and health</p>
                             <div class="flex justify-between items-center">
@@ -650,9 +917,9 @@
                                 <x-strata::button size="sm">Add to Cart</x-strata::button>
                             </div>
                         </x-strata::card>
-                        
+
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=400&h=200&fit=crop" alt="Product 3" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=400&h=200&fit=crop" alt="Product 3" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">Laptop Stand</h4>
                             <p class="text-sm text-muted-foreground mb-3">Ergonomic aluminum laptop stand</p>
                             <div class="flex justify-between items-center">
@@ -660,9 +927,9 @@
                                 <x-strata::button size="sm">Add to Cart</x-strata::button>
                             </div>
                         </x-strata::card>
-                        
+
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=200&fit=crop" alt="Product 4" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=200&fit=crop" alt="Product 4" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">Keyboard</h4>
                             <p class="text-sm text-muted-foreground mb-3">Mechanical gaming keyboard</p>
                             <div class="flex justify-between items-center">
@@ -670,9 +937,9 @@
                                 <x-strata::button size="sm">Add to Cart</x-strata::button>
                             </div>
                         </x-strata::card>
-                        
+
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=400&h=200&fit=crop" alt="Product 5" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=400&h=200&fit=crop" alt="Product 5" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">Wireless Mouse</h4>
                             <p class="text-sm text-muted-foreground mb-3">Ergonomic wireless mouse with RGB</p>
                             <div class="flex justify-between items-center">
@@ -680,9 +947,9 @@
                                 <x-strata::button size="sm">Add to Cart</x-strata::button>
                             </div>
                         </x-strata::card>
-                        
+
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=200&fit=crop" alt="Product 6" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=200&fit=crop" alt="Product 6" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">Studio Headphones</h4>
                             <p class="text-sm text-muted-foreground mb-3">Professional studio monitoring</p>
                             <div class="flex justify-between items-center">
@@ -690,9 +957,9 @@
                                 <x-strata::button size="sm">Add to Cart</x-strata::button>
                             </div>
                         </x-strata::card>
-                        
+
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=400&h=200&fit=crop" alt="Product 7" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=400&h=200&fit=crop" alt="Product 7" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">Laptop Backpack</h4>
                             <p class="text-sm text-muted-foreground mb-3">Waterproof laptop backpack</p>
                             <div class="flex justify-between items-center">
@@ -700,9 +967,9 @@
                                 <x-strata::button size="sm">Add to Cart</x-strata::button>
                             </div>
                         </x-strata::card>
-                        
+
                         <x-strata::card>
-                            <img src="https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=400&h=200&fit=crop" alt="Product 8" class="w-full h-32 object-cover mb-4 rounded" />
+                            <img src="https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=400&h=200&fit=crop" alt="Product 8" class="h-32 object-cover mb-4 rounded" />
                             <h4 class="font-semibold mb-2">USB-C Hub</h4>
                             <p class="text-sm text-muted-foreground mb-3">7-in-1 USB-C multiport hub</p>
                             <div class="flex justify-between items-center">
@@ -713,14 +980,15 @@
                     </x-strata::carousel>
                 </div>
 
-                {{-- Testimonials --}}
+                {{-- Testimonials Slideshow --}}
                 <div class="space-y-2">
                     <h4 class="font-medium">Customer Testimonials</h4>
-                    <x-strata::carousel 
-                        size="md" 
-                        autoplay 
+                    <p class="text-sm text-muted-foreground">Full-width single testimonials with dots navigation and auto-play</p>
+                    <x-strata::carousel
+                        size="md"
+                        autoplay
                         :interval="6000"
-                        :showArrows="false" 
+                        :showArrows="false"
                         class="max-w-2xl"
                     >
                         <div class="text-center p-6 bg-card rounded-lg border">
@@ -738,7 +1006,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="text-center p-6 bg-card rounded-lg border">
                             <div class="mb-4">
                                 <x-strata::form.rating :value="5" readonly :clearable="false" class="justify-center" />
@@ -754,7 +1022,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="text-center p-6 bg-card rounded-lg border">
                             <div class="mb-4">
                                 <x-strata::form.rating :value="4" readonly :clearable="false" class="justify-center" />
@@ -772,6 +1040,78 @@
                         </div>
                     </x-strata::carousel>
                 </div>
+
+                {{-- Additional Carousel Examples --}}
+                <div class="space-y-2">
+                    <h4 class="font-medium">Showcase: Different Gap Sizes</h4>
+                    <p class="text-sm text-muted-foreground">Demonstrating small, medium, and large gaps with perfect width calculations</p>
+
+                    {{-- Small Gap Example --}}
+                    <div class="space-y-1">
+                        <h5 class="text-sm font-medium text-muted-foreground">Small Gap (gap-2)</h5>
+                        <x-strata::carousel
+                            variant="cards"
+                            :itemsPerView="['default' => 2, 'lg' => 4]"
+                            gap="sm"
+                            size="sm"
+                            class="max-w-4xl"
+                        >
+                            <div class="bg-blue-100 rounded-lg p-4 text-center">
+                                <div class="text-blue-800 font-medium">Card 1</div>
+                                <div class="text-sm text-blue-600">Small gap</div>
+                            </div>
+                            <div class="bg-green-100 rounded-lg p-4 text-center">
+                                <div class="text-green-800 font-medium">Card 2</div>
+                                <div class="text-sm text-green-600">Small gap</div>
+                            </div>
+                            <div class="bg-purple-100 rounded-lg p-4 text-center">
+                                <div class="text-purple-800 font-medium">Card 3</div>
+                                <div class="text-sm text-purple-600">Small gap</div>
+                            </div>
+                            <div class="bg-orange-100 rounded-lg p-4 text-center">
+                                <div class="text-orange-800 font-medium">Card 4</div>
+                                <div class="text-sm text-orange-600">Small gap</div>
+                            </div>
+                            <div class="bg-red-100 rounded-lg p-4 text-center">
+                                <div class="text-red-800 font-medium">Card 5</div>
+                                <div class="text-sm text-red-600">Small gap</div>
+                            </div>
+                            <div class="bg-indigo-100 rounded-lg p-4 text-center">
+                                <div class="text-indigo-800 font-medium">Card 6</div>
+                                <div class="text-sm text-indigo-600">Small gap</div>
+                            </div>
+                        </x-strata::carousel>
+                    </div>
+
+                    {{-- Large Gap Example --}}
+                    <div class="space-y-1">
+                        <h5 class="text-sm font-medium text-muted-foreground">Large Gap (gap-6)</h5>
+                        <x-strata::carousel
+                            variant="gallery"
+                            :itemsPerView="['default' => 1, 'md' => 3]"
+                            gap="lg"
+                            size="sm"
+                            class="max-w-4xl"
+                        >
+                            <div class="bg-gradient-to-br from-pink-500 to-rose-500 rounded-lg p-6 text-white text-center">
+                                <div class="font-bold text-lg">Large Gap</div>
+                                <div class="text-sm opacity-90">Perfect spacing</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-violet-500 to-purple-500 rounded-lg p-6 text-white text-center">
+                                <div class="font-bold text-lg">Large Gap</div>
+                                <div class="text-sm opacity-90">Perfect spacing</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg p-6 text-white text-center">
+                                <div class="font-bold text-lg">Large Gap</div>
+                                <div class="text-sm opacity-90">Perfect spacing</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg p-6 text-white text-center">
+                                <div class="font-bold text-lg">Large Gap</div>
+                                <div class="text-sm opacity-90">Perfect spacing</div>
+                            </div>
+                        </x-strata::carousel>
+                    </div>
+                </div>
             </div>
 
             {{-- Calendar --}}
@@ -787,18 +1127,37 @@
                 </div>
             </div>
 
+
             {{-- File Upload --}}
             <div class="space-y-4">
                 <h3 class="text-xl font-semibold">File Upload</h3>
-                <div class="max-w-2xl">
-                    <x-strata::form.file-upload
-                        name="demo-files"
-                        label="Upload Files"
-                        accept="image/*,.pdf,.doc,.docx"
-                        multiple
-                        placeholder="Drop files here or click to browse"
-                        description="Upload images or documents (max 5MB each)"
-                    />
+                <div class="space-y-4">
+                    <div class="max-w-2xl">
+                        <h4 class="font-medium mb-2">Standard File Upload</h4>
+                        <p class="text-sm text-muted-foreground mb-3">Features integrated Progress components for upload tracking</p>
+                        <x-strata::form.file-upload
+                            name="demo-files"
+                            label="Upload Files"
+                            accept="image/*,.pdf,.doc,.docx"
+                            multiple
+                            placeholder="Drop files here or click to browse"
+                            description="Upload images or documents (max 5MB each) - Progress bars powered by Strata Progress component"
+                        />
+                    </div>
+                    
+                    <div class="max-w-2xl">
+                        <h4 class="font-medium mb-2">Gallery View Upload</h4>
+                        <p class="text-sm text-muted-foreground mb-3">Perfect for image collections with visual previews</p>
+                        <x-strata::form.file-upload
+                            name="gallery-files"
+                            variant="gallery"
+                            label="Upload Images"
+                            accept="image/*"
+                            multiple
+                            placeholder="Add images to gallery"
+                            description="Visual gallery with integrated progress tracking"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -972,4 +1331,160 @@
         </div>
     </x-strata::modal>
 
-</div>
+    {{-- Sidebar Definitions --}}
+    <x-strata::sidebar 
+        name="overlay-sidebar" 
+        variant="overlay" 
+        position="left"
+        width="w-80"
+    >
+        <x-slot name="header">
+            <div class="flex items-center gap-3">
+                <x-strata::avatar size="sm" initials="SU" />
+                <div>
+                    <div class="font-semibold">Strata UI</div>
+                    <div class="text-sm text-muted-foreground">Overlay Sidebar</div>
+                </div>
+            </div>
+        </x-slot>
+        
+        <x-strata::sidebar-group label="Main Navigation">
+            <x-strata::nav-item href="#" icon="heroicon-o-home" active>Dashboard</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-users">Team</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-folder">Projects</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-chart-bar">Analytics</x-strata::nav-item>
+        </x-strata::sidebar-group>
+        
+        <x-strata::sidebar-group label="Recent" collapsible>
+            <x-strata::nav-item href="#" icon="heroicon-o-document">Project Alpha</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-document">Website Redesign</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-document">Mobile App</x-strata::nav-item>
+        </x-strata::sidebar-group>
+        
+        <x-strata::sidebar-group label="Settings">
+            <x-strata::nav-item href="#" icon="heroicon-o-cog-6-tooth">Preferences</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-bell">Notifications</x-strata::nav-item>
+        </x-strata::sidebar-group>
+        
+        <x-slot name="footer">
+            <div class="flex items-center gap-2">
+                <x-strata::button variant="ghost" size="sm" class="flex-1">
+                    <x-strata::icon name="heroicon-o-arrow-right-start-on-rectangle" class="w-4 h-4 mr-2" />
+                    Sign Out
+                </x-strata::button>
+            </div>
+        </x-slot>
+    </x-strata::sidebar>
+
+    <x-strata::sidebar 
+        name="push-sidebar" 
+        variant="push" 
+        position="left"
+        width="w-72"
+        persistent
+    >
+        <x-slot name="header">
+            <div class="text-center">
+                <div class="font-semibold">Push Sidebar</div>
+                <div class="text-sm text-muted-foreground">Pushes content aside</div>
+            </div>
+        </x-slot>
+        
+        <x-strata::sidebar-group label="Navigation">
+            <x-strata::nav-item href="#" icon="heroicon-o-squares-2x2">Overview</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-document-text">Documentation</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-code-bracket">Components</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-paint-brush">Themes</x-strata::nav-item>
+        </x-strata::sidebar-group>
+        
+        <x-strata::sidebar-group label="Tools" collapsible collapsed>
+            <x-strata::nav-item href="#" icon="heroicon-o-wrench-screwdriver">Settings</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-bug-ant">Debug</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-academic-cap">Learning</x-strata::nav-item>
+        </x-strata::sidebar-group>
+    </x-strata::sidebar>
+
+    <x-strata::sidebar 
+        name="right-sidebar" 
+        variant="overlay" 
+        position="right"
+        width="w-96"
+    >
+        <x-slot name="header">
+            <div>
+                <div class="font-semibold">Right Sidebar</div>
+                <div class="text-sm text-muted-foreground">Information panel</div>
+            </div>
+        </x-slot>
+        
+        <div class="space-y-6">
+            <x-strata::card size="sm">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-primary mb-1">1,234</div>
+                    <div class="text-sm text-muted-foreground">Active Users</div>
+                </div>
+            </x-strata::card>
+            
+            <x-strata::card size="sm">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-accent mb-1">89%</div>
+                    <div class="text-sm text-muted-foreground">Success Rate</div>
+                </div>
+            </x-strata::card>
+            
+            <div>
+                <h4 class="font-medium mb-3">Recent Activity</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-3 text-sm">
+                        <x-strata::avatar size="xs" initials="JD" />
+                        <span class="text-muted-foreground">John deployed to production</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm">
+                        <x-strata::avatar size="xs" initials="SM" />
+                        <span class="text-muted-foreground">Sarah created new project</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm">
+                        <x-strata::avatar size="xs" initials="BW" />
+                        <span class="text-muted-foreground">Bob fixed critical bug</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </x-strata::sidebar>
+
+    <x-strata::sidebar 
+        name="collapsible-sidebar" 
+        variant="fixed" 
+        position="left"
+        width="w-64"
+        collapsible
+        persistent
+    >
+        <x-slot name="header">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                    <span class="text-primary-foreground font-bold text-sm">S</span>
+                </div>
+                <div x-show="!collapsed" x-transition>
+                    <div class="font-semibold">Strata UI</div>
+                    <div class="text-xs text-muted-foreground">v1.0</div>
+                </div>
+            </div>
+        </x-slot>
+        
+        <x-strata::sidebar-group label="Main" x-show="!collapsed">
+            <x-strata::nav-item href="#" icon="heroicon-o-home">Dashboard</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-chart-bar">Analytics</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-users">Users</x-strata::nav-item>
+            <x-strata::nav-item href="#" icon="heroicon-o-cog-6-tooth">Settings</x-strata::nav-item>
+        </x-strata::sidebar-group>
+        
+        <div x-show="collapsed" x-transition class="space-y-1">
+            <x-strata::nav-item href="#" icon="heroicon-o-home" :tooltip="'Dashboard'" />
+            <x-strata::nav-item href="#" icon="heroicon-o-chart-bar" :tooltip="'Analytics'" />
+            <x-strata::nav-item href="#" icon="heroicon-o-users" :tooltip="'Users'" />
+            <x-strata::nav-item href="#" icon="heroicon-o-cog-6-tooth" :tooltip="'Settings'" />
+        </div>
+    </x-strata::sidebar>
+    </div>
+</x-strata::main-content>

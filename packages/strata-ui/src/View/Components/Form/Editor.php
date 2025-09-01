@@ -9,7 +9,7 @@ use Illuminate\View\Component;
 
 /**
  * Rich text editor component with contenteditable
- * 
+ *
  * @property string $name The form field name
  * @property string $value The initial content value
  * @property ?string $placeholder Placeholder text

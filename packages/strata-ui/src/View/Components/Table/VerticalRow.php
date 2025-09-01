@@ -12,8 +12,7 @@ class VerticalRow extends Component
     public function __construct(
         public string $label = '',
         public bool $labelBold = true
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

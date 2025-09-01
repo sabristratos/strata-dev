@@ -13,8 +13,7 @@ class Popover extends Component
         public string $position = 'bottom-start',
         public int $offset = 8,
         public string $width = 'w-56'
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

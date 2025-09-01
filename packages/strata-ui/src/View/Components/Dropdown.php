@@ -12,8 +12,7 @@ class Dropdown extends Component
     public function __construct(
         public string $position = 'bottom-end',
         public string $width = 'w-56'
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

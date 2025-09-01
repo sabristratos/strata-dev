@@ -7,7 +7,7 @@
 import { createBaseComponent, extendComponent } from './BaseComponent.js';
 import { lockBodyScroll, unlockBodyScroll, extractComponentName } from '../utilities/dom.js';
 import { storeFocus } from '../utilities/focus.js';
-import { dispatchGlobalEvent, EVENTS } from '../utilities/events.js';
+import { dispatchGlobalEvent, addEventListener, EVENTS } from '../utilities/events.js';
 
 /**
  * Create a base modal component using pure Alpine.js
@@ -60,22 +60,22 @@ export function createBaseModal(config = {}) {
             if (!this.name) return;
             
             // Listen for show events
-            const showCleanup = this.addEventListener(window, `strata-modal-show-${this.name}`, (event) => {
+            const showCleanup = addEventListener(window, `strata-modal-show-${this.name}`, (event) => {
                 this.showModal(event.detail);
             });
             
             // Listen for hide events
-            const hideCleanup = this.addEventListener(window, `strata-modal-hide-${this.name}`, () => {
+            const hideCleanup = addEventListener(window, `strata-modal-hide-${this.name}`, () => {
                 this.hideModal();
             });
             
             // Listen for toggle events
-            const toggleCleanup = this.addEventListener(window, `strata-modal-toggle-${this.name}`, (event) => {
+            const toggleCleanup = addEventListener(window, `strata-modal-toggle-${this.name}`, (event) => {
                 this.toggleModal(event.detail);
             });
             
             // Listen for ESC key if dismissible
-            const escapeCleanup = this.addEventListener(window, 'keydown', (event) => {
+            const escapeCleanup = addEventListener(window, 'keydown', (event) => {
                 if (event.key === 'Escape' && this.show && this.dismissible) {
                     this.hideModal();
                 }
@@ -191,20 +191,6 @@ export function createBaseModal(config = {}) {
             this.hideModal();
         },
         
-        /**
-         * Add event listener with automatic cleanup
-         * @param {Element|Window} target - Event target
-         * @param {string} event - Event name
-         * @param {Function} handler - Event handler
-         * @returns {Function} Cleanup function
-         */
-        addEventListener(target, event, handler) {
-            target.addEventListener(event, handler);
-            
-            return () => {
-                target.removeEventListener(event, handler);
-            };
-        },
         
         /**
          * Get modal state information

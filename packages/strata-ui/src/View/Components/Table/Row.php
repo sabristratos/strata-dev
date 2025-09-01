@@ -12,8 +12,7 @@ class Row extends Component
     public function __construct(
         public bool $selected = false,
         public bool $clickable = false
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

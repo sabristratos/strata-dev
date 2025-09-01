@@ -47,68 +47,24 @@ class Carousel extends Component
 
     /**
      * Validate and normalize component configuration.
-     *
-     * @throws \InvalidArgumentException When configuration values are invalid
      */
     private function validateAndNormalizeConfiguration(): void
     {
-        // Validate variant
-        $validVariants = ['default', 'gallery', 'cards'];
-        if (! in_array($this->variant, $validVariants)) {
-            throw new \InvalidArgumentException(
-                "Invalid variant '{$this->variant}'. Must be one of: ".implode(', ', $validVariants)
-            );
-        }
-
-        // Validate size
-        $validSizes = ['sm', 'md', 'lg'];
-        if (! in_array($this->size, $validSizes)) {
-            throw new \InvalidArgumentException(
-                "Invalid size '{$this->size}'. Must be one of: ".implode(', ', $validSizes)
-            );
-        }
-
-        // Validate and normalize interval
-        if ($this->interval < 1000) {
-            $this->interval = 1000; // Minimum 1 second
-        } elseif ($this->interval > 30000) {
-            $this->interval = 30000; // Maximum 30 seconds
-        }
-
-        // Validate gap
-        $validGaps = ['sm', 'md', 'lg'];
-        if (! in_array($this->gap, $validGaps)) {
-            throw new \InvalidArgumentException(
-                "Invalid gap '{$this->gap}'. Must be one of: ".implode(', ', $validGaps)
-            );
-        }
-
-        // Validate snapAlign
-        $validSnapAligns = ['start', 'center', 'end'];
-        if (! in_array($this->snapAlign, $validSnapAligns)) {
-            throw new \InvalidArgumentException(
-                "Invalid snapAlign '{$this->snapAlign}'. Must be one of: ".implode(', ', $validSnapAligns)
-            );
-        }
+        // Normalize interval (keep between 1-30 seconds)
+        $this->interval = max(1000, min(30000, $this->interval));
 
         // Normalize and validate itemsPerView
         $this->itemsPerView = $this->normalizeItemsPerView($this->itemsPerView);
     }
 
     /**
-     * Normalize itemsPerView configuration and validate values.
-     *
-     * @param  array|string|int  $itemsPerView  The items per view configuration
-     * @return array Normalized configuration
-     *
-     * @throws \InvalidArgumentException When itemsPerView values are invalid
+     * Normalize itemsPerView configuration.
      */
     private function normalizeItemsPerView($itemsPerView): array
     {
         // Convert single values to array format
         if (is_string($itemsPerView) || is_numeric($itemsPerView)) {
-            $count = (int) $itemsPerView;
-            $this->validateItemCount($count, 'default');
+            $count = max(1, min(10, (int) $itemsPerView));
 
             return ['default' => $count];
         }
@@ -118,15 +74,9 @@ class Carousel extends Component
             $validBreakpoints = ['default', 'sm', 'md', 'lg', 'xl'];
 
             foreach ($itemsPerView as $breakpoint => $count) {
-                if (! in_array($breakpoint, $validBreakpoints)) {
-                    throw new \InvalidArgumentException(
-                        "Invalid breakpoint '{$breakpoint}'. Must be one of: ".implode(', ', $validBreakpoints)
-                    );
+                if (in_array($breakpoint, $validBreakpoints)) {
+                    $normalized[$breakpoint] = max(1, min(10, (int) $count));
                 }
-
-                $count = (int) $count;
-                $this->validateItemCount($count, $breakpoint);
-                $normalized[$breakpoint] = $count;
             }
 
             // Ensure we have at least a default value
@@ -139,23 +89,6 @@ class Carousel extends Component
 
         // Fallback to safe default
         return ['default' => 1];
-    }
-
-    /**
-     * Validate item count for a specific breakpoint.
-     *
-     * @param  int  $count  The item count to validate
-     * @param  string  $breakpoint  The breakpoint name
-     *
-     * @throws \InvalidArgumentException When count is invalid
-     */
-    private function validateItemCount(int $count, string $breakpoint): void
-    {
-        if ($count < 1 || $count > 10) {
-            throw new \InvalidArgumentException(
-                "itemsPerView[{$breakpoint}] must be between 1 and 10, got: {$count}"
-            );
-        }
     }
 
     /**
@@ -201,15 +134,15 @@ class Carousel extends Component
     }
 
     /**
-     * Get navigation mode based on items per view configuration.
-     *
-     * @return string 'slide' or 'page'
+     * Get the maximum items per view across all breakpoints.
      */
-    public function getNavigationMode(): string
+    public function getMaxItemsPerView(): int
     {
-        $defaultItems = $this->itemsPerView['default'] ?? 1;
+        if (empty($this->itemsPerView)) {
+            return 1;
+        }
 
-        return $defaultItems > 1 ? 'page' : 'slide';
+        return max(array_values($this->itemsPerView));
     }
 
     /**
@@ -258,13 +191,10 @@ class Carousel extends Component
      */
     public function getItemClasses(): string
     {
-        $classes = [
+        return implode(' ', [
             'flex-shrink-0',
             $this->getSnapAlignClasses(),
-            $this->getItemWidthClasses(),
-        ];
-
-        return implode(' ', array_filter($classes));
+        ]);
     }
 
     /**
@@ -292,50 +222,49 @@ class Carousel extends Component
     }
 
     /**
-     * Get the CSS classes for item width based on responsive itemsPerView with improved calculations.
+     * Get inline styles with CSS custom properties for item widths.
      */
-    public function getItemWidthClasses(): string
+    public function getItemStyles(): string
     {
-        $classes = [];
+        $styles = [];
 
-        // Set flex properties for proper carousel behavior
-        $classes[] = 'min-w-0'; // Allow flex items to shrink below content size
-        $classes[] = 'flex-shrink-0'; // Prevent flex shrinking
-
-        // Add width classes for each breakpoint
         foreach (['default', 'sm', 'md', 'lg', 'xl'] as $breakpoint) {
             if (isset($this->itemsPerView[$breakpoint])) {
                 $items = $this->itemsPerView[$breakpoint];
                 $width = $this->calculateItemWidth($items);
-                $prefix = $breakpoint === 'default' ? '' : $breakpoint.':';
-                $classes[] = "{$prefix}w-[{$width}]";
+
+                if ($breakpoint === 'default') {
+                    $styles[] = "--carousel-item-width: {$width}";
+                } else {
+                    $styles[] = "--carousel-item-width-{$breakpoint}: {$width}";
+                }
             }
         }
 
-        return implode(' ', array_filter($classes));
+        return implode('; ', $styles);
     }
 
     /**
-     * Calculate item width percentage based on items per view.
-     *
-     * @param  int  $items  Number of items per view
-     * @return string CSS width value
+     * Calculate item width using CSS container queries for precise control.
      */
     private function calculateItemWidth(int $items): string
     {
-        if ($items <= 0) {
-            return '100%';
+        if ($items <= 0 || $items === 1) {
+            return '100cqw';
         }
 
-        // Use precise percentage calculation
-        $percentage = (100 / $items);
+        // Get gap size in Tailwind spacing units
+        $gapSpacing = match ($this->gap) {
+            'sm' => '0.5rem', // theme(spacing.2)
+            'lg' => '1.5rem', // theme(spacing.6)
+            default => '1rem', // theme(spacing.4) for md
+        };
 
-        // Round to reasonable precision to avoid CSS issues
-        if ($percentage === floor($percentage)) {
-            return $percentage.'%';
-        }
+        // Calculate total gap space: (items - 1) * gap
+        $totalGaps = $items - 1;
 
-        return number_format($percentage, 6, '.', '').'%';
+        // Container query formula: 100cqw / items - (gap * total_gaps / items)
+        return "calc(100cqw / {$items} - {$gapSpacing} * {$totalGaps} / {$items})";
     }
 
     /**
@@ -397,38 +326,12 @@ class Carousel extends Component
     }
 
     /**
-     * Check if arrows should be shown.
-     */
-    public function shouldShowArrows(): bool
-    {
-        return $this->showArrows;
-    }
-
-    /**
-     * Check if dots should be shown.
+     * Check if dots should be shown - automatically hide for multi-item carousels.
      */
     public function shouldShowDots(): bool
     {
-        return $this->showDots;
-    }
-
-    /**
-     * Get autoplay configuration as JSON.
-     */
-    public function getAutoplayConfig(): string
-    {
-        return json_encode([
-            'enabled' => $this->autoplay,
-            'interval' => $this->interval,
-        ], JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * Get responsive items per view configuration as JSON.
-     */
-    public function getItemsPerViewConfig(): string
-    {
-        return json_encode($this->itemsPerView, JSON_THROW_ON_ERROR);
+        // Auto-hide dots when any breakpoint shows more than 1 item
+        return $this->showDots && $this->getMaxItemsPerView() === 1;
     }
 
     /**
@@ -449,11 +352,9 @@ class Carousel extends Component
             'gap' => $this->gap,
             'snapAlign' => $this->snapAlign,
             'showArrows' => $this->showArrows,
-            'showDots' => $this->showDots,
+            'showDots' => $this->shouldShowDots(), // Use computed value
             'hideScrollbar' => $this->hideScrollbar,
             'itemClasses' => $this->getItemClasses(),
-            'navigationMode' => $this->getNavigationMode(),
-            'hasResponsiveConfig' => $this->hasResponsiveConfig(),
         ];
     }
 }

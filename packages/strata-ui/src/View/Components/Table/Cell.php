@@ -14,8 +14,7 @@ class Cell extends Component
         public bool $sortable = false,
         public string $sortDirection = 'none',
         public string $align = 'left'
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

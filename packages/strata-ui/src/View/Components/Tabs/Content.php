@@ -24,4 +24,17 @@ class Content extends Component
     {
         return view('strata::components.tabs.content');
     }
+
+    /**
+     * Get the CSS classes for the tab content.
+     */
+    public function getContentClasses(): string
+    {
+        $classes = [
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'tab-radius'
+        ];
+
+        return implode(' ', $classes);
+    }
 }

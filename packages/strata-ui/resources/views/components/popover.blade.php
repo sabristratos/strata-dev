@@ -11,7 +11,7 @@
     class="relative"
     {{ $attributes->except(['position', 'offset', 'width']) }}
 >
-    <div @click="open = !open" x-ref="trigger" class="inline-block">
+    <div @click="open = !open" x-ref="trigger" class="inline-block w-full">
         {{ $trigger }}
     </div>
     <template x-teleport="body">

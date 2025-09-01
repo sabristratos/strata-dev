@@ -21,4 +21,19 @@ class TabList extends Component
     {
         return view('strata::components.tabs.list');
     }
+
+    /**
+     * Get the CSS classes for the tab list.
+     */
+    public function getListClasses(): string
+    {
+        $classes = [
+            'flex',
+            'gap-1',
+            'border-b border-border',
+            'mb-4'
+        ];
+
+        return implode(' ', $classes);
+    }
 }

@@ -76,8 +76,9 @@
                             
                             <!-- Upload Progress -->
                             <div x-show="progress[getFileId(file)] !== undefined && progress[getFileId(file)] < 100" class="mt-2">
-                                <div class="w-full bg-muted rounded-full h-1">
-                                    <div class="bg-primary h-1 rounded-full transition-all duration-300" :style="`width: ${progress[getFileId(file)] || 0}%`"></div>
+                                <div class="w-full bg-neutral-200 rounded-full h-2 dark:bg-neutral-700">
+                                    <div class="bg-primary h-2 rounded-full transition-all duration-300" 
+                                         :style="'width: ' + (progress[getFileId(file)] || 0) + '%'"></div>
                                 </div>
                             </div>
                             
@@ -147,8 +148,13 @@
                             
                             <!-- Upload Progress -->
                             <div x-show="progress[getFileId(file)] !== undefined && progress[getFileId(file)] < 100" class="mt-1">
-                                <div class="w-full bg-muted rounded-full h-1">
-                                    <div class="bg-primary h-1 rounded-full transition-all duration-300" :style="`width: ${progress[getFileId(file)] || 0}%`"></div>
+                                <div class="flex justify-between text-xs text-muted-foreground mb-1">
+                                    <span>Uploading...</span>
+                                    <span x-text="Math.round(progress[getFileId(file)] || 0) + '%'"></span>
+                                </div>
+                                <div class="w-full bg-neutral-200 rounded-full h-2 dark:bg-neutral-700">
+                                    <div class="bg-primary h-2 rounded-full transition-all duration-300" 
+                                         :style="'width: ' + (progress[getFileId(file)] || 0) + '%'"></div>
                                 </div>
                             </div>
                             

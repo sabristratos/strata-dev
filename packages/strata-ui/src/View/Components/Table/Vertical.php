@@ -12,8 +12,7 @@ class Vertical extends Component
     public function __construct(
         public bool $striped = false,
         public string $size = 'md'
-    ) {
-    }
+    ) {}
 
     public function render(): View
     {

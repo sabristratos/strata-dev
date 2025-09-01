@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Strata\UI\View\Components\Form;
 
 use Illuminate\Contracts\View\View;
-use Illuminate\View\Component;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\Component;
 
 /**
  * Color picker component for form fields with multiple color space support.
@@ -60,14 +60,14 @@ class ColorPicker extends Component
         $originalShowAlpha = $this->showAlpha;
 
         // If format supports alpha but showAlpha is false, enable alpha
-        if (in_array($this->format, $alphaFormats) && !$this->showAlpha) {
+        if (in_array($this->format, $alphaFormats) && ! $this->showAlpha) {
             $this->showAlpha = true;
             if (app()->environment(['local', 'development'])) {
                 Log::warning("Color picker '{$this->name}': Auto-enabled alpha control for {$this->format} format", [
                     'component' => 'ColorPicker',
                     'name' => $this->name,
                     'original_showAlpha' => $originalShowAlpha,
-                    'corrected_showAlpha' => $this->showAlpha
+                    'corrected_showAlpha' => $this->showAlpha,
                 ]);
             }
         }
@@ -80,7 +80,7 @@ class ColorPicker extends Component
                     'component' => 'ColorPicker',
                     'name' => $this->name,
                     'original_format' => $originalFormat,
-                    'corrected_format' => $this->format
+                    'corrected_format' => $this->format,
                 ]);
             }
         }
@@ -96,7 +96,7 @@ class ColorPicker extends Component
      */
     private function validateDefaultColor(): void
     {
-        if (!$this->defaultColor) {
+        if (! $this->defaultColor) {
             return;
         }
 
@@ -105,26 +105,26 @@ class ColorPicker extends Component
         $hasAlphaInColor = $isRgbaColor || $isHslaColor;
 
         // If defaultColor has alpha but format doesn't support it, warn developer
-        if ($hasAlphaInColor && !in_array($this->format, ['rgba', 'hsla'])) {
+        if ($hasAlphaInColor && ! in_array($this->format, ['rgba', 'hsla'])) {
             if (app()->environment(['local', 'development'])) {
                 Log::warning("Color picker '{$this->name}': Default color has alpha but format doesn't support it", [
                     'component' => 'ColorPicker',
                     'name' => $this->name,
                     'defaultColor' => $this->defaultColor,
                     'format' => $this->format,
-                    'suggestion' => 'Consider using format="rgba" or format="hsla"'
+                    'suggestion' => 'Consider using format="rgba" or format="hsla"',
                 ]);
             }
         }
 
         // If defaultColor doesn't have alpha but showAlpha is true, suggest rgba color
-        if (!$hasAlphaInColor && $this->showAlpha && $this->format === 'rgba') {
+        if (! $hasAlphaInColor && $this->showAlpha && $this->format === 'rgba') {
             if (app()->environment(['local', 'development'])) {
                 Log::info("Color picker '{$this->name}': Consider using RGBA color for consistency with alpha controls", [
                     'component' => 'ColorPicker',
                     'name' => $this->name,
                     'current_defaultColor' => $this->defaultColor,
-                    'suggestion' => 'Use rgba(r, g, b, a) format for defaultColor'
+                    'suggestion' => 'Use rgba(r, g, b, a) format for defaultColor',
                 ]);
             }
         }

@@ -17,8 +17,7 @@ class Table extends Component
         public bool $loading = false,
         public string $size = 'md',
         public bool $sticky = false
-    ) {
-    }
+    ) {}
 
     /**
      * Get the view / contents that represent the component.
