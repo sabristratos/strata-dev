@@ -8,10 +8,13 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\App;
 use Illuminate\View\Component;
+use Strata\UI\Concerns\HasDatePresets;
 use Strata\UI\ValueObjects\DateRange;
 
 class Calendar extends Component
 {
+    use HasDatePresets;
+
     public Carbon $initialDate;
 
     public ?Carbon $startDate;
@@ -41,16 +44,13 @@ class Calendar extends Component
         public bool $showClearButton = false,
         public bool $closeOnSelect = false
     ) {
-        // Handle new wire:model approach with DateRange object or array
         if ($this->value instanceof DateRange) {
             $this->startDate = $this->value->start;
             $this->endDate = $this->value->end;
         } elseif (is_array($this->value) && isset($this->value['start'])) {
             $this->startDate = Carbon::parse($this->value['start']);
             $this->endDate = Carbon::parse($this->value['end']);
-        }
-        // Handle legacy string parameters for backward compatibility
-        elseif ($startDate || $endDate) {
+        } elseif ($startDate || $endDate) {
             $this->startDate = $startDate ? Carbon::parse($startDate) : null;
             $this->endDate = $endDate ? Carbon::parse($endDate) : null;
         } else {
@@ -77,18 +77,5 @@ class Calendar extends Component
         }
 
         return $days;
-    }
-
-    protected function getTranslatedPresets(): array
-    {
-        return [
-            trans('strata::calendar.today', [], $this->locale) => [Carbon::today(), Carbon::today()],
-            trans('strata::calendar.yesterday', [], $this->locale) => [Carbon::yesterday(), Carbon::yesterday()],
-            trans('strata::calendar.this_week', [], $this->locale) => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
-            trans('strata::calendar.last_7_days', [], $this->locale) => [Carbon::now()->subDays(6), Carbon::now()],
-            trans('strata::calendar.this_month', [], $this->locale) => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
-            trans('strata::calendar.last_30_days', [], $this->locale) => [Carbon::now()->subDays(29), Carbon::now()],
-            trans('strata::calendar.last_month', [], $this->locale) => [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()],
-        ];
     }
 }

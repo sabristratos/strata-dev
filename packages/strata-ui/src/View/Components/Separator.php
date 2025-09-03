@@ -36,7 +36,7 @@ class Separator extends Component
     {
         $classes = [];
 
-        // Base classes
+
         if ($this->orientation === 'vertical') {
             $classes[] = 'flex-col';
             $classes[] = 'items-center';
@@ -45,7 +45,7 @@ class Separator extends Component
             $classes[] = 'items-center';
         }
 
-        // Add spacing
+
         $classes[] = $this->getSpacingClasses();
 
         if ($this->class) {
@@ -62,7 +62,7 @@ class Separator extends Component
     {
         $classes = [];
 
-        // Orientation classes
+
         if ($this->orientation === 'vertical') {
             $classes[] = 'w-px';
             $classes[] = 'h-full';
@@ -72,7 +72,7 @@ class Separator extends Component
             $classes[] = 'h-px';
         }
 
-        // Variant classes
+
         $classes[] = $this->getVariantClasses();
 
         return implode(' ', $classes);

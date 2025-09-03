@@ -18,7 +18,7 @@ class Label extends Component
         public ?string $id = null,
         public string $size = 'sm'
     ) {
-        // Auto-generate ID if not provided
+
         if (! $this->id && $this->for) {
             $this->id = $this->for.'-label';
         } elseif (! $this->id) {
@@ -46,7 +46,7 @@ class Label extends Component
             'mb-2',
         ];
 
-        // Add size-specific classes
+
         $classes[] = match ($this->size) {
             'xs' => 'text-xs',
             'sm' => 'text-sm',

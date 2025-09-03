@@ -7,6 +7,8 @@
 
 import { createBaseComponent, extendComponent } from './BaseComponent.js';
 import { dispatchElementEvent, EVENTS } from '../utilities/events.js';
+import { findAllFocusable, focusNext, focusPrevious } from '../utilities/focus.js';
+import { openContent, closeContent, ANIMATION_DURATIONS } from '../utilities/animation.js';
 
 /**
  * Create a Strata Accordion component
@@ -21,7 +23,7 @@ export function createAccordionComponent(config = {}) {
     });
 
     return extendComponent(baseComponent, {
-        // Configuration
+
         type: config.type || 'single',
         variant: config.variant || 'default',
         size: config.size || 'md',
@@ -29,11 +31,11 @@ export function createAccordionComponent(config = {}) {
         iconPosition: config.iconPosition || 'end',
         disabled: config.disabled || false,
 
-        // State management
+
         openItems: [],
         accordionItems: [],
 
-        // Event listener cleanup
+
         _detailsListeners: [],
         _keyboardHandler: null,
 
@@ -41,10 +43,10 @@ export function createAccordionComponent(config = {}) {
          * Initialize accordion component
          */
         init() {
-            // Call base component init
+
             baseComponent.init.call(this);
 
-            // Set initial open items from config
+
             if (config.defaultValue !== null && config.defaultValue !== undefined) {
                 if (this.type === 'single') {
                     this.openItems = typeof config.defaultValue === 'string' ? [config.defaultValue] : [];
@@ -59,11 +61,13 @@ export function createAccordionComponent(config = {}) {
                 this.setupKeyboardNavigation();
                 this.updateItemStates();
                 
-                // Dispatch ready event
+
                 this.dispatchComponentEvent(EVENTS.COMPONENT_READY, {
                     totalItems: this.accordionItems.length,
                     openItems: this.openItems
                 });
+                
+                this.setupFocusManagement();
             });
         },
 
@@ -89,25 +93,25 @@ export function createAccordionComponent(config = {}) {
          */
         enhanceNativeElements() {
             this.accordionItems.forEach(item => {
-                // Add animation class to accordion container if animated
+
                 if (this.animated) {
                     this.$el.setAttribute('data-animated', 'true');
                 }
 
-                // Override default details behavior for single mode
+
                 if (this.type === 'single') {
-                    // Prevent native toggle for single mode with animation support
+
                     const toggleHandler = (event) => {
                         if (item.disabled || this.disabled) {
                             event.preventDefault();
                             return;
                         }
 
-                        // Always allow native behavior, then handle additional logic
+
                         setTimeout(() => {
                             const isOpen = item.element.open;
                             if (isOpen && this.type === 'single') {
-                                // Close other items in single mode
+
                                 this.closeOtherItems(item.value);
                             }
                             this.syncStateFromDOM();
@@ -119,14 +123,14 @@ export function createAccordionComponent(config = {}) {
                         item.summary?.removeEventListener('click', toggleHandler);
                     });
                 } else {
-                    // For multiple mode, handle both animated and non-animated
+
                     const toggleHandler = (event) => {
                         if (item.disabled || this.disabled) {
                             event.preventDefault();
                             return;
                         }
 
-                        // Always allow native behavior for multiple mode
+
                         setTimeout(() => {
                             this.syncStateFromDOM();
                         }, 0);
@@ -138,7 +142,7 @@ export function createAccordionComponent(config = {}) {
                     });
                 }
 
-                // Setup ARIA attributes
+
                 this.setupAriaAttributes(item);
             });
         },
@@ -191,11 +195,22 @@ export function createAccordionComponent(config = {}) {
                         break;
                     case 'Home':
                         event.preventDefault();
-                        this.focusItem(enabledItems[0]);
+                        this.focusFirstItem();
                         break;
                     case 'End':
                         event.preventDefault();
-                        this.focusItem(enabledItems[enabledItems.length - 1]);
+                        this.focusLastItem();
+                        break;
+                    case 'Tab':
+                        if (event.shiftKey) {
+                            if (currentIndex === 0) {
+                                return;
+                            }
+                        } else {
+                            if (currentIndex === enabledItems.length - 1) {
+                                return;
+                            }
+                        }
                         break;
                     case 'Enter':
                     case ' ':
@@ -214,11 +229,36 @@ export function createAccordionComponent(config = {}) {
         },
 
         /**
-         * Focus a specific accordion item
+         * Focus a specific accordion item with fallback handling
          */
         focusItem(item) {
             if (item && item.summary && !item.disabled) {
-                item.summary.focus();
+                try {
+                    item.summary.focus();
+                } catch (e) {
+                    console.warn('Failed to focus accordion item:', e);
+                }
+            }
+        },
+
+        /**
+         * Focus the first focusable accordion item
+         */
+        focusFirstItem() {
+            const firstEnabled = this.accordionItems.find(item => !item.disabled);
+            if (firstEnabled) {
+                this.focusItem(firstEnabled);
+            }
+        },
+
+        /**
+         * Focus the last focusable accordion item  
+         */
+        focusLastItem() {
+            const enabledItems = this.accordionItems.filter(item => !item.disabled);
+            const lastEnabled = enabledItems[enabledItems.length - 1];
+            if (lastEnabled) {
+                this.focusItem(lastEnabled);
             }
         },
 
@@ -236,7 +276,7 @@ export function createAccordionComponent(config = {}) {
             
             if (this.type === 'single') {
                 if (isCurrentlyOpen) {
-                    // Animate close current item
+
                     this.animateClose(item, () => {
                         item.element.open = false;
                         this.openItems = [];
@@ -244,7 +284,7 @@ export function createAccordionComponent(config = {}) {
                         this.dispatchChangeEvent(value, false);
                     });
                 } else {
-                    // Close other items first, then open this one
+
                     this.closeOtherItems(value);
                     this.animateOpen(item, () => {
                         item.element.open = true;
@@ -254,7 +294,7 @@ export function createAccordionComponent(config = {}) {
                     });
                 }
             } else {
-                // Multiple mode
+
                 if (isCurrentlyOpen) {
                     this.animateClose(item, () => {
                         item.element.open = false;
@@ -290,17 +330,17 @@ export function createAccordionComponent(config = {}) {
             
             if (this.type === 'single') {
                 if (isCurrentlyOpen) {
-                    // Close current item
+
                     item.element.open = false;
                     this.openItems = [];
                 } else {
-                    // Close all other items and open this one
+
                     this.closeOtherItems(value);
                     item.element.open = true;
                     this.openItems = [value];
                 }
             } else {
-                // Multiple mode
+
                 item.element.open = !isCurrentlyOpen;
                 if (isCurrentlyOpen) {
                     this.openItems = this.openItems.filter(item => item !== value);
@@ -314,7 +354,7 @@ export function createAccordionComponent(config = {}) {
         },
 
         /**
-         * Animate accordion item opening
+         * Animate accordion item opening using centralized utilities
          */
         animateOpen(item, callback) {
             const content = item.element.querySelector('[data-accordion-content]');
@@ -323,33 +363,19 @@ export function createAccordionComponent(config = {}) {
                 return;
             }
 
-            // Set up the opening animation
             item.element.open = true;
             
-            // Use Alpine.js collapse functionality if available, otherwise fallback
             if (content.getAttribute('x-collapse') !== null) {
-                // Let Alpine.js handle the animation
                 setTimeout(callback, this.getAnimationDuration());
             } else {
-                // Fallback animation
-                content.style.opacity = '0';
-                content.style.transform = 'translateY(-8px)';
-                
-                requestAnimationFrame(() => {
-                    content.style.transition = 'opacity 200ms ease-out, transform 200ms ease-out';
-                    content.style.opacity = '1';
-                    content.style.transform = 'translateY(0)';
-                    
-                    setTimeout(() => {
-                        content.style.transition = '';
-                        callback();
-                    }, 200);
-                });
+                openContent(content, {
+                    duration: ANIMATION_DURATIONS.NORMAL
+                }).then(callback);
             }
         },
 
         /**
-         * Animate accordion item closing
+         * Animate accordion item closing using centralized utilities
          */
         animateClose(item, callback) {
             const content = item.element.querySelector('[data-accordion-content]');
@@ -358,22 +384,14 @@ export function createAccordionComponent(config = {}) {
                 return;
             }
 
-            // Use Alpine.js collapse functionality if available, otherwise fallback
             if (content.getAttribute('x-collapse') !== null) {
-                // Let Alpine.js handle the animation
                 setTimeout(() => {
                     callback();
                 }, this.getAnimationDuration());
             } else {
-                // Fallback animation
-                content.style.transition = 'opacity 200ms ease-out, transform 200ms ease-out';
-                content.style.opacity = '0';
-                content.style.transform = 'translateY(-8px)';
-                
-                setTimeout(() => {
-                    content.style.transition = '';
-                    callback();
-                }, 200);
+                closeContent(content, {
+                    duration: ANIMATION_DURATIONS.NORMAL
+                }).then(callback);
             }
         },
 
@@ -381,7 +399,7 @@ export function createAccordionComponent(config = {}) {
          * Get animation duration based on configuration
          */
         getAnimationDuration() {
-            return this.animated ? 300 : 0;
+            return this.animated ? ANIMATION_DURATIONS.SLOW : 0;
         },
 
         /**
@@ -492,14 +510,32 @@ export function createAccordionComponent(config = {}) {
         },
 
         /**
+         * Set up additional focus management features
+         */
+        setupFocusManagement() {
+            if (this.accordionItems.length === 0) return;
+            
+            const firstEnabledItem = this.accordionItems.find(item => !item.disabled);
+            if (firstEnabledItem) {
+                firstEnabledItem.summary?.setAttribute('tabindex', '0');
+                
+                this.accordionItems.forEach(item => {
+                    if (item !== firstEnabledItem && item.summary) {
+                        item.summary.setAttribute('tabindex', '-1');
+                    }
+                });
+            }
+        },
+
+        /**
          * Component cleanup
          */
         destroy() {
-            // Base component cleanup will handle most cleanup
+
             this.accordionItems = [];
             this.openItems = [];
             
-            // Call base component destroy
+
             baseComponent.destroy.call(this);
         }
     });
@@ -509,5 +545,5 @@ export default {
     createAccordionComponent
 };
 
-// Global registration for template access
+
 window.strataAccordion = createAccordionComponent;

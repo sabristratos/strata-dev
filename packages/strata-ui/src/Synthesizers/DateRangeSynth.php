@@ -37,7 +37,6 @@ class DateRangeSynth extends Synth
 
     public function set(&$target, $key, $value): void
     {
-        // For DateRange objects, we need to create a new instance since they're immutable
         if ($key === 'start') {
             $target = new DateRange(
                 Carbon::parse($value),
@@ -53,11 +52,10 @@ class DateRangeSynth extends Synth
 
     public function get(&$target, $key)
     {
-        // Return the property value from the DateRange object
         return match ($key) {
             'start' => $target->start->toDateString(),
             'end' => $target->end->toDateString(),
-            default => $target->$key ?? null,
+            default => null,
         };
     }
 }

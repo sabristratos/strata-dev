@@ -11,10 +11,10 @@
     class="relative inline-block max-w-max"
     x-ref="trigger"
 >
-    {{-- This is the element that triggers the tooltip --}}
+
     {{ $slot }}
 
-    {{-- The tooltip content itself --}}
+
     <div
         x-show="open"
         x-transition:enter="transition ease-out duration-200"
@@ -25,7 +25,7 @@
         x-transition:leave-end="opacity-0 transform scale-75"
         x-anchor.{{ $position }}.offset.{{ $offset }}="$refs.trigger"
         role="tooltip"
-        class="absolute z-50 px-2.5 py-1.5 text-sm font-medium text-primary-foreground bg-primary/90 tooltip-radius shadow-sm backdrop-blur-sm pointer-events-none whitespace-nowrap max-w-max"
+        class="absolute z-50 px-2.5 py-1.5 text-sm font-medium text-primary-foreground bg-primary/90 tooltip-radius shadow-xs backdrop-blur-sm pointer-events-none whitespace-nowrap max-w-max"
         style="display: none;"
     >
         {{ $text }}

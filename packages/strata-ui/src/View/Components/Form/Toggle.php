@@ -16,7 +16,8 @@ class Toggle extends Component
         public ?string $error = null,
         public mixed $value = null,
         public bool $checked = false,
-        public ?string $id = null
+        public ?string $id = null,
+        public string $position = 'before'
     ) {
         $this->id = $id ?: 'toggle-'.uniqid();
     }

@@ -29,27 +29,27 @@ export function parseOKLCH(oklchValue) {
  * @returns {Object} RGB values
  */
 export function oklchToRgb(l, c, h) {
-    // Convert OKLCH to OKLAB
+
     const hRad = (h * Math.PI) / 180;
     const a = c * Math.cos(hRad);
     const bVal = c * Math.sin(hRad);
     
-    // Convert OKLAB to Linear RGB using the correct transformation matrix
+
     let lms1 = l + 0.3963377774 * a + 0.2158037573 * bVal;
     let lms2 = l - 0.1055613458 * a - 0.0638541728 * bVal;
     let lms3 = l - 0.0894841775 * a - 1.2914855480 * bVal;
     
-    // Cube the LMS values (inverse of cube root from RGB to OKLAB)
+
     lms1 = lms1 * lms1 * lms1;
     lms2 = lms2 * lms2 * lms2;
     lms3 = lms3 * lms3 * lms3;
     
-    // Convert LMS to Linear RGB using the correct matrix
+
     let rLinear = +4.0767416621 * lms1 - 3.3077115913 * lms2 + 0.2309699292 * lms3;
     let gLinear = -1.2684380046 * lms1 + 2.6097574011 * lms2 - 0.3413193965 * lms3;
     let bLinear = -0.0041960863 * lms1 - 0.7034186147 * lms2 + 1.7076147010 * lms3;
     
-    // Apply gamma correction to convert Linear RGB to sRGB
+
     const gammaCorrect = (c) => {
         if (c <= 0.0031308) {
             return 12.92 * c;
@@ -62,7 +62,7 @@ export function oklchToRgb(l, c, h) {
     let g = gammaCorrect(Math.max(0, gLinear));
     let b = gammaCorrect(Math.max(0, bLinear));
     
-    // Clamp values to valid range and convert to 0-255
+
     return {
         r: Math.round(Math.max(0, Math.min(1, r)) * 255),
         g: Math.round(Math.max(0, Math.min(1, g)) * 255),
@@ -161,7 +161,7 @@ export function hslToRgb(h, s, l) {
  * @returns {Object} RGB values
  */
 export function hsvToRgb(h, s, v) {
-    // Validate and sanitize inputs
+
     if (typeof h !== 'number' || isNaN(h)) {
         console.warn('HSV to RGB: Invalid hue value, using 0');
         h = 0;
@@ -175,7 +175,7 @@ export function hsvToRgb(h, s, v) {
         v = 100;
     }
     
-    // Clamp values to valid ranges
+
     h = Math.max(0, Math.min(360, h)) % 360;
     s = Math.max(0, Math.min(100, s)) / 100;
     v = Math.max(0, Math.min(100, v)) / 100;
@@ -200,12 +200,12 @@ export function hsvToRgb(h, s, v) {
         [r, g, b] = [c, 0, x];
     }
     
-    // Calculate final RGB values
+
     const rFinal = (r + m) * 255;
     const gFinal = (g + m) * 255;
     const bFinal = (b + m) * 255;
     
-    // Validate output and prevent NaN
+
     const result = {
         r: Math.round(Math.max(0, Math.min(255, isNaN(rFinal) ? 0 : rFinal))),
         g: Math.round(Math.max(0, Math.min(255, isNaN(gFinal) ? 0 : gFinal))),
@@ -223,7 +223,7 @@ export function hsvToRgb(h, s, v) {
  * @returns {Object} HSV values
  */
 export function rgbToHsv(r, g, b) {
-    // Validate and sanitize inputs
+
     if (typeof r !== 'number' || isNaN(r)) {
         console.warn('RGB to HSV: Invalid red value, using 0');
         r = 0;
@@ -237,7 +237,7 @@ export function rgbToHsv(r, g, b) {
         b = 0;
     }
     
-    // Clamp values to valid range
+
     r = Math.max(0, Math.min(255, r)) / 255;
     g = Math.max(0, Math.min(255, g)) / 255;
     b = Math.max(0, Math.min(255, b)) / 255;
@@ -267,7 +267,7 @@ export function rgbToHsv(r, g, b) {
     h = Math.round(h * 60);
     if (h < 0) h += 360;
     
-    // Validate output and prevent NaN
+
     const result = {
         h: isNaN(h) ? 0 : Math.max(0, Math.min(360, h)),
         s: isNaN(s) ? 0 : Math.round(Math.max(0, Math.min(1, s)) * 100),
@@ -297,7 +297,7 @@ export function rgbToHex(r, g, b) {
  * @returns {Object} RGB values or fallback
  */
 export function hexToRgb(hex) {
-    // Validate input
+
     if (typeof hex !== 'string' || !hex) {
         return { r: 0, g: 0, b: 0 };
     }
@@ -307,7 +307,7 @@ export function hexToRgb(hex) {
         return { r: 0, g: 0, b: 0 };
     }
     
-    // Parse and validate each component
+
     const r = parseInt(result[1], 16);
     const g = parseInt(result[2], 16);
     const b = parseInt(result[3], 16);
@@ -390,7 +390,7 @@ export function formatColor(color) {
 export function parseColor(colorString) {
     if (!colorString) return null;
     
-    // HEX
+
     if (colorString.startsWith('#')) {
         const rgb = hexToRgb(colorString);
         if (rgb) {
@@ -402,7 +402,7 @@ export function parseColor(colorString) {
         }
     }
     
-    // RGB/RGBA
+
     const rgbMatch = colorString.match(/rgba?\(([^)]+)\)/);
     if (rgbMatch) {
         const values = rgbMatch[1].split(',').map(v => parseFloat(v.trim()));
@@ -415,7 +415,7 @@ export function parseColor(colorString) {
         };
     }
     
-    // HSL/HSLA
+
     const hslMatch = colorString.match(/hsla?\(([^)]+)\)/);
     if (hslMatch) {
         const values = hslMatch[1].split(',').map(v => parseFloat(v.trim()));
@@ -428,7 +428,7 @@ export function parseColor(colorString) {
         };
     }
     
-    // OKLCH
+
     const oklchMatch = colorString.match(/oklch\(([^)]+)\)/);
     if (oklchMatch) {
         const values = oklchMatch[1].split(/\s+/).map(v => parseFloat(v));
@@ -453,7 +453,7 @@ export function parseColor(colorString) {
 export function convertColorFormat(color, targetFormat, alpha = 1) {
     let rgb = { r: 0, g: 0, b: 0 };
     
-    // Convert source to RGB first
+
     if (color.format === 'hex' || (color.r !== undefined && color.g !== undefined && color.b !== undefined)) {
         rgb = color.format === 'hex' ? hexToRgb(color.value) : { r: color.r, g: color.g, b: color.b };
     } else if (color.format === 'hsl' || color.format === 'hsla') {
@@ -462,7 +462,7 @@ export function convertColorFormat(color, targetFormat, alpha = 1) {
         rgb = oklchToRgb(color.l, color.c, color.h);
     }
     
-    // Convert RGB to target format
+
     switch (targetFormat) {
         case 'hex':
             return {
@@ -523,7 +523,7 @@ export function isColorValue(value) {
     
     value = value.trim();
     
-    // Check for common color formats
+
     return (
         value.startsWith('#') || // Hex colors
         value.startsWith('rgb(') || // RGB colors
@@ -545,7 +545,7 @@ export function getBrandColors() {
     const style = getComputedStyle(root);
     const brandColors = {};
     
-    // Define color categories and their patterns
+
     const colorCategories = {
         brand: [
             { pattern: /^--primary-?(.*)$/, baseName: 'Primary' },
@@ -570,18 +570,18 @@ export function getBrandColors() {
         ]
     };
     
-    // Get all CSS custom properties
+
     for (let i = 0; i < style.length; i++) {
         const property = style[i];
         if (property.startsWith('--')) {
             const value = style.getPropertyValue(property).trim();
             
-            // Skip non-color values (check if it contains color-like patterns)
+
             if (!isColorValue(value)) {
                 continue;
             }
             
-            // Categorize the color
+
             let categorized = false;
             for (const [category, patterns] of Object.entries(colorCategories)) {
                 for (const { pattern, baseName } of patterns) {
@@ -700,7 +700,7 @@ export function generateColorPalette(baseColor, count = 9) {
 export function isValidColor(colorString) {
     if (!colorString) return false;
     
-    // Test with a temporary element
+
     const testEl = document.createElement('div');
     testEl.style.color = colorString;
     return testEl.style.color !== '';

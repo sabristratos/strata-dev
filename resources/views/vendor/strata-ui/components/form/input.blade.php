@@ -127,7 +127,7 @@
                             type="button"
                             x-show="hasValue"
                             x-on:click.stop="clearInput()"
-                            class="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
+                            class="text-muted-foreground hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
                             aria-label="Clear input"
                             tabindex="0"
                         >
@@ -139,7 +139,7 @@
                         <button
                             type="button"
                             x-on:click.stop="togglePassword()"
-                            class="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
+                            class="text-muted-foreground hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
                             :aria-label="showPassword ? 'Hide password' : 'Show password'"
                             tabindex="0"
                         >

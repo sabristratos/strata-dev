@@ -33,15 +33,15 @@ class ColorPicker extends Component
         public float $alpha = 1.0,
         public string $variant = 'default',
     ) {
-        // Backward compatibility for helpText
+
         if (! $this->description && $this->helpText) {
             $this->description = $this->helpText;
         }
 
-        // Validate and auto-correct invalid format/alpha combinations
+
         $this->validateConfiguration();
 
-        // Auto-generate ID if not provided
+
         if (! $this->id && $this->name) {
             $this->id = $this->name.'_'.uniqid();
         } elseif (! $this->id) {
@@ -59,7 +59,7 @@ class ColorPicker extends Component
         $originalFormat = $this->format;
         $originalShowAlpha = $this->showAlpha;
 
-        // If format supports alpha but showAlpha is false, enable alpha
+
         if (in_array($this->format, $alphaFormats) && ! $this->showAlpha) {
             $this->showAlpha = true;
             if (app()->environment(['local', 'development'])) {
@@ -72,7 +72,7 @@ class ColorPicker extends Component
             }
         }
 
-        // If showAlpha is true but format doesn't support it, switch to rgba
+
         if ($this->showAlpha && in_array($this->format, $nonAlphaFormats)) {
             $this->format = 'rgba';
             if (app()->environment(['local', 'development'])) {
@@ -85,7 +85,7 @@ class ColorPicker extends Component
             }
         }
 
-        // Validate defaultColor format compatibility
+
         if ($this->defaultColor) {
             $this->validateDefaultColor();
         }
@@ -104,7 +104,7 @@ class ColorPicker extends Component
         $isHslaColor = str_contains($this->defaultColor, 'hsla');
         $hasAlphaInColor = $isRgbaColor || $isHslaColor;
 
-        // If defaultColor has alpha but format doesn't support it, warn developer
+
         if ($hasAlphaInColor && ! in_array($this->format, ['rgba', 'hsla'])) {
             if (app()->environment(['local', 'development'])) {
                 Log::warning("Color picker '{$this->name}': Default color has alpha but format doesn't support it", [
@@ -117,7 +117,7 @@ class ColorPicker extends Component
             }
         }
 
-        // If defaultColor doesn't have alpha but showAlpha is true, suggest rgba color
+
         if (! $hasAlphaInColor && $this->showAlpha && $this->format === 'rgba') {
             if (app()->environment(['local', 'development'])) {
                 Log::info("Color picker '{$this->name}': Consider using RGBA color for consistency with alpha controls", [

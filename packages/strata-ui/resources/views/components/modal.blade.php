@@ -10,7 +10,7 @@
     $modalId = $name ? 'modal-' . $name : uniqid('modal-');
     $isWireModel = $attributes->has('wire:model') || $attributes->has('wire:model.self');
     
-    // Modal container positioning classes
+
     $containerClasses = [
         'fixed inset-0 z-50 flex',
         $variant === 'flyout' && $position === 'left' ? 'justify-start' : '',
@@ -19,7 +19,7 @@
         $variant !== 'flyout' ? 'items-center justify-center p-4' : '',
     ];
     
-    // Modal content classes
+
     $contentClasses = [
         'relative bg-card text-card-foreground shadow-xl border border-border overflow-hidden',
         $getSizeClasses(),
@@ -28,7 +28,7 @@
         $variant !== 'bare' ? 'w-full' : '',
     ];
     
-    // Alpine transition classes based on variant
+
     $enterTransitions = match($variant) {
         'flyout' => match($position) {
             'left' => 'transition ease-out duration-300|opacity-0 -translate-x-full|opacity-100 translate-x-0',
@@ -76,7 +76,7 @@
     style="display: none;"
     {{ $attributes->except(['name', 'variant', 'size', 'position', 'dismissible', 'wire:model', 'wire:model.self']) }}
 >
-    {{-- Alpine-controlled backdrop --}}
+
     <div 
         x-show="show"
         x-transition:enter="transition ease-out duration-300"
@@ -91,7 +91,7 @@
         class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
     ></div>
     
-    {{-- Modal container --}}
+
     <div @class(array_filter($containerClasses))>
         <div
             x-show="show"
@@ -133,7 +133,7 @@
     </div>
 </div>
 
-{{-- Session modal data for JavaScript API --}}
+
 @if (session()->has('strata_modal'))
     <script data-strata-session-modal>
         @json(session('strata_modal'))
@@ -145,7 +145,7 @@
                 try {
                     const modalData = JSON.parse(sessionModalScript.textContent);
                     if (modalData.id) {
-                        // Delay slightly to ensure modals are rendered
+
                         setTimeout(() => {
                             window.dispatchEvent(new CustomEvent(`strata-modal-show-${modalData.id}`, { detail: modalData }));
                         }, 100);

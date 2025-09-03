@@ -10,7 +10,7 @@
 @endphp
 
 @if($hasLabel())
-    {{-- Labeled Separator --}}
+
     <div 
         {{ $attributes->merge(['class' => $getContainerClasses()]) }}
         {!! $accessibilityAttrs !!}
@@ -26,7 +26,7 @@
         @endif
     </div>
 @else
-    {{-- Simple Separator --}}
+
     <div 
         {{ $attributes->merge(['class' => $getContainerClasses()]) }}
         {!! $accessibilityAttrs !!}

@@ -20,7 +20,7 @@ export function isLivewireAvailable() {
 export function hasWireModel(element) {
     if (!element || !element.hasAttribute) return false;
     
-    // Check for various wire:model patterns
+
     const wireModelPatterns = [
         'wire:model',
         'wire:model.defer',
@@ -96,14 +96,14 @@ export function createLivewireBinding(alpineComponent, property, element) {
     const wireModelProperty = getWireModel(element);
     if (!wireModelProperty) return null;
     
-    // Watch Alpine property and sync to Livewire
+
     const unwatchAlpine = alpineComponent.$watch(property, (value) => {
         if (alpineComponent.$wire) {
             alpineComponent.$wire.set(wireModelProperty, value);
         }
     });
     
-    // Listen for Livewire updates and sync to Alpine
+
     let unwatchLivewire = null;
     if (alpineComponent.$wire && typeof alpineComponent.$wire.watch === 'function') {
         unwatchLivewire = alpineComponent.$wire.watch(wireModelProperty, (value) => {
@@ -111,7 +111,7 @@ export function createLivewireBinding(alpineComponent, property, element) {
         });
     }
     
-    // Return cleanup function
+
     return function cleanup() {
         if (unwatchAlpine) unwatchAlpine();
         if (unwatchLivewire) unwatchLivewire();
@@ -129,30 +129,30 @@ export function createLivewireAlpineComponent(config, property = 'value') {
         [property]: config.hasWireModel ? null : config[property],
         
         init() {
-            // Handle Livewire entanglement
+
             if (config.hasWireModel && this.$wire) {
-                // Set initial value from Livewire
+
                 this[property] = config[property];
                 
-                // Create binding if element has wire:model
+
                 if (hasWireModel(this.$el)) {
                     this._livewireCleanup = createLivewireBinding(this, property, this.$el);
                 }
             }
             
-            // Call original init if provided
+
             if (config.init) {
                 config.init.call(this);
             }
         },
         
         destroy() {
-            // Cleanup Livewire binding
+
             if (this._livewireCleanup) {
                 this._livewireCleanup();
             }
             
-            // Call original destroy if provided  
+
             if (config.destroy) {
                 config.destroy.call(this);
             }
@@ -224,16 +224,16 @@ export function waitForLivewire(timeout = 5000) {
             }
         };
         
-        // Listen for livewire:init event
+
         document.addEventListener('livewire:init', checkLivewire, { once: true });
         
-        // Timeout fallback
+
         timeoutId = setTimeout(() => {
             document.removeEventListener('livewire:init', checkLivewire);
             reject(new Error('Livewire not available within timeout'));
         }, timeout);
         
-        // Check immediately in case we missed the init event
+
         checkLivewire();
     });
 }

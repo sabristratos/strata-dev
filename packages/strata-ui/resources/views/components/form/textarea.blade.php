@@ -5,48 +5,49 @@
 @endphp
 
 <div class="space-y-2">
-    {{-- Label Component --}}
+
     @if($hasLabel)
-        <x-strata::form.label 
-            :for="$id" 
+        <x-strata::form.label
+            :for="$id"
             :required="$required"
         >
             {{ $label }}
         </x-strata::form.label>
     @endif
-    
-    {{-- Helper Text Component --}}
+
+
     @if($hasDescription && !$hasError)
-        <x-strata::form.helper 
+        <x-strata::form.helper
             :field="$name"
             :text="$description"
         />
     @endif
 
-    {{-- Textarea Element --}}
+
     <textarea
         @if($autoResize)
             x-data="{
-                value: @if($attributes->wire('model')) @entangle($attributes->wire('model')) @else '{{ $value }}' @endif,
-                
+                value: @if($attributes->has('wire:model')) @entangle($attributes->get('wire:model')) @else @js($value ?? '') @endif,
+
+                init() {
+                    this.$nextTick(() => this.resize());
+                },
+
                 resize() {
                     $el.style.height = 'auto';
                     $el.style.height = $el.scrollHeight + 'px';
-                },
-                
-                init() {
-                    this.$nextTick(() => this.resize());
                 }
             }"
             x-model="value"
             x-on:input="resize"
             x-init="resize()"
         @else
-            @if($attributes->wire('model'))
-                x-data="{ value: @entangle($attributes->wire('model')) }"
+            @if($attributes->has('wire:model'))
+                x-data="{ value: @entangle($attributes->get('wire:model')).live }"
                 x-model="value"
             @else
-                @if($value) value="{{ $value }}" @endif
+                x-data="{ value: @js($value ?? '') }"
+                x-model="value"
             @endif
         @endif
         id="{{ $id }}"
@@ -62,11 +63,11 @@
         rows="{{ $rows }}"
         {{ $attributes->except(['wire:model', 'id', 'name', 'placeholder', 'required', 'disabled', 'readonly']) }}
         class="{{ $getTextareaClasses() }}"
-    >@if(!$attributes->wire('model') && $value){{ $value }}@endif</textarea>
-    
-    {{-- Error Component --}}
+    >@if(!$attributes->has('wire:model') && $value){!! e($value) !!}@endif</textarea>
+
+
     @if($hasError)
-        <x-strata::form.error 
+        <x-strata::form.error
             :field="$name"
             :message="$error"
         />

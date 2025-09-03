@@ -9,14 +9,14 @@
  * Centralizes event naming to prevent typos and ensure consistency
  */
 export const EVENTS = {
-    // Modal events
+
     MODAL_OPENED: 'strata-modal-opened',
     MODAL_CLOSED: 'strata-modal-closed', 
     MODAL_SHOW: 'strata-modal-show',
     MODAL_HIDE: 'strata-modal-hide',
     MODAL_TOGGLE: 'strata-modal-toggle',
     
-    // Toast events  
+
     TOAST_SHOW: 'strata-toast-show',
     TOAST_HIDE: 'strata-toast-hide',
     TOAST_DISMISS: 'strata-toast-dismiss',
@@ -25,15 +25,15 @@ export const EVENTS = {
     TOAST_CLEARED: 'strata-toast-cleared',
     TOAST_ACTION_EXECUTED: 'strata-toast-action-executed',
     
-    // Tab events
+
     TAB_CHANGE: 'strata-tab-change',
     TAB_ACTIVATED: 'strata-tab-activated',
     
-    // Rating events
+
     RATING_CHANGE: 'strata-rating-change',
     RATING_CLEARED: 'strata-rating-cleared',
     
-    // Video Player events
+
     VIDEO_READY: 'strata-video-ready',
     VIDEO_PLAY: 'strata-video-play',
     VIDEO_PAUSE: 'strata-video-pause',
@@ -42,37 +42,45 @@ export const EVENTS = {
     VIDEO_VOLUME_CHANGE: 'strata-video-volume-change',
     VIDEO_SEEK: 'strata-video-seek',
     VIDEO_FULLSCREEN_CHANGE: 'strata-video-fullscreen-change',
+    VIDEO_FULLSCREEN_ENTER: 'strata-video-fullscreen-enter',
+    VIDEO_FULLSCREEN_EXIT: 'strata-video-fullscreen-exit',
+    VIDEO_SPEED_CHANGE: 'strata-video-speed-change',
     VIDEO_ENDED: 'strata-video-ended',
     VIDEO_ERROR: 'strata-video-error',
     VIDEO_LOADING: 'strata-video-loading',
     VIDEO_LOADED: 'strata-video-loaded',
     VIDEO_SOURCE_CHANGE: 'strata-video-source-change',
     
-    // Carousel events
+
     CAROUSEL_SLIDE_CHANGE: 'strata-carousel-slide-change',
     CAROUSEL_NEXT: 'strata-carousel-next',
     CAROUSEL_PREVIOUS: 'strata-carousel-previous',
+    CAROUSEL_AUTOPLAY_START: 'strata-carousel-autoplay-start',
+    CAROUSEL_AUTOPLAY_STOP: 'strata-carousel-autoplay-stop',
+    CAROUSEL_AUTOPLAY_PAUSE: 'strata-carousel-autoplay-pause',
+    CAROUSEL_AUTOPLAY_RESUME: 'strata-carousel-autoplay-resume',
+    CAROUSEL_READY: 'strata-carousel-ready',
     
-    // Accordion events
+
     ACCORDION_ITEM_TOGGLE: 'strata-accordion-item-toggle',
     ACCORDION_ITEM_OPENED: 'strata-accordion-item-opened',
     ACCORDION_ITEM_CLOSED: 'strata-accordion-item-closed',
     
-    // Select events
+
     SELECT_OPTION_CHANGE: 'strata-select-option-change',
     SELECT_OPENED: 'strata-select-opened',
     SELECT_CLOSED: 'strata-select-closed',
     
-    // Form events
+
     FORM_CHANGE: 'strata-form-change',
     FORM_SUBMIT: 'strata-form-submit',
     FORM_RESET: 'strata-form-reset',
     
-    // Generic component events
+
     COMPONENT_INIT: 'strata-component-init',
     COMPONENT_DESTROY: 'strata-component-destroy',
     
-    // Common interaction events
+
     CHANGE: 'change',
     CLOSE: 'close',
     CANCEL: 'cancel',

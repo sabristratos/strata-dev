@@ -17,7 +17,6 @@ class SidebarGroup extends Component
         public bool $collapsible = false,
         public ?bool $collapsed = null,
     ) {
-        // Smart default: collapsible groups start collapsed unless explicitly set
         if ($this->collapsed === null) {
             $this->collapsed = $this->collapsible;
         }
@@ -85,12 +84,17 @@ class SidebarGroup extends Component
             $classes[] = 'py-2';
             $classes[] = 'cursor-pointer';
             $classes[] = 'hover:text-muted-foreground/90';
+            $classes[] = 'hover:bg-accent/10';
             $classes[] = 'transition-colors';
             $classes[] = 'duration-200';
             $classes[] = 'flex';
             $classes[] = 'items-center';
             $classes[] = 'justify-between';
-            $classes[] = 'focus:outline-none';
+            $classes[] = 'focus:ring-0';
+            $classes[] = 'focus-visible:outline-hidden';
+            $classes[] = 'focus-visible:ring-2';
+            $classes[] = 'focus-visible:ring-ring';
+            $classes[] = 'focus-visible:ring-offset-1';
         } else {
             $classes[] = 'px-3';
             $classes[] = 'py-2';
@@ -109,8 +113,7 @@ class SidebarGroup extends Component
         if ($this->collapsible) {
             $classes[] = 'transition-all';
             $classes[] = 'duration-200';
-            $classes[] = 'sidebar-group-nested'; // Add line styling for nested items
-            $classes[] = 'relative'; // For pseudo-element positioning
+            $classes[] = 'relative';
         }
 
         return implode(' ', $classes);

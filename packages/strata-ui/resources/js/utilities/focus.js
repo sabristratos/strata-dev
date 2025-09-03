@@ -61,13 +61,13 @@ export function createFocusTrap(container) {
         if (e.key !== 'Tab') return;
         
         if (e.shiftKey) {
-            // Shift + Tab (backward)
+
             if (document.activeElement === firstFocusable) {
                 e.preventDefault();
                 lastFocusable.focus();
             }
         } else {
-            // Tab (forward)
+
             if (document.activeElement === lastFocusable) {
                 e.preventDefault();
                 firstFocusable.focus();
@@ -77,10 +77,10 @@ export function createFocusTrap(container) {
     
     container.addEventListener('keydown', handleKeyDown);
     
-    // Focus first element initially
+
     focusFirst(container);
     
-    // Return cleanup function
+
     return () => {
         container.removeEventListener('keydown', handleKeyDown);
     };
@@ -109,10 +109,10 @@ export function storeFocus() {
 export function isFocusable(element) {
     if (!element) return false;
     
-    // Check if element matches focusable selector
+
     if (!element.matches(FOCUSABLE_ELEMENTS)) return false;
     
-    // Check if element is visible and not disabled
+
     return element.offsetParent !== null && !element.disabled;
 }
 

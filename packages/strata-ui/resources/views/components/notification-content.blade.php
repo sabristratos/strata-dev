@@ -5,7 +5,7 @@
 ])
 
 <div class="flex items-start gap-3">
-    {{-- Image/Avatar --}}
+
     @if ($image)
         <div class="shrink-0 flex items-center">
             @if (is_string($image))
@@ -20,7 +20,7 @@
         </div>
     @endif
     
-    {{-- Content --}}
+
     <div class="flex-1 min-w-0">
         @if ($title)
             <div class="text-base font-medium text-foreground">
@@ -34,7 +34,7 @@
             </div>
         @endif
         
-        {{-- Custom content slot --}}
+
         @if ($slot->isNotEmpty())
             <div class="{{ ($title || $description) ? 'mt-2' : '' }}">
                 {{ $slot }}
@@ -42,7 +42,7 @@
         @endif
     </div>
     
-    {{-- Actions --}}
+
     @isset($actions)
         <div class="shrink-0 flex items-center gap-1">
             {{ $actions }}

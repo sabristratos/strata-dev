@@ -32,7 +32,6 @@ class Input extends Component
             $this->showPasswordToggle = true;
         }
 
-        // Auto-generate ID if not provided
         if (! $this->id && $this->name) {
             $this->id = $this->name.'_'.uniqid();
         } elseif (! $this->id) {
@@ -55,7 +54,6 @@ class Input extends Component
     {
         $classes = ['input-base', 'h-9', 'items-center'];
 
-        // Add error state styling using theme tokens
         if ($this->error) {
             $classes[] = 'border-destructive';
             $classes[] = 'focus-within:ring-destructive';

@@ -7,6 +7,7 @@
 
 import { createBaseComponent, extendComponent } from './BaseComponent.js';
 import { dispatchElementEvent, addEventListener, EVENTS } from '../utilities/events.js';
+import { findAllFocusable, focusFirst } from '../utilities/focus.js';
 
 /**
  * Create a Strata Tabs component
@@ -21,28 +22,28 @@ export function createTabsComponent(config = {}) {
     });
 
     return extendComponent(baseComponent, {
-        // Configuration
+
         activeTab: config.defaultValue || null,
         orientation: config.orientation || 'horizontal',
         activationMode: config.activationMode || 'automatic',
         variant: config.variant || 'default',
         containerId: config.id || null,
         
-        // State management
+
         triggers: [],
         contents: [],
 
-        // Event listener cleanup
+
         _keyboardListeners: [],
 
         /**
          * Initialize tabs component
          */
         init() {
-            // Call base component init
+
             baseComponent.init.call(this);
 
-            // Generate unique ID if not provided
+
             if (!this.containerId && this.$el) {
                 this.containerId = this.$el.id || `strata-tabs-${Math.random().toString(36).substr(2, 9)}`;
             }
@@ -52,7 +53,7 @@ export function createTabsComponent(config = {}) {
                 this.setupKeyboardNavigation();
                 this.setupAriaAttributes();
                 
-                // Set initial active tab if none specified
+
                 if (!this.activeTab && this.triggers.length > 0) {
                     const firstEnabledTrigger = this.triggers.find(t => !t.disabled);
                     if (firstEnabledTrigger) {
@@ -62,12 +63,14 @@ export function createTabsComponent(config = {}) {
 
                 this.updateAriaStates();
 
-                // Dispatch ready event
+
                 this.dispatchComponentEvent(EVENTS.COMPONENT_READY, {
                     totalTabs: this.triggers.length,
                     activeTab: this.activeTab,
                     containerId: this.containerId
                 });
+                
+                this.setupFocusManagement();
             });
         },
 
@@ -134,6 +137,18 @@ export function createTabsComponent(config = {}) {
                 case ' ':
                     this.activateTab(currentValue);
                     break;
+                case 'Tab':
+                    if (!event.shiftKey) {
+                        const activeContent = this.contents.find(c => c.value === this.activeTab);
+                        if (activeContent) {
+                            const firstFocusableInContent = findAllFocusable(activeContent.element)[0];
+                            if (firstFocusableInContent) {
+                                event.preventDefault();
+                                firstFocusableInContent.focus();
+                            }
+                        }
+                    }
+                    break;
                 default:
                     handled = false;
             }
@@ -173,7 +188,7 @@ export function createTabsComponent(config = {}) {
                 }
             });
             
-            // Setup tablist attributes
+
             const tabList = this.$el.querySelector('[role="tablist"]');
             if (tabList) {
                 tabList.setAttribute('aria-orientation', this.orientation);
@@ -194,7 +209,7 @@ export function createTabsComponent(config = {}) {
             
             this.updateAriaStates();
             
-            // Dispatch events
+
             this.dispatchComponentEvent(EVENTS.TAB_CHANGE, { 
                 activeTab: value, 
                 previousTab: previousTab,
@@ -290,7 +305,7 @@ export function createTabsComponent(config = {}) {
                 tab.element.setAttribute('disabled', 'true');
                 tab.element.setAttribute('aria-disabled', 'true');
                 
-                // If disabling active tab, switch to first enabled tab
+
                 if (this.activeTab === value) {
                     const firstEnabled = this.triggers.find(t => !t.disabled && t.value !== value);
                     if (firstEnabled) {
@@ -303,13 +318,71 @@ export function createTabsComponent(config = {}) {
         },
 
         /**
+         * Focus a specific tab trigger with error handling
+         */
+        focusTrigger(trigger) {
+            if (trigger && trigger.element && !trigger.disabled) {
+                try {
+                    trigger.element.focus();
+                } catch (e) {
+                    console.warn('Failed to focus tab trigger:', e);
+                }
+            }
+        },
+
+        /**
+         * Focus the first focusable tab trigger
+         */
+        focusFirstTrigger() {
+            const firstEnabled = this.triggers.find(t => !t.disabled);
+            if (firstEnabled) {
+                this.focusTrigger(firstEnabled);
+            }
+        },
+
+        /**
+         * Focus the last focusable tab trigger
+         */
+        focusLastTrigger() {
+            const enabledTriggers = this.triggers.filter(t => !t.disabled);
+            const lastEnabled = enabledTriggers[enabledTriggers.length - 1];
+            if (lastEnabled) {
+                this.focusTrigger(lastEnabled);
+            }
+        },
+
+        /**
+         * Set up additional focus management features
+         */
+        setupFocusManagement() {
+            if (this.triggers.length === 0) return;
+            
+            this.triggers.forEach(trigger => {
+                const isActive = trigger.value === this.activeTab;
+                trigger.element?.setAttribute('tabindex', isActive ? '0' : '-1');
+            });
+            
+            this.contents.forEach(content => {
+                const isActive = content.value === this.activeTab;
+                if (isActive && !content.forceMount) {
+                    const focusableElements = findAllFocusable(content.element);
+                    focusableElements.forEach(el => {
+                        if (!el.hasAttribute('tabindex') || el.getAttribute('tabindex') !== '-1') {
+                            el.setAttribute('tabindex', '0');
+                        }
+                    });
+                }
+            });
+        },
+
+        /**
          * Component cleanup
          */
         destroy() {
             this.triggers = [];
             this.contents = [];
             
-            // Call base component destroy
+
             baseComponent.destroy.call(this);
         }
     });

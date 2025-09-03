@@ -30,12 +30,12 @@ class Icon extends Component
      */
     public function getIconComponent(): string
     {
-        // Support different icon libraries
+
         if ($this->library) {
             return $this->library.'::'.$this->name;
         }
 
-        // Default to heroicons if available, otherwise blade-heroicons
+
         if (str_starts_with($this->name, 'heroicon-')) {
             return 'heroicon-'.str_replace('heroicon-', '', $this->name);
         }

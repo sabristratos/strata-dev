@@ -19,7 +19,7 @@ export function createBaseFileUpload(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // File state
+
         files: config.multiple ? [] : null,
         dragOver: false,
         uploading: false,
@@ -28,7 +28,7 @@ export function createBaseFileUpload(config = {}) {
         previews: {},
         errors: {},
         
-        // Configuration
+
         hasWireModel: config.hasWireModel || false,
         maxSize: config.maxSize || 5120, // KB
         accept: config.accept || '*/*',
@@ -37,20 +37,20 @@ export function createBaseFileUpload(config = {}) {
         enableReordering: config.enableReordering || false,
         maxSizeFormatted: config.maxSizeFormatted || '5MB',
         
-        // Event handlers
+
         _fileInputHandler: null,
 
         /**
          * File upload specific initialization
          */
         init() {
-            // Initialize existing files if any
+
             this.initializeExistingFiles();
             
-            // Add file input change listener
+
             if (this.$refs.fileInput) {
                 this._fileInputHandler = (e) => {
-                    // Skip if we're processing a drop (to avoid double processing)
+
                     if (!this.processingDrop) {
                         this.handleFileSelection(e.target.files);
                     }
@@ -68,7 +68,7 @@ export function createBaseFileUpload(config = {}) {
          * File upload specific cleanup
          */
         destroy() {
-            // Clean up blob URLs
+
             Object.values(this.previews).forEach(url => {
                 if (url && typeof url === 'string' && url.startsWith('blob:')) {
                     URL.revokeObjectURL(url);
@@ -118,7 +118,7 @@ export function createBaseFileUpload(config = {}) {
             e.preventDefault();
             this.dragOver = false;
             
-            // For Livewire integration, we need to transfer files to the input
+
             if (this.$wire && this.hasWireModel) {
                 this.processingDrop = true;
                 
@@ -127,13 +127,13 @@ export function createBaseFileUpload(config = {}) {
                     dataTransfer.items.add(file);
                 });
                 
-                // Update the file input and let Livewire handle it
+
                 this.$refs.fileInput.files = dataTransfer.files;
                 
-                // Handle UI updates separately
+
                 this.handleFileSelection(e.dataTransfer.files);
                 
-                // Reset flag after a brief delay to allow change event to be ignored
+
                 setTimeout(() => {
                     this.processingDrop = false;
                 }, 10);
@@ -156,29 +156,34 @@ export function createBaseFileUpload(config = {}) {
          * @param {FileList} fileList - Selected files
          */
         handleFileSelection(fileList) {
-            const files = Array.from(fileList);
-            this.errors = {};
-            
-            // Validate files
-            const validFiles = files.filter(file => this.validateFile(file));
-            
-            if (validFiles.length === 0) return;
-            
-            // For both Livewire and non-Livewire, just handle UI state
-            // Let the actual file input and wire:model handle the data
-            if (this.multiple) {
-                validFiles.forEach(file => this.addFile(file));
-            } else {
-                // Single file mode - replace existing
-                this.clearFiles();
-                this.addFile(validFiles[0]);
-            }
+            try {
+                const files = Array.from(fileList);
+                this.errors = {};
+                
 
-            // Dispatch change event
-            this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
-                files: this.files,
-                fileCount: this.multiple ? (this.files ? this.files.length : 0) : (this.files ? 1 : 0)
-            });
+                const validFiles = files.filter(file => this.validateFile(file));
+                
+                if (validFiles.length === 0) return;
+                
+
+
+                if (this.multiple) {
+                    validFiles.forEach(file => this.addFile(file));
+                } else {
+
+                    this.clearFiles();
+                    this.addFile(validFiles[0]);
+                }
+
+
+                this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
+                    files: this.files,
+                    fileCount: this.multiple ? (this.files ? this.files.length : 0) : (this.files ? 1 : 0)
+                });
+            } catch (error) {
+                console.error('File selection error:', error);
+                this.errors['general'] = 'An error occurred while processing files. Please try again.';
+            }
         },
 
         /**
@@ -189,13 +194,13 @@ export function createBaseFileUpload(config = {}) {
         validateFile(file) {
             const fileId = this.generateFileId(file);
             
-            // Check file size
+
             if (file.size > this.maxSize * 1024) {
                 this.errors[fileId] = `File size exceeds ${this.maxSizeFormatted}`;
                 return false;
             }
             
-            // Check file type if accept is specified
+
             if (this.accept && this.accept !== '*/*') {
                 const acceptedTypes = this.accept.split(',').map(type => type.trim());
                 const isAccepted = acceptedTypes.some(type => {
@@ -232,64 +237,73 @@ export function createBaseFileUpload(config = {}) {
          * @param {File} file - File to add
          */
         addFile(file) {
-            const fileId = this.generateFileId(file);
-            
-            // Create preview for images
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.previews[fileId] = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-            
-            // For Livewire integration, only manage UI state
-            if (this.$wire && this.hasWireModel) {
-                // Create UI-only file objects for display purposes
-                const uiFileObject = {
-                    id: fileId,
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    file: file,
-                    uploaded: false // Will be managed by Livewire
-                };
+            try {
+                const fileId = this.generateFileId(file);
                 
-                if (this.multiple) {
-                    if (!Array.isArray(this.files)) {
-                        this.files = [];
-                    }
-                    this.files.push(uiFileObject);
-                } else {
-                    this.files = uiFileObject;
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.previews[fileId] = e.target.result;
+                    };
+                    reader.onerror = () => {
+                        this.errors[fileId] = 'Failed to generate image preview';
+                    };
+                    reader.readAsDataURL(file);
                 }
                 
-                // Livewire will handle the actual file upload automatically
-                // We just need to trigger the file input change event
-                // The wire:model on the input will sync with Livewire
-                
-            } else {
-                // For non-Livewire usage, use custom file objects
-                const fileObject = {
-                    id: fileId,
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    file: file,
-                    uploaded: false
-                };
-                
-                if (this.multiple) {
-                    if (!Array.isArray(this.files)) {
-                        this.files = [];
+
+                if (this.$wire && this.hasWireModel) {
+
+                    const uiFileObject = {
+                        id: fileId,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        file: file,
+                        uploaded: false // Will be managed by Livewire
+                    };
+                    
+                    if (this.multiple) {
+                        if (!Array.isArray(this.files)) {
+                            this.files = [];
+                        }
+                        this.files.push(uiFileObject);
+                    } else {
+                        this.files = uiFileObject;
                     }
-                    this.files.push(fileObject);
+                    
+
+
+
+                    
                 } else {
-                    this.files = fileObject;
+
+                    const fileObject = {
+                        id: fileId,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        file: file,
+                        uploaded: false
+                    };
+                    
+                    if (this.multiple) {
+                        if (!Array.isArray(this.files)) {
+                            this.files = [];
+                        }
+                        this.files.push(fileObject);
+                    } else {
+                        this.files = fileObject;
+                    }
+                    
+
+                    this.uploadFile(fileObject);
                 }
-                
-                // Start simulated upload for non-Livewire usage
-                this.uploadFile(fileObject);
+            } catch (error) {
+                console.error('Add file error:', error);
+                const fileId = file.name + '_error';
+                this.errors[fileId] = 'Failed to process file. Please try again.';
             }
         },
 
@@ -301,8 +315,8 @@ export function createBaseFileUpload(config = {}) {
             this.uploading = true;
             this.progress[fileObject.id] = 0;
             
-            // Simulate upload progress for demo purposes
-            // In real implementation, this would be handled by Livewire
+
+
             const interval = setInterval(() => {
                 if (this.progress[fileObject.id] < 90) {
                     this.progress[fileObject.id] += Math.random() * 20;
@@ -320,32 +334,37 @@ export function createBaseFileUpload(config = {}) {
          * @param {string} fileId - File ID to remove
          */
         removeFile(fileId) {
-            if (this.multiple && Array.isArray(this.files)) {
-                this.files = this.files.filter(file => this.getFileId(file) !== fileId);
-            } else {
-                this.files = null;
-            }
-            
-            // Clean up preview
-            if (this.previews[fileId] && this.previews[fileId].startsWith('blob:')) {
-                URL.revokeObjectURL(this.previews[fileId]);
-            }
-            delete this.previews[fileId];
-            delete this.progress[fileId];
-            delete this.errors[fileId];
-            
-            // Clear the file input to allow re-selection of the same file
-            if (this.$refs.fileInput) {
-                this.$refs.fileInput.value = '';
-            }
+            try {
+                if (this.multiple && Array.isArray(this.files)) {
+                    this.files = this.files.filter(file => this.getFileId(file) !== fileId);
+                } else {
+                    this.files = null;
+                }
+                
 
-            // Dispatch change event
-            this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
-                files: this.files,
-                fileCount: this.multiple ? (this.files ? this.files.length : 0) : (this.files ? 1 : 0),
-                action: 'remove',
-                removedFileId: fileId
-            });
+                if (this.previews[fileId] && this.previews[fileId].startsWith('blob:')) {
+                    URL.revokeObjectURL(this.previews[fileId]);
+                }
+                delete this.previews[fileId];
+                delete this.progress[fileId];
+                delete this.errors[fileId];
+                
+
+                if (this.$refs.fileInput) {
+                    this.$refs.fileInput.value = '';
+                }
+
+
+                this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
+                    files: this.files,
+                    fileCount: this.multiple ? (this.files ? this.files.length : 0) : (this.files ? 1 : 0),
+                    action: 'remove',
+                    removedFileId: fileId
+                });
+            } catch (error) {
+                console.error('Remove file error:', error);
+                this.errors['general'] = 'Failed to remove file. Please try again.';
+            }
         },
 
         /**
@@ -365,12 +384,12 @@ export function createBaseFileUpload(config = {}) {
             this.progress = {};
             this.errors = {};
             
-            // Clear the file input to allow re-selection
+
             if (this.$refs.fileInput) {
                 this.$refs.fileInput.value = '';
             }
 
-            // Dispatch change event
+
             this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
                 files: this.files,
                 fileCount: 0,
@@ -415,7 +434,7 @@ export function createBaseFileUpload(config = {}) {
          */
         getFileIconHtml(file, classes = 'w-6 h-6') {
             const iconName = this.getFileIconName(file);
-            // Return appropriate Heroicon SVG based on icon name
+
             const icons = {
                 'heroicon-o-photo': `<svg class="${classes}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 3a3 3 0 00-3 3v2.25a3 3 0 003 3h2.25a3 3 0 003-3V6a3 3 0 00-3-3H6zM15.75 3a3 3 0 013 3v2.25a3 3 0 01-3 3H13.5a3 3 0 01-3-3V6a3 3 0 013-3h2.25zM6 12.75a3 3 0 00-3 3V18a3 3 0 003 3h2.25a3 3 0 003-3v-2.25a3 3 0 00-3-3H6zM15.75 12.75a3 3 0 013 3V18a3 3 0 01-3 3H13.5a3 3 0 01-3-3v-2.25a3 3 0 013-3h2.25z"></path></svg>`,
                 'heroicon-o-document-text': `<svg class="${classes}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5-3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0-1.125.504-1.125 1.125V11.25a9 9 0 00-9-9z"></path></svg>`,

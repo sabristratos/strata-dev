@@ -1,6 +1,6 @@
 @php
     $checkboxId = $name . '_' . $value . '_' . uniqid();
-    // Remove [] from name for the ID if present (common in multi-value form fields)
+
     $cleanName = str_replace(['[', ']'], '', $name);
 @endphp
 
@@ -16,7 +16,7 @@
             type="checkbox"
             value="{{ $value }}"
             @if($checked) checked @endif
-            class="h-4 w-4 text-primary border-muted input-radius-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            class="h-4 w-4 text-primary border-muted input-radius-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
     </div>
     

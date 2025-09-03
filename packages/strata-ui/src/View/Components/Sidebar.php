@@ -64,7 +64,7 @@ class Sidebar extends Component
      */
     public function getWidthClasses(): string
     {
-        // Normalize width to valid Tailwind classes
+
         if (str_starts_with($this->width, 'w-')) {
             return $this->width;
         }
@@ -97,18 +97,18 @@ class Sidebar extends Component
             $this->getPositionClasses(),
         ];
 
-        // Add height and positioning based on variant
+
         if (in_array($this->variant, ['overlay', 'hybrid'])) {
             $classes[] = 'h-screen';
             $classes[] = 'top-0';
             $classes[] = 'z-50';
             $classes[] = 'shadow-xl';
         } else {
-            // Fixed and push variants should also be full viewport height
+
             $classes[] = 'h-screen';
         }
 
-        // Add border based on position and variant
+
         if ($this->variant !== 'overlay') {
             $classes[] = $this->position === 'right' ? 'border-l' : 'border-r';
         }

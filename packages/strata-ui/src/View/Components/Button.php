@@ -51,7 +51,7 @@ class Button extends Component
             'destructive' => 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow',
             'outline' => 'border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground shadow',
             'secondary' => 'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow',
-            'ghost' => 'hover:bg-accent hover:text-accent-foreground',
+            'ghost' => 'text-foreground hover:bg-accent hover:text-accent-foreground',
             default => 'bg-primary text-primary-foreground hover:bg-primary/90 shadow',
         };
     }

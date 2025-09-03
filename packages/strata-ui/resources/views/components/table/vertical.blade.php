@@ -11,7 +11,7 @@
         $tableClasses .= ' [&>tbody>tr:nth-child(even)]:bg-default';
     }
     
-    // CSS variables for dynamic cell padding based on size
+
     $paddingVariables = match($size) {
         'sm' => '--table-cell-px: 0.75rem; --table-cell-py: 0.5rem;',
         'md' => '--table-cell-px: 1rem; --table-cell-py: 0.75rem;',

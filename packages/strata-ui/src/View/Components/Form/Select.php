@@ -32,12 +32,12 @@ class Select extends Component
         public string $searchPlaceholder = 'Search...',
         public string $variant = 'default',
     ) {
-        // Backward compatibility for helpText
+
         if (! $this->description && $this->helpText) {
             $this->description = $this->helpText;
         }
 
-        // Auto-generate ID if not provided
+
         if (! $this->id && $this->name) {
             $this->id = $this->name.'_'.uniqid();
         } elseif (! $this->id) {

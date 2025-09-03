@@ -79,7 +79,7 @@ trait HasDeferredUploads
                         $mediaItems
                     );
                 } else {
-                    // Fallback to regular file storage
+
                     $storedFiles = $service->storeFiles(
                         $uploadGroup['files'],
                         "uploads/{$this->getTable()}"
@@ -93,7 +93,7 @@ trait HasDeferredUploads
             }
         }
 
-        // Clear deferred uploads after processing
+
         $this->deferredUploads = [];
 
         return $processedUploads;
@@ -138,7 +138,7 @@ trait HasDeferredUploads
             return $this;
         }
 
-        // Normalize files to array
+
         if ($files instanceof UploadedFile) {
             $files = [$files];
         }
@@ -147,7 +147,7 @@ trait HasDeferredUploads
             return $this;
         }
 
-        // Filter out non-file objects
+
         $validFiles = array_filter($files, fn ($file) => $file instanceof UploadedFile);
 
         if (empty($validFiles)) {
@@ -173,7 +173,7 @@ trait HasDeferredUploads
      */
     protected static function bootHasDeferredUploads(): void
     {
-        // Process deferred uploads after model is saved
+
         static::saved(function ($model) {
             if (method_exists($model, 'processDeferredUploads')) {
                 $model->processDeferredUploads();

@@ -14,12 +14,12 @@ import { dispatchElementEvent, EVENTS } from '../utilities/events.js';
  */
 export function createBaseComponent(config = {}) {
     return {
-        // Component metadata
+
         _strataComponentName: config.componentName || 'strata-component',
         _strataInitialized: false,
         _strataCleanupFunctions: [],
         
-        // Common properties
+
         id: config.id || null,
         name: config.name || null,
         disabled: config.disabled || false,
@@ -30,20 +30,20 @@ export function createBaseComponent(config = {}) {
         init() {
             this._strataInitialized = true;
             
-            // Auto-generate ID if not provided
+
             if (!this.id && this.$el) {
                 this.id = this.$el.id || `strata-${Math.random().toString(36).substr(2, 9)}`;
             }
             
-            // Set up Livewire binding if applicable
+
             this.initializeLivewireBinding();
             
-            // Call custom init if provided
+
             if (config.init && typeof config.init === 'function') {
                 config.init.call(this);
             }
             
-            // Dispatch initialization event
+
             this.dispatchComponentEvent(EVENTS.COMPONENT_INIT);
         },
         
@@ -51,12 +51,12 @@ export function createBaseComponent(config = {}) {
          * Component destruction cleanup
          */
         destroy() {
-            // Call custom destroy if provided
+
             if (config.destroy && typeof config.destroy === 'function') {
                 config.destroy.call(this);
             }
             
-            // Run all cleanup functions
+
             this._strataCleanupFunctions.forEach(cleanup => {
                 try {
                     cleanup();
@@ -66,7 +66,7 @@ export function createBaseComponent(config = {}) {
             });
             this._strataCleanupFunctions = [];
             
-            // Dispatch destruction event
+
             this.dispatchComponentEvent(EVENTS.COMPONENT_DESTROY);
             
             this._strataInitialized = false;
@@ -165,7 +165,7 @@ export function createBaseComponent(config = {}) {
  * @returns {Object} Extended component configuration
  */
 export function extendComponent(baseComponent, extensions) {
-    // Merge init functions
+
     const baseInit = baseComponent.init || function() {};
     const extendedInit = extensions.init || function() {};
     
@@ -174,7 +174,7 @@ export function extendComponent(baseComponent, extensions) {
         extendedInit.call(this);
     };
     
-    // Merge destroy functions
+
     const baseDestroy = baseComponent.destroy || function() {};
     const extendedDestroy = extensions.destroy || function() {};
     
@@ -201,7 +201,7 @@ export function createFormComponent(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Form-specific properties
+
         value: config.hasWireModel ? null : (config.value ?? ''),
         required: config.required || false,
         readonly: config.readonly || false,
@@ -217,10 +217,10 @@ export function createFormComponent(config = {}) {
             const oldValue = this.value;
             this.value = newValue;
             
-            // Update hidden input for form submission
+
             this.updateHiddenInput();
             
-            // Dispatch change event
+
             this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
                 value: newValue,
                 oldValue: oldValue
@@ -261,7 +261,7 @@ export function createFormComponent(config = {}) {
                 return false;
             }
             
-            // Custom validation if provided
+
             if (config.validate && typeof config.validate === 'function') {
                 return config.validate.call(this, this.value);
             }

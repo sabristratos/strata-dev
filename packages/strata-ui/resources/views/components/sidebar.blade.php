@@ -14,31 +14,34 @@
     $accessibilityAttrs = collect($getAccessibilityAttributes())->map(fn($value, $key) => "{$key}=\"{$value}\"")->implode(' ');
 @endphp
 
-{{-- Backdrop (for overlay and hybrid variants) --}}
-@if($shouldShowBackdrop())
-    <div
-        x-show="show"
-        x-transition:enter="transition-opacity duration-300"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity duration-300"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        x-cloak
-        @click="close()"
-        class="{{ $getBackdropClasses() }}"
-        aria-hidden="true"
-    ></div>
-@endif
 
-{{-- Sidebar Container --}}
-<aside
+<div
     x-data="strataSidebar({
         name: '{{ $name }}',
         variant: '{{ $variant }}',
         persistent: {{ $persistent ? 'true' : 'false' }},
         collapsible: {{ $collapsible ? 'true' : 'false' }}
     })"
+>
+
+    @if($shouldShowBackdrop())
+        <div
+            x-show="show"
+            x-transition:enter="transition-opacity duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity duration-300"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            x-cloak
+            @click="close()"
+            class="{{ $getBackdropClasses() }}"
+            aria-hidden="true"
+        ></div>
+    @endif
+
+
+    <aside
     x-show="show || variant === 'fixed'"
     x-transition:enter="transform transition-transform duration-300 ease-in-out"
     x-transition:enter-start="{{ $getTransformClasses() }}"
@@ -60,7 +63,16 @@
     @touchmove.passive="handleTouchMove"
     @touchend.passive="handleTouchEnd"
 >
-    {{-- Sidebar Header --}}
+
+    <div
+        class="sr-only"
+        aria-live="polite"
+        aria-atomic="true"
+        role="status"
+    >
+        <span x-text="show ? `${name || 'Sidebar'} navigation opened` : `${name || 'Sidebar'} navigation closed`"></span>
+    </div>
+
     @if(isset($header))
         <div class="p-4" id="{{ $targetId }}-header">
             {{ $header }}
@@ -73,7 +85,7 @@
             <button
                 type="button"
                 @click="toggleCollapsed()"
-                class="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                class="p-1 button-radius text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
                 aria-describedby="{{ $targetId }}-header"
             >
@@ -91,9 +103,9 @@
         </div>
     @endif
 
-    {{-- Sidebar Content (Scrollable Navigation) --}}
+
     <nav
-        class="overflow-y-auto p-4 space-y-1 focus:outline-none min-h-0"
+        class="overflow-y-auto p-4 space-y-1 focus:outline-hidden min-h-0"
         :class="{ 'px-2': collapsed && collapsible }"
         aria-labelledby="{{ isset($header) ? $targetId . '-header' : null }}"
         x-ref="sidebarContent"
@@ -102,25 +114,16 @@
         {{ $slot }}
     </nav>
 
-    {{-- Sidebar Footer --}}
+
     @if(isset($footer))
         <div class="p-4 border-t border-border">
             {{ $footer }}
         </div>
     @endif
 </aside>
-
-{{-- Screen reader announcements --}}
-<div
-    class="sr-only"
-    aria-live="polite"
-    aria-atomic="true"
-    role="status"
->
-    <span x-text="show ? `${$data.name || 'Sidebar'} navigation opened` : `${$data.name || 'Sidebar'} navigation closed`"></span>
 </div>
 
-{{-- Reduced motion styles --}}
+
 @once
 <style>
 @media (prefers-reduced-motion: reduce) {

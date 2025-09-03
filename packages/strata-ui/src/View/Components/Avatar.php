@@ -21,6 +21,8 @@ class Avatar extends Component
         public string $status = 'none',
         public string $statusPosition = 'bottom-right',
         public bool $border = false,
+        public ?string $tooltip = null,
+        public string $tooltipPosition = 'top',
     ) {}
 
     /**
@@ -64,7 +66,7 @@ class Avatar extends Component
      */
     public function getBorderClasses(): string
     {
-        return $this->border ? 'ring-2 ring-white dark:ring-slate-800' : '';
+        return $this->border ? 'ring-2 ring-background' : '';
     }
 
     /**
@@ -72,7 +74,7 @@ class Avatar extends Component
      */
     public function getStatusClasses(): string
     {
-        $baseClasses = 'absolute rounded-full ring-2 ring-white dark:ring-slate-800';
+        $baseClasses = 'absolute rounded-full ring-2 ring-background';
 
         $sizeClasses = match ($this->size) {
             'xs', 'sm' => 'w-2 h-2',

@@ -1,25 +1,27 @@
 @props([
     'href' => null,
     'icon' => null,
-    'active' => false
+    'active' => false,
+    'nested' => false,
+    'hideIcon' => false,
 ])
 
 @php
     $tag = $href ? 'a' : 'button';
-    $baseClasses = 'flex items-center w-full gap-3 px-3 py-2 text-sm text-left button-radius transition-colors';
-    $activeClasses = $active
-        ? 'bg-accent text-accent-foreground font-medium'
-        : 'text-foreground hover:bg-accent hover:text-accent-foreground';
+    $baseClasses = $getBaseClasses();
+    $stateClasses = $getStateClasses();
 @endphp
 
-<{{ $tag }} {{ $attributes->merge(['class' => "$baseClasses $activeClasses", 'href' => $href]) }}>
-    @if ($icon)
-        <x-icon :name="$icon" class="w-4 h-4" />
+<{{ $tag }} {{ $attributes->merge(['class' => "$baseClasses $stateClasses", 'href' => $href]) }}>
+    @if ($shouldShowIcon())
+        <x-icon :name="$icon" class="{{ $getIconClasses() }}" />
     @endif
 
-    <span class="flex-1">{{ $slot }}</span>
+    <span class="flex-1 truncate">{{ $slot }}</span>
 
     @if (isset($badge))
-        {{ $badge }}
+        <div class="flex-shrink-0">
+            {{ $badge }}
+        </div>
     @endif
 </{{ $tag }}>

@@ -133,11 +133,14 @@ class StrataUIService
         string $message,
         ?string $title = null,
         string $variant = 'info',
-        int $duration = 5000,
+        int $duration = null,
         ?string $icon = null,
         ?array $actions = null
     ): void {
-        // Validate variant
+        // Use config default if no duration specified
+        if ($duration === null) {
+            $duration = config('strata-ui.defaults.toast_duration', 5000);
+        }
         $validVariants = ['success', 'warning', 'destructive', 'info', 'primary', 'accent'];
         if (! in_array($variant, $validVariants)) {
             throw new \InvalidArgumentException(
@@ -145,12 +148,10 @@ class StrataUIService
             );
         }
 
-        // Validate duration
         if ($duration < 0) {
             throw new \InvalidArgumentException('Duration must be 0 or positive integer');
         }
 
-        // Validate actions format if provided
         if ($actions !== null) {
             foreach ($actions as $index => $action) {
                 if (! is_array($action) || ! isset($action['label']) || ! isset($action['action'])) {
@@ -160,7 +161,6 @@ class StrataUIService
                 }
             }
 
-            // Limit to 2 actions for UX
             if (count($actions) > 2) {
                 throw new \InvalidArgumentException('Maximum 2 action buttons allowed per toast');
             }
@@ -220,10 +220,7 @@ class StrataUIService
                     throw new \InvalidArgumentException('Modal name is required to show a modal');
                 }
 
-                // Store data to dispatch via JavaScript
                 session()->put("strata_modal_show_{$this->name}", $data);
-
-                // Dispatch Livewire event to trigger the modal
                 if (function_exists('dispatch')) {
                     dispatch('strata-modal-show', [
                         'name' => $this->name,
@@ -238,7 +235,6 @@ class StrataUIService
                     throw new \InvalidArgumentException('Modal name is required to hide a modal');
                 }
 
-                // Dispatch Livewire event to hide the modal
                 if (function_exists('dispatch')) {
                     dispatch('strata-modal-hide', [
                         'name' => $this->name,
@@ -252,7 +248,7 @@ class StrataUIService
                     throw new \InvalidArgumentException('Modal name is required to toggle a modal');
                 }
 
-                // Dispatch Livewire event to toggle the modal
+
                 if (function_exists('dispatch')) {
                     dispatch('strata-modal-toggle', [
                         'name' => $this->name,
@@ -272,7 +268,6 @@ class StrataUIService
         {
             public function close(): void
             {
-                // Dispatch Livewire event to close all modals
                 if (function_exists('dispatch')) {
                     dispatch('strata-modals-close-all')->self();
                 }
@@ -291,7 +286,6 @@ class StrataUIService
             return '<!-- Strata UI: JavaScript bundle not found. Please run: cd packages/strata-ui && npm run build -->';
         }
 
-        // Set default attributes
         $attributes = array_merge(['defer' => true], $attributes);
 
         $attributeString = $this->buildAttributes($attributes);
@@ -308,20 +302,28 @@ class StrataUIService
      */
     protected function getAssetPath(): ?string
     {
-        // Try published assets first (production)
+        $strategy = config('strata-ui.assets.strategy', 'route');
+        
+        if ($strategy === 'static') {
+            // Static strategy - only use published assets
+            $publishedPath = public_path('vendor/strata-ui/strata-ui.iife.js');
+            if (file_exists($publishedPath)) {
+                $timestamp = filemtime($publishedPath);
+                return asset('vendor/strata-ui/strata-ui.iife.js?v='.$timestamp);
+            }
+            return null;
+        }
+        
+        // Route strategy (default) - prefer published, fallback to embedded
         $publishedPath = public_path('vendor/strata-ui/strata-ui.iife.js');
         if (file_exists($publishedPath)) {
             $timestamp = filemtime($publishedPath);
-
             return asset('vendor/strata-ui/strata-ui.iife.js?v='.$timestamp);
         }
 
-        // Fall back to package assets (development)
         $packagePath = __DIR__.'/../resources/dist/strata-ui.iife.js';
         if (file_exists($packagePath)) {
-            // Create a data URI for the script content
             $content = file_get_contents($packagePath);
-
             return 'data:application/javascript;base64,'.base64_encode($content);
         }
 

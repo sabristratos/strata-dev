@@ -13,8 +13,8 @@
             count: {{ $itemCount }},
             multiple: {{ $multiple ? 'true' : 'false' }},
             maxSelections: {{ $maxSelections }},
-            @if($attributes->wire('model'))
-            value: @entangle($attributes->wire('model')),
+            @if($attributes->has('wire:model'))
+            value: @entangle($attributes->get('wire:model')),
             @else
             initialSelected: @js($initialSelected),
             @endif
@@ -105,25 +105,16 @@
                 <!-- Search Input (when searchable) -->
                 <template x-if="searchable">
                     <div class="p-2 border-b border-border">
-                        <div class="relative">
-                            <input
-                                x-ref="searchInput"
-                                x-model="searchQuery"
-                                x-on:input="filterItems()"
-                                x-on:keydown="handleSearchKeydown($event)"
-                                type="text"
-                                placeholder="{{ $searchPlaceholder }}"
-                                class="input-base h-8 w-full text-sm pr-8"
-                            />
-                            <button
-                                x-show="searchQuery"
-                                x-on:click="clearSearch()"
-                                type="button"
-                                class="absolute inset-y-0 right-0 pr-2 flex items-center text-muted-foreground hover:text-primary transition-colors"
-                            >
-                                <x-icon name="heroicon-o-x-mark" class="h-4 w-4" />
-                            </button>
-                        </div>
+                        <x-strata::form.input
+                            x-model="searchQuery"
+                            x-on:input="filterItems()"
+                            x-on:keydown="handleSearchKeydown($event)"
+                            x-ref="searchInput"
+                            type="text"
+                            :placeholder="$searchPlaceholder"
+                            clearable="true"
+                            class="h-8 text-sm"
+                        />
                     </div>
                 </template>
 

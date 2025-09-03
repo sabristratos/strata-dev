@@ -1,8 +1,8 @@
 @php
     $hasError = !empty($error);
     $inputClasses = $hasError 
-        ? 'h-4 w-4 text-primary border-destructive input-radius-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2 bg-white dark:bg-gray-900'
-        : 'h-4 w-4 text-primary border-muted input-radius-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-white dark:bg-gray-900';
+        ? 'h-4 w-4 text-primary border-destructive input-radius-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2 bg-white dark:bg-gray-900'
+        : 'h-4 w-4 text-primary border-muted input-radius-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 bg-white dark:bg-gray-900';
 @endphp
 
 <div>

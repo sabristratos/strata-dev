@@ -1,5 +1,4 @@
 @php
-    $baseClasses = 'flex alert-radius shadow-xs';
     $role = match ($color) {
         'destructive' => 'alert',
         'warning' => 'alert', 
@@ -19,55 +18,91 @@
     x-transition:leave-end="opacity-0 transform scale-95"
     role="{{ $role }}"
     aria-live="{{ $ariaLive }}"
-    {{ $attributes->merge([
-        'class' => implode(' ', [
-            $baseClasses,
+    @class([
+        'alert-radius shadow-xs relative',
+        'border border-info bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'info',
+        'border border-success bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'success',
+        'border border-warning bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'warning',
+        'border border-destructive bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'destructive',
+        'border border-primary bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'primary',
+        'border border-accent bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'accent',
+    ])
+    {{ $attributes }}
+>
+    <div 
+        @class([
+            'flex w-full items-center gap-3 alert-radius transition-all duration-300',
             $getSizeClasses(),
-            $getVariantClasses()
+            'bg-info/10' => $color === 'info',
+            'bg-success/10' => $color === 'success',
+            'bg-warning/10' => $color === 'warning',
+            'bg-destructive/10' => $color === 'destructive',
+            'bg-primary/10' => $color === 'primary',
+            'bg-accent/10' => $color === 'accent',
         ])
-    ]) }}>
-    
-    {{-- Icon --}}
-    <div class="shrink-0 flex items-start">
-        <x-icon :name="$getContextualIcon()" :class="$getIconSizeClasses() . ' mt-0.5'" />
-    </div>
-    
-    {{-- Content --}}
-    <div class="ml-3 flex-1 min-w-0">
-        @if ($title)
-            <div {{ $attributes->only(['class'])->merge(['class' => $getTitleClasses()]) }}>
-                {{ $title }}
-            </div>
-            @if ($slot->isNotEmpty())
-                <div class="mt-1 text-sm opacity-90">
+    >
+
+        <div 
+            @class([
+                'rounded-full p-0.5 shrink-0',
+                'bg-info/15 text-info toast-pulse-info' => $color === 'info',
+                'bg-success/15 text-success toast-pulse-success' => $color === 'success',
+                'bg-warning/15 text-warning toast-pulse-warning' => $color === 'warning',
+                'bg-destructive/15 text-destructive toast-pulse-destructive' => $color === 'destructive',
+                'bg-primary/15 text-primary toast-pulse-primary' => $color === 'primary',
+                'bg-accent/15 text-accent toast-pulse-accent' => $color === 'accent',
+            ])
+            aria-hidden="true"
+        >
+            <x-icon :name="$getContextualIcon()" :class="$getIconSizeClasses()" />
+        </div>
+
+
+        <div class="flex flex-col gap-2 flex-1 min-w-0 pr-8">
+            @if ($title)
+                <h3 
+                    @class([
+                        'font-semibold',
+                        $getTitleClasses(),
+                        'text-info' => $color === 'info',
+                        'text-success' => $color === 'success',
+                        'text-warning' => $color === 'warning',
+                        'text-destructive' => $color === 'destructive',
+                        'text-primary' => $color === 'primary',
+                        'text-accent' => $color === 'accent',
+                    ])
+                >
+                    {{ $title }}
+                </h3>
+                @if ($slot->isNotEmpty())
+                    <div class="text-pretty text-sm">
+                        {{ $slot }}
+                    </div>
+                @endif
+            @else
+                <div class="text-pretty text-sm">
                     {{ $slot }}
                 </div>
             @endif
-        @else
-            <div class="text-sm">
-                {{ $slot }}
-            </div>
-        @endif
-        
-        {{-- Actions slot --}}
-        @isset($actions)
-            <div class="mt-3 flex gap-2">
-                {!! $actions !!}
-            </div>
-        @endisset
-    </div>
-    
-    {{-- Dismiss button --}}
-    @if ($dismissible)
-        <div class="shrink-0 flex items-start mt-0.5">
+            
+
+            @isset($actions)
+                <div class="flex gap-2 mt-1">
+                    {!! $actions !!}
+                </div>
+            @endisset
+        </div>
+
+
+        @if ($dismissible)
             <x-strata::button
                 variant="ghost"
                 size="sm"
                 icon="heroicon-o-x-mark"
                 x-on:click="visible = false"
                 aria-label="Dismiss alert"
-                class="!p-1"
+                class="!p-1 absolute top-2 right-2 shrink-0"
             />
-        </div>
-    @endif
+        @endif
+    </div>
 </div>

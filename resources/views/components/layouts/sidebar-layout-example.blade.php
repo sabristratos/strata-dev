@@ -8,8 +8,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="min-h-screen bg-background text-foreground">
-        <div class="min-h-screen bg-background flex" x-data="{ sidebarOpen: false }">
+    <body class="bg-surface text-foreground">
 
             {{-- Sidebar --}}
             <x-strata::sidebar
@@ -22,7 +21,7 @@
                 <x-slot name="header">
                     <x-strata::dropdown>
                         <x-slot name="trigger">
-                            <button class="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                            <button class="flex items-center gap-3 w-full p-3 button-radius hover:bg-muted/50 transition-colors">
                                 <x-strata::avatar size="md" initials="JD" />
                                 <div class="flex-1 text-left">
                                     <div class="font-semibold text-foreground">John Doe</div>
@@ -123,7 +122,6 @@
 
                 {{ $slot }}
             </x-strata::main-content>
-        </div>
 
         {{-- Toast notification container --}}
         <x-strata::toast-container position="top-end" />

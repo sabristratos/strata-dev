@@ -45,7 +45,7 @@ export function safePluginRegistration(Alpine, plugins) {
     
     Object.entries(plugins).forEach(([name, plugin]) => {
         try {
-            // Check if plugin is already registered by looking for plugin markers
+
             if (Alpine[name] || (Alpine.directive && Alpine.directive[name])) {
                 return; // Plugin already registered
             }
@@ -127,16 +127,16 @@ export function waitForAlpine(timeout = 5000) {
             }
         };
         
-        // Listen for alpine:init event
+
         document.addEventListener('alpine:init', checkAlpine, { once: true });
         
-        // Timeout fallback
+
         timeoutId = setTimeout(() => {
             document.removeEventListener('alpine:init', checkAlpine);
             reject(new Error('Alpine.js not available within timeout'));
         }, timeout);
         
-        // Check immediately in case we missed the init event
+
         checkAlpine();
     });
 }
@@ -150,34 +150,34 @@ export function createComponentFactory(componentFactory) {
     return function(config = {}) {
         const componentConfig = componentFactory(config);
         
-        // Add standard component lifecycle
+
         const originalInit = componentConfig.init || function() {};
         const originalDestroy = componentConfig.destroy || function() {};
         
         componentConfig.init = function() {
-            // Standard initialization
+
             this._strataComponentName = componentConfig.name || 'unknown';
             this._strataInitialized = true;
             
-            // Call original init
+
             originalInit.call(this);
             
-            // Dispatch initialization event
+
             this.$dispatch('strata-component-init', { 
                 component: this._strataComponentName 
             });
         };
         
         componentConfig.destroy = function() {
-            // Call original destroy
+
             originalDestroy.call(this);
             
-            // Dispatch destroy event
+
             this.$dispatch('strata-component-destroy', { 
                 component: this._strataComponentName 
             });
             
-            // Cleanup
+
             this._strataInitialized = false;
         };
         
@@ -243,12 +243,12 @@ export function hasAlpineComponent(element, componentName = null) {
  * @param {Object} config - Configuration options
  */
 export function initializeAlpineForStrata(Alpine, config = {}) {
-    // Configure Alpine for Strata UI
+
     if (config.prefix && Alpine.prefix) {
         Alpine.prefix(config.prefix);
     }
     
-    // Set up error handling
+
     if (config.errorHandler) {
         Alpine.bind = new Proxy(Alpine.bind, {
             apply(target, thisArg, argumentsList) {
@@ -262,7 +262,7 @@ export function initializeAlpineForStrata(Alpine, config = {}) {
         });
     }
     
-    // Add development helpers
+
     if (config.development && typeof window !== 'undefined') {
         window.__STRATA_ALPINE__ = Alpine;
     }

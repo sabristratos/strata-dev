@@ -59,7 +59,7 @@ class StrataFileUploadService
                 ->addMediaFromRequest($file->getClientOriginalName())
                 ->toMediaCollection($collection);
 
-            // Add custom properties if specified
+
             if ($customProperties) {
                 foreach ($customProperties as $key => $value) {
                     $mediaItem->setCustomProperty($key, $value);
@@ -67,19 +67,19 @@ class StrataFileUploadService
                 $mediaItem->save();
             }
 
-            // Set conversions disk if specified
+
             if ($conversionsDisk) {
                 $mediaItem->setCustomProperty('conversions_disk', $conversionsDisk);
                 $mediaItem->save();
             }
 
-            // Enable responsive images if requested
+
             if ($responsiveImages) {
                 $mediaItem->setCustomProperty('responsive_images', true);
                 $mediaItem->save();
             }
 
-            // Apply manipulations if specified
+
             if ($manipulations) {
                 foreach ($manipulations as $conversionName => $manipulation) {
                     $mediaItem->setCustomProperty("manipulation_{$conversionName}", $manipulation);
@@ -121,7 +121,7 @@ class StrataFileUploadService
                 'uploaded' => true,
             ];
 
-            // Add conversion URLs if they exist
+
             if ($media->hasGeneratedConversion($conversion ?? 'thumb')) {
                 $data['thumb_url'] = $media->getUrl($conversion ?? 'thumb');
             }
@@ -218,20 +218,20 @@ class StrataFileUploadService
         $acceptedTypes = array_map('trim', explode(',', $accept));
 
         foreach ($acceptedTypes as $type) {
-            // Extension-based check
+
             if (str_starts_with($type, '.')) {
                 if (str_ends_with(strtolower($file->getClientOriginalName()), strtolower($type))) {
                     return true;
                 }
             }
-            // Wildcard mime type check (e.g., image/*)
+
             elseif (str_ends_with($type, '/*')) {
                 $category = str_replace('/*', '', $type);
                 if (str_starts_with($file->getMimeType(), $category)) {
                     return true;
                 }
             }
-            // Exact mime type check
+
             elseif ($file->getMimeType() === $type) {
                 return true;
             }

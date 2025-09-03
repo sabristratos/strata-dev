@@ -26,7 +26,7 @@ class Textarea extends Component
         public bool $disabled = false,
         public bool $readonly = false
     ) {
-        // Auto-generate ID if not provided
+
         if (! $this->id && $this->name) {
             $this->id = $this->name.'_'.uniqid();
         } elseif (! $this->id) {
@@ -49,13 +49,13 @@ class Textarea extends Component
     {
         $classes = ['input-base', 'min-h-20', 'px-3'];
 
-        // Add error state styling using theme tokens
+
         if ($this->error) {
             $classes[] = 'border-destructive';
             $classes[] = 'focus-visible:ring-destructive';
         }
 
-        // Handle resize behavior
+
         if ($this->autoResize) {
             $classes[] = 'resize-none';
             $classes[] = 'overflow-hidden';

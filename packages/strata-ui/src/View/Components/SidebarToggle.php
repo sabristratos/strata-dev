@@ -18,7 +18,7 @@ class SidebarToggle extends Component
         public string $size = 'md',
         public ?string $icon = null,
     ) {
-        // Default icon based on variant
+
         if ($this->icon === null) {
             $this->icon = $this->variant === 'hamburger' ? 'heroicon-o-bars-3' : 'heroicon-o-plus';
         }
@@ -71,7 +71,7 @@ class SidebarToggle extends Component
             'inline-flex',
             'items-center',
             'justify-center',
-            'rounded-md',
+            'button-radius',
             'border',
             'border-input',
             'bg-background',
@@ -102,7 +102,7 @@ class SidebarToggle extends Component
             'inline-flex',
             'items-center',
             'justify-center',
-            'rounded-md',
+            'button-radius',
             'text-muted-foreground',
             'hover:text-foreground',
             'hover:bg-accent',
@@ -131,7 +131,7 @@ class SidebarToggle extends Component
             'inline-flex',
             'items-center',
             'justify-center',
-            'rounded-md',
+            'button-radius',
             'text-muted-foreground',
             'hover:text-foreground',
             'hover:bg-accent',

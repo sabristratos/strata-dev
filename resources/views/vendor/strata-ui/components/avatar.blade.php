@@ -6,13 +6,17 @@
         : 'relative inline-flex overflow-hidden';
     
     $innerClasses = implode(' ', array_filter([
-        'relative inline-flex items-center justify-center bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 font-medium select-none',
+        'relative inline-flex items-center justify-center bg-muted text-muted-foreground font-medium select-none',
         $hasStatusIndicator ? 'overflow-hidden' : '',
         $getSizeClasses(),
         $getShapeClasses(),
         $getBorderClasses(),
     ]));
 @endphp
+
+@if($tooltip)
+<x-strata::tooltip :text="$tooltip" :position="$tooltipPosition">
+@endif
 
 <div {{ $attributes->merge(['class' => $containerClasses]) }}>
     <div class="{{ $innerClasses }}">
@@ -44,3 +48,7 @@
 
     {{ $slot }}
 </div>
+
+@if($tooltip)
+</x-strata::tooltip>
+@endif

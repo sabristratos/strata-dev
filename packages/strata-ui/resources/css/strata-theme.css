@@ -1,8 +1,5 @@
 :root {
-    /* ----------------------------------------- */
-    /* Modern Color Palette           */
-    /* ----------------------------------------- */
-    --slate-0: oklch(1.0000 0 0); /* Pure White */
+    --slate-0: oklch(1.0000 0 0);
     --slate-50: oklch(0.9850 0.0015 270);
     --slate-100: oklch(0.9700 0.0030 270);
     --slate-200: oklch(0.9450 0.0045 270);
@@ -12,22 +9,19 @@
     --slate-600: oklch(0.5800 0.0120 270);
     --slate-900: oklch(0.3200 0.0180 270);
 
-    --primary-500: oklch(0.6200 0.1400 260); /* Modern deep blue-violet */
-    --accent-500: oklch(0.8100 0.0900 320); /* Warm rose accent */
+    --primary-500: oklch(0.6200 0.1400 260);
+    --accent-500: oklch(0.8100 0.0900 320);
     --accent-900: oklch(0.3800 0.0600 320);
-    --destructive-500: oklch(0.6400 0.1600 25); /* Modern red */
-    --success-500: oklch(0.7000 0.1300 140); /* Fresh green */
-    --warning-500: oklch(0.7800 0.1100 85); /* Vibrant amber */
-    --info-500: oklch(0.7200 0.0900 220); /* Clear blue */
+    --destructive-500: oklch(0.6400 0.1600 25);
+    --success-500: oklch(0.7000 0.1300 140);
+    --warning-500: oklch(0.7800 0.1100 85);
+    --info-500: oklch(0.7200 0.0900 220);
 
     --teal-500: oklch(0.7200 0.0950 180);
     --yellow-500: oklch(0.8600 0.1000 85);
     --yellow-600: oklch(0.7800 0.1100 85);
     --indigo-500: oklch(0.7400 0.0800 260);
 
-    /* ----------------------------------------- */
-    /* Modern Semantic Variables     */
-    /* ----------------------------------------- */
     --background: var(--slate-50);
     --foreground: var(--slate-900);
     --card: var(--slate-0);
@@ -65,7 +59,11 @@
     --chart-4: var(--yellow-500);
     --chart-5: var(--indigo-500);
 
-    /* Modern Sidebar */
+    --status-online: var(--success-500);
+    --status-away: var(--warning-500);
+    --status-busy: var(--destructive-500);
+    --status-offline: var(--slate-500);
+
     --sidebar: var(--slate-0);
     --sidebar-foreground: var(--slate-900);
     --sidebar-primary: var(--primary-500);
@@ -75,22 +73,15 @@
     --sidebar-border: var(--slate-200);
     --sidebar-ring: var(--primary-500);
 
-    /* ----------------------------------------- */
-    /* Other Variables             */
-    /* ----------------------------------------- */
     --font-sans: Geist, sans-serif;
     --font-serif: "Lora", Georgia, serif;
     --font-mono: "Fira Code", "Courier New", monospace;
     
-    /* Container Width System */
-    --container-width-compact: 24rem;     /* 384px */
-    --container-width-narrow: 32rem;      /* 512px */
-    --container-width-standard: 56rem;    /* 896px */
-    --container-width-wide: 72rem;        /* 1152px */
+    --container-width-compact: 24rem;
+    --container-width-narrow: 32rem;
+    --container-width-standard: 56rem;
+    --container-width-wide: 72rem;
     
-    /* ----------------------------------------- */
-    /* Semantic Radius System                   */
-    /* ----------------------------------------- */
     /* Interactive Elements - Can be fully rounded */
     --radius-button: 0.375rem;        /* 6px - Buttons, badges, pills */
     --radius-button-sm: 0.25rem;      /* 4px - Small buttons */
@@ -114,14 +105,14 @@
     --radius-avatar: 9999px;          /* Full - Avatars (always round) */
     --radius-tab: 0.375rem;           /* 6px - Tab buttons */
     --radius-alert: 0.375rem;         /* 6px - Alert boxes */
-    --shadow-2xs: 1px 2px 5px 1px hsl(0 0% 0% / 0.03);
-    --shadow-xs: 1px 2px 5px 1px hsl(0 0% 0% / 0.03);
-    --shadow-sm: 1px 2px 5px 1px hsl(0 0% 0% / 0.06), 1px 1px 2px 0px hsl(0 0% 0% / 0.06);
-    --shadow: 1px 2px 5px 1px hsl(0 0% 0% / 0.06), 1px 1px 2px 0px hsl(0 0% 0% / 0.06);
-    --shadow-md: 1px 2px 5px 1px hsl(0 0% 0% / 0.06), 1px 2px 4px 0px hsl(0 0% 0% / 0.06);
-    --shadow-lg: 1px 2px 5px 1px hsl(0 0% 0% / 0.06), 1px 4px 6px 0px hsl(0 0% 0% / 0.06);
-    --shadow-xl: 1px 2px 5px 1px hsl(0 0% 0% / 0.06), 1px 8px 10px 0px hsl(0 0% 0% / 0.06);
-    --shadow-2xl: 1px 2px 5px 1px hsl(0 0% 0% / 0.15);
+    /* Tailwind v4 aligned shadow system */
+    --shadow-xs: 1px 1px 2px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 1px 1px 3px 0px hsl(0 0% 0% / 0.1), 1px 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow: 1px 2px 4px 0px hsl(0 0% 0% / 0.1), 1px 1px 3px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md: 1px 4px 6px -1px hsl(0 0% 0% / 0.1), 1px 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 1px 10px 15px -3px hsl(0 0% 0% / 0.1), 1px 4px 6px -4px hsl(0 0% 0% / 0.1);
+    --shadow-xl: 1px 20px 25px -5px hsl(0 0% 0% / 0.1), 1px 8px 10px -6px hsl(0 0% 0% / 0.1);
+    --shadow-2xl: 1px 25px 50px -12px hsl(0 0% 0% / 0.25);
     --tracking-normal: 0em;
     --spacing: 0.25rem;
 }
@@ -145,9 +136,6 @@
     --accent-900: oklch(0.8500 0.0800 320);
     --destructive-500: oklch(0.7000 0.1700 25);
 
-    /* ----------------------------------------- */
-    /* Modern Dark Mode Semantic Mapping */
-    /* ----------------------------------------- */
     --background: var(--slate-950);
     --foreground: var(--slate-50);
     --card: var(--slate-900);
@@ -225,6 +213,11 @@
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+    
+    --color-status-online: var(--status-online);
+    --color-status-away: var(--status-away);
+    --color-status-busy: var(--status-busy);
+    --color-status-offline: var(--status-offline);
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -239,7 +232,6 @@
     --font-serif: var(--font-serif);
 
 
-    --shadow-2xs: var(--shadow-2xs);
     --shadow-xs: var(--shadow-xs);
     --shadow-sm: var(--shadow-sm);
     --shadow: var(--shadow);
@@ -278,17 +270,14 @@
         @apply text-base font-medium text-foreground leading-tight;
     }
 
-    /* Body text */
     p {
         @apply text-base text-foreground leading-relaxed;
     }
 
-    /* Small text */
     small {
         @apply text-sm text-muted-foreground;
     }
 
-    /* Links */
     a {
         @apply text-accent font-medium no-underline underline-offset-4;
     }
@@ -329,21 +318,29 @@
     code, kbd, samp, pre {
         font-family: var(--font-mono);
     }
+
+    /* Prevent dual scrollbars when using MainContent component */
+    body.has-main-content {
+        overflow: hidden;
+        height: 100vh;
+    }
 }
 
 /* ----------------------------------------- */
-/* Input Components Utilities               */
+/* Enhanced Input Components Utilities      */
 /* ----------------------------------------- */
 @utility input-base {
-    @apply flex w-full border border-input bg-card text-foreground placeholder:text-muted-foreground;
-    @apply focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;
+    @apply flex w-full border border-border bg-card text-foreground;
+    @apply placeholder:text-muted-foreground;
+    @apply focus-within:outline-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;
     @apply disabled:cursor-not-allowed disabled:opacity-50;
     @apply px-0 py-2 text-sm transition-all duration-200;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
     border-radius: var(--radius-input);
 }
 
 @utility input-element {
-    @apply flex-1 bg-transparent border-0 outline-0 focus:outline-0;
+    @apply flex-1 bg-transparent border-0 outline-hidden focus:outline-hidden;
     @apply text-sm placeholder:text-muted-foreground px-3;
     @apply disabled:cursor-not-allowed;
 }
@@ -385,7 +382,7 @@
 
 @utility select-minimal {
     @apply bg-transparent border-0 text-sm text-foreground placeholder:text-muted-foreground;
-    @apply focus:outline-none focus:ring-0 focus:bg-transparent;
+    @apply focus:outline-hidden focus:ring-0 focus:bg-transparent;
     @apply disabled:cursor-not-allowed disabled:opacity-50;
     @apply py-1 transition-colors duration-200;
 }
@@ -485,7 +482,7 @@
     
     .tabs-pills [role="tab"] {
         @apply tab-radius border-0;
-        @apply data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm;
+        @apply data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs;
     }
     
     /* Underline variant */
@@ -502,55 +499,70 @@
     /* Vertical orientation adjustments */
     .tabs-default.grid [role="tablist"].lg\:flex-col [role="tab"] {
         @apply lg:border-b-0 lg:border-0 lg:tab-radius;
-        @apply lg:data-[state=active]:bg-background lg:data-[state=active]:shadow-sm;
+        @apply lg:data-[state=active]:bg-background lg:data-[state=active]:shadow-xs;
         @apply lg:hover:bg-background/50;
     }
     
     .tabs-underline.grid [role="tablist"].lg\:flex-col [role="tab"] {
         @apply lg:border-b-0 lg:border-0 lg:tab-radius;
-        @apply lg:data-[state=active]:bg-background lg:data-[state=active]:shadow-sm lg:data-[state=active]:text-foreground;
+        @apply lg:data-[state=active]:bg-background lg:data-[state=active]:shadow-xs lg:data-[state=active]:text-foreground;
         @apply lg:hover:bg-background/50;
     }
     
     .tabs-pills.grid [role="tablist"].lg\:flex-col [role="tab"] {
-        @apply lg:data-[state=active]:bg-background lg:data-[state=active]:shadow-sm;
+        @apply lg:data-[state=active]:bg-background lg:data-[state=active]:shadow-xs;
     }
 }
 
 /* ----------------------------------------- */
 /* Semantic Radius Utilities                */
 /* ----------------------------------------- */
-/* Button radius utilities */
-@utility button-radius { border-radius: var(--radius-button); }
-@utility button-radius-sm { border-radius: var(--radius-button-sm); }
-@utility button-radius-lg { border-radius: var(--radius-button-lg); }
-@utility button-radius-full { border-radius: var(--radius-button-full); }
+/* v4 Compatible Semantic Radius System */
+@utility button-radius { 
+    border-radius: var(--radius-button); 
+}
+@utility button-radius-sm { 
+    border-radius: var(--radius-button-sm); 
+}
+@utility button-radius-lg { 
+    border-radius: var(--radius-button-lg); 
+}
+@utility button-radius-full { 
+    border-radius: var(--radius-button-full); 
+}
 
-/* Input radius utilities */
-@utility input-radius { border-radius: var(--radius-input); }
-@utility input-radius-sm { border-radius: var(--radius-input-sm); }
+@utility input-radius { 
+    border-radius: var(--radius-input); 
+}
+@utility input-radius-sm { 
+    border-radius: var(--radius-input-sm); 
+}
 
-/* Card radius utilities */
-@utility card-radius { border-radius: var(--radius-card); }
-@utility card-radius-lg { border-radius: var(--radius-card-lg); }
+@utility card-radius { 
+    border-radius: var(--radius-card); 
+}
+@utility card-radius-lg { 
+    border-radius: var(--radius-card-lg); 
+}
 
-/* Modal radius utilities */
-@utility modal-radius { border-radius: var(--radius-modal); }
-
-/* Dropdown radius utilities */
-@utility dropdown-radius { border-radius: var(--radius-dropdown); }
-
-/* Tooltip radius utilities */
-@utility tooltip-radius { border-radius: var(--radius-tooltip); }
-
-/* Avatar radius utilities */
-@utility avatar-radius { border-radius: var(--radius-avatar); }
-
-/* Tab radius utilities */
-@utility tab-radius { border-radius: var(--radius-tab); }
-
-/* Alert radius utilities */
-@utility alert-radius { border-radius: var(--radius-alert); }
+@utility modal-radius { 
+    border-radius: var(--radius-modal); 
+}
+@utility dropdown-radius { 
+    border-radius: var(--radius-dropdown); 
+}
+@utility tooltip-radius { 
+    border-radius: var(--radius-tooltip); 
+}
+@utility avatar-radius { 
+    border-radius: var(--radius-avatar); 
+}
+@utility tab-radius { 
+    border-radius: var(--radius-tab); 
+}
+@utility alert-radius { 
+    border-radius: var(--radius-alert); 
+}
 
 /* ----------------------------------------- */
 /* Dialog Element Utilities                 */
@@ -781,6 +793,146 @@
 }
 
 /* ----------------------------------------- */
+/* Toast & Alert Pulse Animation             */
+/* ----------------------------------------- */
+
+@keyframes toast-pulse-info {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.7200 0.0900 220 / 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.7200 0.0900 220 / 0);
+    }
+}
+
+@keyframes toast-pulse-success {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.7000 0.1300 140 / 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.7000 0.1300 140 / 0);
+    }
+}
+
+@keyframes toast-pulse-warning {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.7800 0.1100 85 / 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.7800 0.1100 85 / 0);
+    }
+}
+
+@keyframes toast-pulse-destructive {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.6400 0.1600 25 / 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.6400 0.1600 25 / 0);
+    }
+}
+
+@keyframes toast-pulse-primary {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.6200 0.1400 260 / 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.6200 0.1400 260 / 0);
+    }
+}
+
+@keyframes toast-pulse-accent {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.8100 0.0900 320 / 0.3);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.8100 0.0900 320 / 0);
+    }
+}
+
+/* Dark mode pulse animations */
+.dark .toast-pulse-info { animation: toast-pulse-info-dark 2s infinite; }
+.dark .toast-pulse-success { animation: toast-pulse-success-dark 2s infinite; }
+.dark .toast-pulse-warning { animation: toast-pulse-warning-dark 2s infinite; }
+.dark .toast-pulse-destructive { animation: toast-pulse-destructive-dark 2s infinite; }
+.dark .toast-pulse-primary { animation: toast-pulse-primary-dark 2s infinite; }
+.dark .toast-pulse-accent { animation: toast-pulse-accent-dark 2s infinite; }
+
+@keyframes toast-pulse-info-dark {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.7200 0.0900 220 / 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.7200 0.0900 220 / 0);
+    }
+}
+
+@keyframes toast-pulse-success-dark {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.7000 0.1300 140 / 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.7000 0.1300 140 / 0);
+    }
+}
+
+@keyframes toast-pulse-warning-dark {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.7800 0.1100 85 / 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.7800 0.1100 85 / 0);
+    }
+}
+
+@keyframes toast-pulse-destructive-dark {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.6400 0.1600 25 / 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.6400 0.1600 25 / 0);
+    }
+}
+
+@keyframes toast-pulse-primary-dark {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.6200 0.1400 260 / 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.6200 0.1400 260 / 0);
+    }
+}
+
+@keyframes toast-pulse-accent-dark {
+    0% {
+        box-shadow: 0 0 0 0px oklch(0.8100 0.0900 320 / 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 10px oklch(0.8100 0.0900 320 / 0);
+    }
+}
+
+/* Toast pulse utility classes */
+@utility toast-pulse-info { animation: toast-pulse-info 2s infinite; }
+@utility toast-pulse-success { animation: toast-pulse-success 2s infinite; }
+@utility toast-pulse-warning { animation: toast-pulse-warning 2s infinite; }
+@utility toast-pulse-destructive { animation: toast-pulse-destructive 2s infinite; }
+@utility toast-pulse-primary { animation: toast-pulse-primary 2s infinite; }
+@utility toast-pulse-accent { animation: toast-pulse-accent 2s infinite; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .toast-pulse-info,
+    .toast-pulse-success,
+    .toast-pulse-warning,
+    .toast-pulse-destructive,
+    .toast-pulse-primary,
+    .toast-pulse-accent {
+        animation: none !important;
+    }
+}
+
+/* ----------------------------------------- */
 /* Accordion Animation Keyframes             */
 /* ----------------------------------------- */
 
@@ -822,7 +974,7 @@
 
     /* Remove default summary markers */
     .accordion summary {
-        @apply cursor-pointer outline-none;
+        @apply cursor-pointer outline-hidden;
         list-style: none;
     }
 
@@ -939,7 +1091,7 @@
 
     /* Bordered variant */
     .accordion[data-variant="bordered"] {
-        @apply border border-border rounded-lg overflow-hidden;
+        @apply border border-border card-radius overflow-hidden;
     }
 
     .accordion[data-variant="bordered"] details {
@@ -1001,7 +1153,7 @@
 
     /* Filled variant */
     .accordion[data-variant="filled"] {
-        @apply bg-muted/50 rounded-lg overflow-hidden;
+        @apply bg-muted/50 card-radius overflow-hidden;
     }
 
     .accordion[data-variant="filled"] details {
@@ -1042,7 +1194,7 @@
 
     /* Video player variants */
     .video-player-default {
-        @apply bg-black rounded-lg;
+        @apply bg-black tooltip-radius;
     }
 
     .video-player-compact {
@@ -1068,7 +1220,7 @@
     .video-player-theater input[type="range"]::-webkit-slider-track {
         background: rgba(255, 255, 255, 0.3);
         height: 4px;
-        border-radius: 2px;
+        border-radius: var(--radius-button-sm);
     }
 
     .video-player-default input[type="range"]::-webkit-slider-thumb,
@@ -1095,7 +1247,7 @@
     .video-player-theater input[type="range"]::-moz-range-track {
         background: rgba(255, 255, 255, 0.3);
         height: 4px;
-        border-radius: 2px;
+        border-radius: var(--radius-button-sm);
         border: none;
     }
 
@@ -1192,7 +1344,7 @@
 
     ::-webkit-scrollbar-thumb {
         background: oklch(0.7000 0.0080 270 / 0.3);
-        border-radius: 4px;
+        border-radius: var(--radius-button);
         border: 1px solid transparent;
         background-clip: padding-box;
         transition: all 0.2s ease;
@@ -1253,28 +1405,78 @@
     /* Nested Navigation Hierarchy Lines        */
     /* ----------------------------------------- */
 
-    /* Group-based continuous vertical line */
-    .sidebar-group-nested::before {
-        content: '';
-        position: absolute;
-        left: 20px; /* Align with parent icon center (16px icon + 4px offset) */
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background: oklch(0.8000 0.0060 270 / 0.3); /* Subtle light mode line */
-        z-index: 1; /* Behind content */
-        pointer-events: none; /* Don't interfere with interactions */
-    }
-
-    /* Dark mode group line */
-    .dark .sidebar-group-nested::before {
-        background: oklch(0.4500 0.0080 270 / 0.4); /* Subtle dark mode line */
-    }
-
-    /* Simple styling for nested items - no icons, clean hierarchy */
     .nav-item-nested {
         position: relative;
-        z-index: 2; /* Above the group line for proper layering */
+        z-index: 2;
+    }
+
+    .nav-item-nested::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--muted-foreground);
+        opacity: 0.3;
+        transform: scaleX(0.33);
+        transform-origin: center;
+        transition: transform 200ms ease-in-out, opacity 200ms ease-in-out;
+        pointer-events: none;
+    }
+
+    .nav-item-nested::after {
+        content: '';
+        position: absolute;
+        left: 32px;
+        right: 12px;
+        top: 2px;
+        bottom: 2px;
+        background: var(--muted);
+        opacity: 0;
+        border-radius: var(--radius-button);
+        transition: opacity 200ms ease-in-out;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .nav-item-nested:hover::before {
+        transform: scaleX(1);
+        opacity: 0.6;
+    }
+
+    .nav-item-nested:hover::after {
+        opacity: 0.4;
+    }
+
+    .dark .nav-item-nested::before {
+        opacity: 0.4;
+    }
+
+    .dark .nav-item-nested:hover::before {
+        opacity: 0.7;
+    }
+
+    .dark .nav-item-nested:hover::after {
+        opacity: 0.3;
+    }
+
+    /* Nested items with icons - full nav item appearance */
+    .nav-item-nested.has-icon::before {
+        display: none; /* Hide hierarchy line */
+    }
+
+    .nav-item-nested.has-icon::after {
+        left: 12px; /* Full width background like regular nav items */
+        opacity: 0;
+    }
+
+    .nav-item-nested.has-icon:hover::after {
+        opacity: 0.6; /* Full background hover like regular nav items */
+    }
+
+    .dark .nav-item-nested.has-icon:hover::after {
+        opacity: 0.4; /* Dark mode full background hover */
     }
 
 }

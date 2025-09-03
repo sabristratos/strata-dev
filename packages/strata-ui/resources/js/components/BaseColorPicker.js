@@ -33,42 +33,41 @@ export function createBaseColorPicker(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // UI state
+
         open: false,
-        activeTab: 'picker',
         
-        // Configuration
+
         variant: config.variant || 'default',
         showAlpha: config.showAlpha || false,
         allowCustom: config.allowCustom !== false,
         brandColors: config.brandColors !== false,
         format: config.format || 'hex',
         
-        // Color state
+
         currentColor: null,
         displayValue: '',
         alpha: config.alpha || 1,
         
-        // Picker state (HSV)
+
         hue: 0,
         saturation: 100,
         brightness: 100,  // Renamed from 'value' to avoid collision with form value
         isDragging: false,
         dragTarget: null,
         
-        // Canvas elements for color picking
+
         pickerCanvas: null,
         pickerCtx: null,
         hueCanvas: null,
         hueCtx: null,
         
-        // Brand colors
+
         availableBrandColors: {},
         
-        // Color search
+
         colorSearchQuery: '',
         
-        // Input validation
+
         inputError: false,
         
         /**
@@ -77,27 +76,27 @@ export function createBaseColorPicker(config = {}) {
         init() {
             try {
                 
-                // Validate and auto-correct configuration
+
                 this.validateConfiguration();
                 
-                // Initialize current color from value or default
+
                 this.initializeColor();
                 
-                // Load brand colors
+
                 this.loadBrandColors();
                 
-                // Set up canvas elements after DOM is ready
+
                 this.$nextTick(() => {
                     this.initializeCanvases();
                     this.updatePickerDisplay();
                 });
                 
-                // Set up global event listeners
+
                 this.setupGlobalEventHandlers();
                 
             } catch (error) {
                 
-                // Fallback initialization to ensure component is usable
+
                 this.currentColor = parseColor('#6366f1');
                 this.displayValue = '#6366f1';
                 this.alpha = 1;
@@ -120,19 +119,19 @@ export function createBaseColorPicker(config = {}) {
                 const originalShowAlpha = this.showAlpha;
                 let configChanged = false;
 
-                // If format supports alpha but showAlpha is false, enable alpha
+
                 if (alphaFormats.includes(this.format) && !this.showAlpha) {
                     this.showAlpha = true;
                     configChanged = true;
                 }
 
-                // If showAlpha is true but format doesn't support it, switch to rgba
+
                 if (this.showAlpha && nonAlphaFormats.includes(this.format)) {
                     this.format = 'rgba';
                     configChanged = true;
                 }
 
-                // Validate default color format
+
                 const defaultColor = this.value || config.defaultColor;
                 if (defaultColor && typeof defaultColor === 'string') {
                     const hasAlphaInColor = defaultColor.includes('rgba') || defaultColor.includes('hsla');
@@ -146,7 +145,7 @@ export function createBaseColorPicker(config = {}) {
 
             } catch (error) {
                 
-                // Fallback to safe defaults
+
                 this.format = 'hex';
                 this.showAlpha = false;
             }
@@ -169,7 +168,7 @@ export function createBaseColorPicker(config = {}) {
             try {
                 let initialColor;
                 
-                // Check if this.value is a valid color string, otherwise use default
+
                 if (this.isValidColorString(this.value)) {
                     initialColor = this.value;
                 } else if (this.isValidColorString(config.defaultColor)) {
@@ -185,19 +184,19 @@ export function createBaseColorPicker(config = {}) {
                     this.currentColor = initialColor;
                 }
                 
-                // Ensure we have a valid color object
+
                 if (!this.currentColor) {
                     this.currentColor = parseColor('#6366f1');
                 }
                 
-                // Extract alpha from the parsed color if it exists and we don't have an explicit alpha
+
                 let effectiveAlpha = this.alpha;
                 if (this.currentColor && this.currentColor.a !== undefined && this.showAlpha) {
                     effectiveAlpha = this.currentColor.a;
                     this.alpha = effectiveAlpha; // Update our alpha to match the color
                 }
                 
-                // Convert to target format with the effective alpha
+
                 if (this.currentColor && this.format) {
                     this.currentColor = convertColorFormat(this.currentColor, this.format, effectiveAlpha);
                 }
@@ -208,7 +207,7 @@ export function createBaseColorPicker(config = {}) {
                     this.updateDisplayValue();
                     
                     
-                    // Ensure indicators are positioned correctly after initialization
+
                     this.$nextTick(() => {
                         if (this.pickerCanvas && this.hueCanvas) {
                             this.updatePickerDisplay();
@@ -218,7 +217,7 @@ export function createBaseColorPicker(config = {}) {
                 }
             } catch (error) {
                 
-                // Fallback to safe defaults with visible color
+
                 this.currentColor = parseColor('#6366f1');
                 this.displayValue = '#6366f1';
                 this.alpha = 1;
@@ -235,7 +234,7 @@ export function createBaseColorPicker(config = {}) {
             if (this.brandColors) {
                 const colors = getBrandColors();
                 
-                // Store brand colors without accessibility processing
+
                 
                 this.availableBrandColors = colors;
             }
@@ -269,14 +268,14 @@ export function createBaseColorPicker(config = {}) {
          * Initialize canvas elements for color picking
          */
         initializeCanvases() {
-            // Initialize main picker canvas
+
             this.pickerCanvas = this.$refs.pickerCanvas;
             if (this.pickerCanvas) {
                 this.pickerCtx = this.pickerCanvas.getContext('2d');
                 this.drawColorPicker();
             }
             
-            // Initialize hue slider canvas
+
             this.hueCanvas = this.$refs.hueCanvas;
             if (this.hueCanvas) {
                 this.hueCtx = this.hueCanvas.getContext('2d');
@@ -295,10 +294,10 @@ export function createBaseColorPicker(config = {}) {
             const width = canvas.width;
             const height = canvas.height;
             
-            // Create base color at current hue
+
             const baseColor = hslToRgb(this.hue, 100, 50);
             
-            // Create horizontal gradient (white to color)
+
             const horizontalGrad = ctx.createLinearGradient(0, 0, width, 0);
             horizontalGrad.addColorStop(0, 'white');
             horizontalGrad.addColorStop(1, `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`);
@@ -306,7 +305,7 @@ export function createBaseColorPicker(config = {}) {
             ctx.fillStyle = horizontalGrad;
             ctx.fillRect(0, 0, width, height);
             
-            // Create vertical gradient (transparent to black)
+
             const verticalGrad = ctx.createLinearGradient(0, 0, 0, height);
             verticalGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
             verticalGrad.addColorStop(1, 'rgba(0, 0, 0, 1)');
@@ -328,7 +327,7 @@ export function createBaseColorPicker(config = {}) {
             
             const gradient = ctx.createLinearGradient(0, 0, width, 0);
             
-            // Create rainbow gradient
+
             for (let i = 0; i <= 6; i++) {
                 const hue = i * 60;
                 const color = hslToRgb(hue, 100, 50);
@@ -376,7 +375,7 @@ export function createBaseColorPicker(config = {}) {
         handlePickerMove(e) {
             if (!this.pickerCanvas || !this.pickerCanvas.getBoundingClientRect) return;
             
-            // Use .call() to ensure proper context for native method
+
             const rect = this.pickerCanvas.getBoundingClientRect.call(this.pickerCanvas);
             const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
             const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
@@ -384,7 +383,7 @@ export function createBaseColorPicker(config = {}) {
             this.saturation = Math.round((x / rect.width) * 100);
             this.brightness = Math.round(100 - (y / rect.height) * 100);
             
-            // Update color and ensure all visual indicators are synchronized
+
             this.updateColorFromHSV();
         },
         
@@ -397,15 +396,15 @@ export function createBaseColorPicker(config = {}) {
             }
             
             try {
-                // Use .call() to ensure proper context for native method
+
                 const rect = this.hueCanvas.getBoundingClientRect.call(this.hueCanvas);
                 
-                // Validate rect properties
+
                 if (!rect || typeof rect.left !== 'number' || typeof rect.width !== 'number' || rect.width <= 0) {
                     return;
                 }
                 
-                // Validate event coordinates
+
                 if (!e || typeof e.clientX !== 'number') {
                     return;
                 }
@@ -413,14 +412,14 @@ export function createBaseColorPicker(config = {}) {
                 const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
                 const newHue = Math.round((x / rect.width) * 360);
                 
-                // Validate calculated hue
+
                 if (isNaN(newHue) || newHue < 0 || newHue > 360) {
                     return;
                 }
                 
                 this.hue = newHue;
                 
-                // Ensure saturation and value have valid defaults
+
                 if (isNaN(this.saturation) || this.saturation < 0 || this.saturation > 100) {
                     this.saturation = 100;
                 }
@@ -438,21 +437,21 @@ export function createBaseColorPicker(config = {}) {
          * Validate and sanitize HSV values
          */
         validateHSVValues() {
-            // Validate and fix hue
+
             if (typeof this.hue !== 'number' || isNaN(this.hue)) {
                 this.hue = 0;
             } else {
                 this.hue = Math.max(0, Math.min(360, this.hue));
             }
             
-            // Validate and fix saturation
+
             if (typeof this.saturation !== 'number' || isNaN(this.saturation)) {
                 this.saturation = 100;
             } else {
                 this.saturation = Math.max(0, Math.min(100, this.saturation));
             }
             
-            // Validate and fix value/brightness
+
             if (typeof this.brightness !== 'number' || isNaN(this.brightness)) {
                 this.brightness = 100;
             } else {
@@ -464,12 +463,12 @@ export function createBaseColorPicker(config = {}) {
          * Update color from HSV values with validation
          */
         updateColorFromHSV() {
-            // Always validate HSV values before conversion
+
             this.validateHSVValues();
             
             const rgb = hsvToRgb(this.hue, this.saturation, this.brightness);
             
-            // Validate RGB output
+
             if (!rgb || typeof rgb.r !== 'number' || typeof rgb.g !== 'number' || typeof rgb.b !== 'number') {
                 return;
             }
@@ -483,7 +482,7 @@ export function createBaseColorPicker(config = {}) {
             this.setValue(formatColor(this.currentColor));
             this.updateDisplayValue();
             
-            // Force synchronization of visual indicators
+
             this.syncVisualIndicators();
         },
         
@@ -491,17 +490,17 @@ export function createBaseColorPicker(config = {}) {
          * Synchronize visual indicators (crosshair and hue thumb positions)
          */
         syncVisualIndicators() {
-            // Redraw gradient canvas to match current hue
-            // This ensures the crosshair is positioned on the correct color background
+
+
             this.drawColorPicker();
             
-            // Force immediate position recalculation by accessing the position properties
-            // This triggers Alpine.js reactivity and ensures visual indicators update immediately
+
+
             const pickerPos = this.getPickerPosition();
             const huePos = this.getHuePosition();
             
-            // The DOM will automatically update due to Alpine.js reactivity
-            // but accessing these properties ensures it happens immediately
+
+
         },
         
         /**
@@ -640,12 +639,12 @@ export function createBaseColorPicker(config = {}) {
             const width = this.pickerCanvas.width || 280;
             const height = this.pickerCanvas.height || 160;
             
-            // Calculate raw position
+
             const rawX = Math.round((this.saturation / 100) * width);
             const rawY = Math.round(((100 - this.brightness) / 100) * height);
             
-            // Apply minimum offset to account for indicator size (6px radius + border)
-            // This ensures the indicator is never positioned outside the visible area
+
+
             const position = {
                 x: Math.max(6, Math.min(width - 6, rawX)),
                 y: Math.max(6, Math.min(height - 6, rawY))
@@ -664,11 +663,11 @@ export function createBaseColorPicker(config = {}) {
             
             const width = this.hueCanvas.width || 280;
             
-            // Calculate raw position
+
             const rawX = Math.round((this.hue / 360) * width);
             
-            // Apply minimum offset to account for indicator size (8px half-width)
-            // This ensures the indicator is never positioned outside the visible area
+
+
             const position = {
                 x: Math.max(8, Math.min(width - 8, rawX))
             };
@@ -704,7 +703,7 @@ export function createBaseColorPicker(config = {}) {
         handleAlphaMove(e) {
             if (!this.$refs.alphaSlider || !this.$refs.alphaSlider.getBoundingClientRect) return;
             
-            // Use .call() to ensure proper context for native method
+
             const rect = this.$refs.alphaSlider.getBoundingClientRect.call(this.$refs.alphaSlider);
             const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
             
@@ -719,7 +718,7 @@ export function createBaseColorPicker(config = {}) {
             const searchQuery = (this.colorSearchQuery || '').toLowerCase().trim();
             
             Object.entries(this.availableBrandColors).forEach(([key, color]) => {
-                // Apply search filter if query exists
+
                 if (searchQuery && searchQuery.length > 0) {
                     const searchableText = [
                         color.name,
@@ -740,7 +739,7 @@ export function createBaseColorPicker(config = {}) {
                 grouped[color.category].push({ key, ...color });
             });
             
-            // Sort categories by priority and colors within each category by variant
+
             const categoryPriority = {
                 'brand': 1,
                 'semantic': 2,
@@ -753,9 +752,9 @@ export function createBaseColorPicker(config = {}) {
             Object.keys(grouped)
                 .sort((a, b) => (categoryPriority[a] || 999) - (categoryPriority[b] || 999))
                 .forEach(category => {
-                    // Sort colors within category by variant number or name
+
                     sortedGrouped[category] = grouped[category].sort((a, b) => {
-                        // Try to sort by numeric variant first (e.g., 50, 100, 200, etc.)
+
                         const aVariant = parseInt(a.variant) || 0;
                         const bVariant = parseInt(b.variant) || 0;
                         
@@ -763,7 +762,7 @@ export function createBaseColorPicker(config = {}) {
                             return aVariant - bVariant;
                         }
                         
-                        // Fallback to alphabetical sorting
+
                         return a.name.localeCompare(b.name);
                     });
                 });
@@ -782,7 +781,7 @@ export function createBaseColorPicker(config = {}) {
                 rgb = hexToRgb(this.currentColor.value);
             }
             
-            // Ensure rgb has the required properties
+
             if (!rgb || typeof rgb.r !== 'number' || typeof rgb.g !== 'number' || typeof rgb.b !== 'number') {
                 return [];
             }
@@ -835,12 +834,6 @@ export function createBaseColorPicker(config = {}) {
             this.dragTarget = null;
         },
         
-        /**
-         * Switch active tab
-         */
-        switchTab(tab) {
-            this.activeTab = tab;
-        },
         
         /**
          * Clear color selection
@@ -903,14 +896,14 @@ export function createBaseColorPicker(config = {}) {
                 return 'background: linear-gradient(to right, transparent, transparent);';
             }
             
-            // Get the current color style
+
             const colorStyle = this.getCurrentColorStyle();
             
-            // Convert rgba/rgb to rgb format for the gradient endpoint
-            // This replaces the complex regex logic that was in the DOM
+
+
             let rgbColor;
             if (colorStyle.includes('rgba') || colorStyle.includes('rgb')) {
-                // Extract RGB values from the color style
+
                 const rgbMatch = colorStyle.match(/rgba?\(([^,]+),\s*([^,]+),\s*([^,)]+)/);
                 if (rgbMatch) {
                     const r = Math.round(parseFloat(rgbMatch[1]));
@@ -918,11 +911,11 @@ export function createBaseColorPicker(config = {}) {
                     const b = Math.round(parseFloat(rgbMatch[3]));
                     rgbColor = `rgb(${r}, ${g}, ${b})`;
                 } else {
-                    // Fallback: use currentColor properties directly
+
                     rgbColor = `rgb(${this.currentColor?.r || 0}, ${this.currentColor?.g || 0}, ${this.currentColor?.b || 0})`;
                 }
             } else {
-                // For hex or other formats, use currentColor properties
+
                 rgbColor = `rgb(${this.currentColor?.r || 0}, ${this.currentColor?.g || 0}, ${this.currentColor?.b || 0})`;
             }
             
@@ -940,7 +933,7 @@ export function createBaseColorPicker(config = {}) {
                     this.close();
                     break;
                 case 'Tab':
-                    // Allow tab navigation through picker elements
+
                     break;
                 case 'ArrowUp':
                     event.preventDefault();
@@ -978,11 +971,11 @@ export function createBaseColorPicker(config = {}) {
                         success: true
                     });
                 } else {
-                    // Fallback for non-secure contexts
+
                     this.copyToClipboardFallback(this.displayValue);
                 }
             } catch (error) {
-                // Try fallback method
+
                 this.copyToClipboardFallback(this.displayValue);
             }
         },
@@ -1029,18 +1022,6 @@ export function createBaseColorPicker(config = {}) {
             return this.showAlpha && this.alpha < 1;
         },
         
-        /**
-         * Get current tab classes
-         */
-        getTabClasses(tab) {
-            const baseClasses = 'px-3 py-1.5 text-sm font-medium button-radius-sm transition-colors duration-150';
-            const activeClasses = 'bg-primary text-primary-foreground';
-            const inactiveClasses = 'text-muted-foreground hover:text-foreground hover:bg-accent';
-            
-            return this.activeTab === tab 
-                ? `${baseClasses} ${activeClasses}`
-                : `${baseClasses} ${inactiveClasses}`;
-        }
     });
 }
 

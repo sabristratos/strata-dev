@@ -32,17 +32,17 @@ class FileUpload extends Component
         public string $variant = 'default',
         public mixed $value = null
     ) {
-        // Set default accept types if not specified
+
         if ($this->accept === null) {
             $this->accept = 'image/*,application/pdf,.doc,.docx,.txt';
         }
 
-        // Set default max size (12MB) if not specified
+
         if ($this->maxSize === null) {
             $this->maxSize = 12288; // 12MB in KB
         }
 
-        // Set default placeholder if not specified
+
         if ($this->placeholder === null) {
             $this->placeholder = $this->multiple
                 ? 'Drop files here or click to browse'
@@ -85,7 +85,7 @@ class FileUpload extends Component
     {
         return match ($this->variant) {
             'compact' => 'border border-dashed border-border input-radius p-4',
-            'gallery' => 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4',
+            'gallery' => 'border border-dashed border-border input-radius p-4',
             default => 'border-2 border-dashed border-border input-radius p-8'
         };
     }

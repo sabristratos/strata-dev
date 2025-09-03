@@ -19,7 +19,7 @@ class Helper extends Component
         public string $size = 'xs',
         public bool $showIcon = false
     ) {
-        // Auto-generate ID if not provided
+
         if (! $this->id && $this->field) {
             $this->id = $this->field.'-description';
         } elseif (! $this->id) {
@@ -51,7 +51,7 @@ class Helper extends Component
             $classes[] = 'gap-2';
         }
 
-        // Add size-specific classes
+
         $classes[] = match ($this->size) {
             'xs' => 'text-xs',
             'sm' => 'text-sm',

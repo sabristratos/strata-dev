@@ -19,9 +19,9 @@ export function createRatingComponent(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Rating state
+
         value: config.hasWireModel ? null : config.value,
-        hoverValue: null,
+        stars: config.hasWireModel ? null : config.value, // Visual display state
         readonly: config.readonly || false,
         max: config.max || 5,
         name: config.name || null,
@@ -31,23 +31,18 @@ export function createRatingComponent(config = {}) {
          * Initialize rating component
          */
         init() {
-            // Handle Livewire entanglement
+
             if (this.hasWireModel) {
                 this.value = config.value;
             }
             
-            // Initialize hidden input value
+
+            this.stars = this.value;
+            
+
             if (this.$refs.hiddenInput) {
                 this.$refs.hiddenInput.value = this.value || '';
             }
-        },
-        
-        /**
-         * Get display value (hover takes precedence over actual value)
-         * @returns {number|null}
-         */
-        get displayValue() {
-            return this.hoverValue !== null ? this.hoverValue : this.value;
         },
         
         /**
@@ -58,13 +53,14 @@ export function createRatingComponent(config = {}) {
             if (this.readonly) return;
             
             this.value = rating;
+            this.stars = rating;
             
-            // Update hidden input
+
             if (this.$refs.hiddenInput) {
                 this.$refs.hiddenInput.value = rating;
             }
             
-            // Dispatch change event
+
             this.dispatchComponentEvent(EVENTS.CHANGE, { value: rating });
             this.$dispatch('change', { value: rating });
         },
@@ -76,13 +72,14 @@ export function createRatingComponent(config = {}) {
             if (this.readonly) return;
             
             this.value = null;
+            this.stars = null;
             
-            // Update hidden input
+
             if (this.$refs.hiddenInput) {
                 this.$refs.hiddenInput.value = '';
             }
             
-            // Dispatch change event
+
             this.dispatchComponentEvent(EVENTS.CHANGE, { value: null });
             this.$dispatch('change', { value: null });
         },
@@ -93,7 +90,7 @@ export function createRatingComponent(config = {}) {
          */
         onMouseEnter(rating) {
             if (this.readonly) return;
-            this.hoverValue = rating;
+            this.stars = rating;
         },
         
         /**
@@ -101,17 +98,7 @@ export function createRatingComponent(config = {}) {
          */
         onMouseLeave() {
             if (this.readonly) return;
-            this.hoverValue = null;
-        },
-        
-        /**
-         * Check if a star at given index should be active
-         * @param {number} index - Star index (1-based)
-         * @returns {boolean}
-         */
-        isActive(index) {
-            const current = this.displayValue;
-            return current !== null && index <= current;
+            this.stars = this.value;
         },
         
         /**
@@ -120,8 +107,7 @@ export function createRatingComponent(config = {}) {
          * @returns {boolean}
          */
         isHalfActive(index) {
-            const current = this.displayValue;
-            return current !== null && index - 0.5 <= current && current < index;
+            return this.stars !== null && index - 0.5 <= this.stars && this.stars < index;
         },
         
         /**
@@ -168,7 +154,7 @@ export function createRatingComponent(config = {}) {
                     break;
                     
                 default:
-                    // Handle numeric keys (1-9)
+
                     if (key >= '1' && key <= '9') {
                         const numValue = parseInt(key, 10);
                         if (numValue <= this.max) {
@@ -184,10 +170,9 @@ export function createRatingComponent(config = {}) {
          * Get rating as percentage for display
          * @returns {number}
          */
-        get percentage() {
-            const current = this.displayValue;
-            if (current === null) return 0;
-            return (current / this.max) * 100;
+        percentage() {
+            if (this.stars === null) return 0;
+            return (this.stars / this.max) * 100;
         },
         
         /**

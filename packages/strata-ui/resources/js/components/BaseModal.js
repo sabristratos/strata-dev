@@ -6,7 +6,7 @@
 
 import { createBaseComponent, extendComponent } from './BaseComponent.js';
 import { lockBodyScroll, unlockBodyScroll, extractComponentName } from '../utilities/dom.js';
-import { storeFocus } from '../utilities/focus.js';
+import { storeFocus, createFocusTrap } from '../utilities/focus.js';
 import { dispatchGlobalEvent, addEventListener, EVENTS } from '../utilities/events.js';
 
 /**
@@ -21,22 +21,23 @@ export function createBaseModal(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Modal state - controlled by Alpine
+
         show: false,
         name: config.name || null,
         dismissible: config.dismissible !== false,
         
-        // Internal state
+
         _restoreFocus: null,
+        _focusTrap: null,
         
         /**
          * Modal-specific initialization
          */
         init() {
-            // Modal starts hidden
+
             this.show = false;
             
-            // Set up event listeners
+
             this.setupEventListeners();
         },
         
@@ -44,12 +45,18 @@ export function createBaseModal(config = {}) {
          * Modal-specific cleanup
          */
         destroy() {
-            // Restore focus if modal was open
+
+            if (this._focusTrap) {
+                this._focusTrap();
+                this._focusTrap = null;
+            }
+            
+
             if (this.show && this._restoreFocus) {
                 this._restoreFocus();
             }
             
-            // Ensure body scroll is unlocked
+
             unlockBodyScroll();
         },
         
@@ -59,29 +66,29 @@ export function createBaseModal(config = {}) {
         setupEventListeners() {
             if (!this.name) return;
             
-            // Listen for show events
+
             const showCleanup = addEventListener(window, `strata-modal-show-${this.name}`, (event) => {
                 this.showModal(event.detail);
             });
             
-            // Listen for hide events
+
             const hideCleanup = addEventListener(window, `strata-modal-hide-${this.name}`, () => {
                 this.hideModal();
             });
             
-            // Listen for toggle events
+
             const toggleCleanup = addEventListener(window, `strata-modal-toggle-${this.name}`, (event) => {
                 this.toggleModal(event.detail);
             });
             
-            // Listen for ESC key if dismissible
+
             const escapeCleanup = addEventListener(window, 'keydown', (event) => {
                 if (event.key === 'Escape' && this.show && this.dismissible) {
                     this.hideModal();
                 }
             });
             
-            // Add all cleanup functions
+
             this.addCleanup(showCleanup);
             this.addCleanup(hideCleanup);
             this.addCleanup(toggleCleanup);
@@ -95,22 +102,27 @@ export function createBaseModal(config = {}) {
         showModal(data = {}) {
             if (this.show) return;
             
-            // Store current focus for restoration
+
             this._restoreFocus = storeFocus();
             
-            // Lock body scroll for better UX
+
             lockBodyScroll();
             
-            // Set Alpine show state - Alpine handles all animations and transitions
+
             this.show = true;
             
-            // Dispatch opened event
+
+            this.$nextTick(() => {
+                this._focusTrap = createFocusTrap(this.$el);
+            });
+            
+
             this.dispatchComponentEvent(EVENTS.MODAL_OPENED, {
                 name: this.name,
                 data
             });
             
-            // Also dispatch global event for other components to listen
+
             dispatchGlobalEvent(EVENTS.MODAL_OPENED, {
                 name: this.name,
                 data
@@ -123,19 +135,25 @@ export function createBaseModal(config = {}) {
         hideModal() {
             if (!this.show) return;
             
-            // Set Alpine show state - Alpine handles smooth closing animation
+
             this.show = false;
             
-            // Unlock body scroll
+
+            if (this._focusTrap) {
+                this._focusTrap();
+                this._focusTrap = null;
+            }
+            
+
             unlockBodyScroll();
             
-            // Restore focus
+
             if (this._restoreFocus) {
                 this._restoreFocus();
                 this._restoreFocus = null;
             }
             
-            // Dispatch events
+
             this.dispatchComponentEvent(EVENTS.MODAL_CLOSED, {
                 name: this.name
             });
@@ -143,7 +161,7 @@ export function createBaseModal(config = {}) {
             this.dispatchComponentEvent(EVENTS.CLOSE);
             this.dispatchComponentEvent(EVENTS.CANCEL);
             
-            // Global event
+
             dispatchGlobalEvent(EVENTS.MODAL_CLOSED, {
                 name: this.name
             });
@@ -210,23 +228,23 @@ export function createBaseModal(config = {}) {
  * Close all open modals using Alpine.js
  */
 export function closeAllModals() {
-    // Find all Strata modals (now div elements with Alpine.js)
+
     const modals = document.querySelectorAll('[x-data*="strataModal"]');
     
     modals.forEach(modalEl => {
         const modalName = modalEl.getAttribute('data-modal-name');
         if (modalName) {
-            // Dispatch hide event for named modals
+
             dispatchGlobalEvent(`strata-modal-hide-${modalName}`);
         } else {
-            // Fallback: try to call hideModal directly through Alpine
+
             if (modalEl.__x && modalEl.__x.$data && modalEl.__x.$data.hideModal) {
                 modalEl.__x.$data.hideModal();
             }
         }
     });
     
-    // Ensure body scroll is unlocked
+
     unlockBodyScroll();
 }
 

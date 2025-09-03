@@ -10,7 +10,7 @@
 <div 
     role="tablist"
     {{ $attributes->merge([
-        'class' => implode(' ', array_filter($listClasses))
+        'class' => implode(' ', $listClasses)
     ]) }}
 >
     {{ $slot }}

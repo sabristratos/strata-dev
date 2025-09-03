@@ -167,7 +167,7 @@
                         
                         <!-- Picker Crosshair -->
                         <div
-                            class="absolute w-3 h-3 border-2 border-white rounded-full pointer-events-none shadow-sm"
+                            class="absolute w-3 h-3 border-2 border-white rounded-full pointer-events-none shadow-xs"
                             :style="`left: calc(${getPickerPosition().x}px - 6px); top: calc(${getPickerPosition().y}px - 6px);`"
                         ></div>
                     </div>
@@ -184,7 +184,7 @@
                         
                         <!-- Hue Handle -->
                         <div
-                            class="absolute w-4 h-6 bg-white border-2 border-border rounded shadow-sm pointer-events-none"
+                            class="absolute w-4 h-6 bg-white border-2 border-border rounded shadow-xs pointer-events-none"
                             :style="`left: calc(${getHuePosition().x}px - 8px); top: -4px;`"
                         ></div>
                     </div>
@@ -206,7 +206,7 @@
                         
                         <!-- Alpha Handle -->
                         <div
-                            class="absolute w-4 h-6 bg-white border-2 border-border rounded shadow-sm pointer-events-none"
+                            class="absolute w-4 h-6 bg-white border-2 border-border rounded shadow-xs pointer-events-none"
                             :style="`left: calc(${getAlphaPosition().x}px - 8px); top: -4px;`"
                         ></div>
                     </div>
@@ -256,7 +256,7 @@
                                             <button
                                                 type="button"
                                                 @click="selectBrandColor(brandColor.key)"
-                                                class="group relative w-full aspect-square button-radius border border-border hover:scale-110 hover:shadow-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                                class="group relative w-full aspect-square button-radius border border-border hover:scale-110 hover:shadow-md transition-all duration-150 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                                 :style="`background-color: ${brandColor.value};`"
                                                 :title="`${brandColor.name} - ${brandColor.value}`"
                                             >

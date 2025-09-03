@@ -6,6 +6,7 @@
 
 import { createBaseComponent, extendComponent } from './BaseComponent.js';
 import { dispatchGlobalEvent, addEventListener, EVENTS } from '../utilities/events.js';
+import { ANIMATION_DURATIONS } from '../utilities/animation.js';
 
 /**
  * Create a toast group component
@@ -19,7 +20,7 @@ export function createToastGroupComponent(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Toast group state
+
         toasts: [],
         position: config.position || 'bottom-end',
         expanded: config.expanded || false,
@@ -35,7 +36,7 @@ export function createToastGroupComponent(config = {}) {
          * Set up event listeners for toast management
          */
         setupEventListeners() {
-            // Listen for show toast events
+
             const showCleanup = addEventListener(window, 'strata-toast-show', (event) => {
                 this.addToast(event.detail);
             });
@@ -50,7 +51,7 @@ export function createToastGroupComponent(config = {}) {
         addToast(detail) {
             const toast = {
                 id: Date.now() + Math.random(),
-                duration: detail.duration === 0 ? 0 : (detail.duration || 5000),
+                duration: detail.duration === 0 ? 0 : (detail.duration || window.strataUIConfig?.defaults?.toast_duration || ANIMATION_DURATIONS.EXTRA_SLOW * 10),
                 message: typeof detail === 'string' ? detail : (detail.message || ''),
                 title: detail.title || null,
                 variant: detail.variant || 'info',
@@ -60,7 +61,7 @@ export function createToastGroupComponent(config = {}) {
 
             this.toasts.push(toast);
             
-            // Dispatch toast added event
+
             this.dispatchComponentEvent(EVENTS.TOAST_ADDED, { toast });
         },
         
@@ -89,11 +90,11 @@ export function createToastGroupComponent(config = {}) {
          * @param {Object} action - Action configuration
          */
         handleAction(action) {
-            // Execute the action callback if it's a function
+
             if (typeof window[action.action] === 'function') {
                 window[action.action]();
             } else {
-                // Try to evaluate as JavaScript code
+
                 try {
                     new Function(action.action)();
                 } catch (e) {
@@ -101,7 +102,7 @@ export function createToastGroupComponent(config = {}) {
                 }
             }
             
-            // Dispatch action executed event
+
             this.dispatchComponentEvent(EVENTS.TOAST_ACTION_EXECUTED, { action });
         },
         
@@ -120,7 +121,7 @@ export function createToastItemComponent(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Toast item state
+
         show: false,
         timer: null,
         toast: config.toast || {},
@@ -130,7 +131,7 @@ export function createToastItemComponent(config = {}) {
          * Initialize individual toast item
          */
         init() {
-            // Show toast with slight delay for animation
+
             this.$nextTick(() => {
                 this.show = true;
                 this.startTimer();
@@ -162,7 +163,7 @@ export function createToastItemComponent(config = {}) {
         removeToast() {
             this.show = false;
             setTimeout(() => {
-                // Find parent toast group and remove this toast
+
                 const toastGroup = this.findParentToastGroup();
                 if (toastGroup && toastGroup.removeToast) {
                     toastGroup.removeToast(this.toast.id);

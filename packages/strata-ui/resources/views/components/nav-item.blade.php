@@ -20,7 +20,7 @@
     <span class="flex-1 truncate">{{ $slot }}</span>
 
     @if (isset($badge))
-        <div class="flex-shrink-0">
+        <div class="flex-shrink-0 mr-2">
             {{ $badge }}
         </div>
     @endif

@@ -33,4 +33,9 @@ class DateRange implements Arrayable
             'end' => $this->end->toDateString(),
         ];
     }
+
+    public function __toString(): string
+    {
+        return $this->start->toDateString().' to '.$this->end->toDateString();
+    }
 }

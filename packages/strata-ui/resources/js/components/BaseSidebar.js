@@ -8,6 +8,7 @@
 import { createBaseComponent, extendComponent } from './BaseComponent.js';
 import { lockBodyScroll, unlockBodyScroll } from '../utilities/dom.js';
 import { dispatchGlobalEvent, addEventListener, EVENTS } from '../utilities/events.js';
+import { createTouchHandler, TOUCH_DIRECTIONS } from '../utilities/touch.js';
 
 /**
  * Create a base sidebar component using Alpine.js
@@ -21,7 +22,7 @@ export function createSidebarComponent(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Sidebar state
+
         show: false,
         collapsed: false,
         name: config.name || 'main',
@@ -29,39 +30,36 @@ export function createSidebarComponent(config = {}) {
         persistent: config.persistent || false,
         collapsible: config.collapsible || false,
         
-        // Internal state
+
         _breakpoint: 768, // md breakpoint
         _isMobile: false,
         _storageKey: null,
-        _touchStartX: null,
-        _touchStartY: null,
-        _touchCurrentX: null,
-        _isDragging: false,
-        _dragThreshold: 10,
-        _swipeThreshold: 100,
+        _touchHandler: null,
         
         /**
          * Sidebar-specific initialization
          */
         init() {
-            // Initialize responsive behavior
+
             this.checkMobile();
             this.setupResponsiveHandling();
             
-            // Set up storage key for persistence
+
             if (this.persistent) {
                 this._storageKey = `strata-sidebar-${this.name}`;
                 this.loadPersistedState();
             }
             
-            // Set initial state based on variant
+
             this.setInitialState();
             
-            // Set up event listeners
+
             this.setupEventListeners();
             
-            // Set up keyboard handling
+
             this.setupKeyboardHandling();
+            
+            this.setupTouchHandling();
         },
         
         /**
@@ -82,12 +80,12 @@ export function createSidebarComponent(config = {}) {
                     const wasMobile = this._isMobile;
                     this.checkMobile();
                     
-                    // Handle mobile/desktop transitions
+
                     if (wasMobile && !this._isMobile) {
-                        // Switched from mobile to desktop
+
                         this.handleMobileToDesktop();
                     } else if (!wasMobile && this._isMobile) {
-                        // Switched from desktop to mobile
+
                         this.handleDesktopToMobile();
                     }
                 }, 150); // Debounce resize events
@@ -137,14 +135,14 @@ export function createSidebarComponent(config = {}) {
          * Set up sidebar-specific event listeners
          */
         setupEventListeners() {
-            // Listen for global sidebar events
+
             this._strataCleanupFunctions.push(
                 addEventListener(window, `strata-sidebar-show-${this.name}`, () => this.open()),
                 addEventListener(window, `strata-sidebar-hide-${this.name}`, () => this.close()),
                 addEventListener(window, `strata-sidebar-toggle-${this.name}`, () => this.toggle())
             );
             
-            // Listen for global close all sidebars
+
             this._strataCleanupFunctions.push(
                 addEventListener(window, 'strata-sidebars-close-all', () => {
                     if (this.variant !== 'fixed') {
@@ -177,21 +175,21 @@ export function createSidebarComponent(config = {}) {
             
             this.show = true;
             
-            // Lock body scroll for overlay variants on mobile
+
             if ((this.variant === 'overlay' || (this.variant === 'hybrid' && this._isMobile))) {
                 lockBodyScroll();
             }
             
-            // Update aria-expanded on toggle buttons
+
             this.updateToggleButtons(true);
             
-            // Save state if persistent
+
             this.saveState();
             
-            // Dispatch event
+
             this.dispatchSidebarEvent('opened');
             
-            // Focus management - focus first focusable element in sidebar
+
             this.$nextTick(() => {
                 const firstFocusable = this.$el.querySelector('a, button, [tabindex]:not([tabindex="-1"])');
                 if (firstFocusable) {
@@ -208,16 +206,16 @@ export function createSidebarComponent(config = {}) {
             
             this.show = false;
             
-            // Unlock body scroll
+
             unlockBodyScroll();
             
-            // Update aria-expanded on toggle buttons
+
             this.updateToggleButtons(false);
             
-            // Save state if persistent
+
             this.saveState();
             
-            // Dispatch event
+
             this.dispatchSidebarEvent('closed');
         },
         
@@ -306,107 +304,68 @@ export function createSidebarComponent(config = {}) {
         },
         
         /**
-         * Handle touch start for swipe gestures
+         * Set up touch handling using centralized utilities
          */
-        handleTouchStart(event) {
+        setupTouchHandling() {
             if (!this._isMobile || this.variant === 'fixed') return;
             
-            this._touchStartX = event.touches[0].clientX;
-            this._touchStartY = event.touches[0].clientY;
-            this._touchCurrentX = this._touchStartX;
-            this._isDragging = false;
+            this._touchHandler = createTouchHandler(document.body, {
+                onSwipe: (swipeInfo) => {
+                    this.handleSwipeGesture(swipeInfo);
+                }
+            });
+            
+            this._touchHandler.enable();
+            this.addCleanup(() => {
+                if (this._touchHandler) {
+                    this._touchHandler.disable();
+                }
+            });
         },
         
         /**
-         * Handle touch move for swipe gestures
+         * Handle swipe gestures for sidebar control
          */
-        handleTouchMove(event) {
-            if (!this._touchStartX || !this._isMobile || this.variant === 'fixed') return;
+        handleSwipeGesture(swipeInfo) {
+            if (!this._isMobile || this.variant === 'fixed') return;
             
-            this._touchCurrentX = event.touches[0].clientX;
-            const touchDeltaX = this._touchCurrentX - this._touchStartX;
-            const touchDeltaY = event.touches[0].clientY - this._touchStartY;
+            const { direction, startX } = swipeInfo;
+            const windowWidth = window.innerWidth;
+            const edgeThreshold = 20;
             
-            // Determine if this is a horizontal swipe
-            if (Math.abs(touchDeltaX) > this._dragThreshold && Math.abs(touchDeltaX) > Math.abs(touchDeltaY)) {
-                this._isDragging = true;
-                
-                // For overlay sidebars, allow visual feedback during drag
-                if (this.show && this.variant === 'overlay') {
-                    const shouldClose = this.position === 'left' ? touchDeltaX < 0 : touchDeltaX > 0;
-                    if (shouldClose && Math.abs(touchDeltaX) > this._dragThreshold) {
-                        // Add visual feedback here if desired
-                    }
+            const isLeftEdgeStart = startX < edgeThreshold;
+            const isRightEdgeStart = startX > windowWidth - edgeThreshold;
+            
+            if (this.position === 'left') {
+                if (direction === TOUCH_DIRECTIONS.LEFT && this.show) {
+                    this.close();
+                } else if (direction === TOUCH_DIRECTIONS.RIGHT && !this.show && isLeftEdgeStart) {
+                    this.open();
+                }
+            } else if (this.position === 'right') {
+                if (direction === TOUCH_DIRECTIONS.RIGHT && this.show) {
+                    this.close();
+                } else if (direction === TOUCH_DIRECTIONS.LEFT && !this.show && isRightEdgeStart) {
+                    this.open();
                 }
             }
-        },
-        
-        /**
-         * Handle touch end for swipe gestures
-         */
-        handleTouchEnd(event) {
-            if (!this._touchStartX || !this._isMobile || this.variant === 'fixed') {
-                this._resetTouchState();
-                return;
-            }
-            
-            const touchDeltaX = this._touchCurrentX - this._touchStartX;
-            const swipeDistance = Math.abs(touchDeltaX);
-            
-            // Only process if this was a horizontal drag and meets threshold
-            if (this._isDragging && swipeDistance > this._swipeThreshold) {
-                const isLeftSwipe = touchDeltaX < 0;
-                const isRightSwipe = touchDeltaX > 0;
-                
-                // Handle swipe based on sidebar position and direction
-                if (this.position === 'left') {
-                    if (isLeftSwipe && this.show) {
-                        this.close();
-                    } else if (isRightSwipe && !this.show) {
-                        // Could open sidebar with right swipe from screen edge
-                        const startFromEdge = this._touchStartX < 20; // Within 20px of left edge
-                        if (startFromEdge) {
-                            this.open();
-                        }
-                    }
-                } else if (this.position === 'right') {
-                    if (isRightSwipe && this.show) {
-                        this.close();
-                    } else if (isLeftSwipe && !this.show) {
-                        // Could open sidebar with left swipe from right edge
-                        const startFromEdge = this._touchStartX > window.innerWidth - 20;
-                        if (startFromEdge) {
-                            this.open();
-                        }
-                    }
-                }
-            }
-            
-            this._resetTouchState();
-        },
-        
-        /**
-         * Reset touch tracking state
-         */
-        _resetTouchState() {
-            this._touchStartX = null;
-            this._touchStartY = null;
-            this._touchCurrentX = null;
-            this._isDragging = false;
         },
         
         /**
          * Sidebar-specific cleanup
          */
         destroy() {
-            // Unlock body scroll if locked
+
             unlockBodyScroll();
             
-            // Update toggle buttons
+
             this.updateToggleButtons(false);
             
-            // Reset touch state
-            this._resetTouchState();
+
+            if (this._touchHandler) {
+                this._touchHandler.disable();
+                this._touchHandler = null;
+            }
         }
     });
 }

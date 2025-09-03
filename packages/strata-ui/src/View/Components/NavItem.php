@@ -38,14 +38,19 @@ class NavItem extends Component
             'duration-200',
         ];
 
-        // Add nested-specific classes
         if ($this->nested) {
-            $classes[] = 'nav-item-nested'; // Keep for icon masking and z-index
+            $classes[] = 'nav-item-nested';
+            
+            // Add has-icon class when nested item has an icon
+            if ($this->shouldShowIcon()) {
+                $classes[] = 'has-icon';
+            }
+            
             $classes[] = 'px-3';
-            $classes[] = 'pl-8'; // Extra indentation for nested items
+            $classes[] = 'pl-12';
             $classes[] = 'py-2';
             $classes[] = 'text-sm';
-            $classes[] = 'font-normal'; // Less bold than regular items
+            $classes[] = 'font-normal';
         } else {
             $classes[] = 'px-3';
             $classes[] = 'py-2.5';
@@ -64,7 +69,7 @@ class NavItem extends Component
         if ($this->nested) {
             return $this->active
                 ? 'bg-muted/50 text-foreground'
-                : 'text-muted-foreground/70 hover:text-foreground hover:bg-muted/40';
+                : 'text-muted-foreground/70 hover:text-foreground';
         }
 
         return $this->active
@@ -78,11 +83,6 @@ class NavItem extends Component
     public function shouldShowIcon(): bool
     {
         if ($this->hideIcon) {
-            return false;
-        }
-
-        // Nested items never show icons for clean hierarchy
-        if ($this->nested) {
             return false;
         }
 

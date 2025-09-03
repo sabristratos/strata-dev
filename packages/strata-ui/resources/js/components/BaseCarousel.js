@@ -6,7 +6,8 @@
  */
 
 import { createBaseComponent, extendComponent } from './BaseComponent.js';
-import { dispatchElementEvent, EVENTS } from '../utilities/events.js';
+import { dispatchElementEvent, addEventListener, EVENTS } from '../utilities/events.js';
+import { ANIMATION_DURATIONS } from '../utilities/animation.js';
 
 /**
  * Create a Strata Carousel component
@@ -21,7 +22,7 @@ export function createCarouselComponent(config = {}) {
     });
 
     return extendComponent(baseComponent, {
-        // Simplified state management
+
         slides: [],
         currentSlide: 0,
         totalSlides: 0,
@@ -34,21 +35,18 @@ export function createCarouselComponent(config = {}) {
         isPaused: false,
         isProgrammaticScroll: false,
 
-        // Event listener references for cleanup
-        _scrollHandler: null,
-        _keydownHandler: null,
+
         _scrollContainer: null,
+        _cachedDimensions: null,
+        _resizeObserver: null,
+        _animationFrameId: null,
+        _scrollUpdateScheduled: false,
 
-        // Store raw config for deferred processing
-        _rawConfig: config,
 
-        // Configuration with validation - will be set in init()
         autoplay: config.autoplay || false,
         interval: Math.max(1000, Math.min(30000, config.interval || 3000)),
         loop: config.loop !== false,
         itemsPerView: { default: 1 }, // Will be normalized in init()
-
-        // CSS classes from PHP component
         itemClasses: config.itemClasses || 'flex-shrink-0 snap-center w-full',
         
 
@@ -81,14 +79,20 @@ export function createCarouselComponent(config = {}) {
          * Wait for container to be available with retry mechanism
          */
         async waitForContainer(maxRetries = 10, delay = 50) {
-            for (let i = 0; i < maxRetries; i++) {
-                if (this.$refs.scrollContainer) {
-                    return this.$refs.scrollContainer;
+            try {
+                for (let i = 0; i < maxRetries; i++) {
+                    if (this.$refs.scrollContainer) {
+                        return this.$refs.scrollContainer;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
-                await new Promise(resolve => setTimeout(resolve, delay));
+
+                console.warn('Strata Carousel: Scroll container not found after retries');
+                return null;
+            } catch (error) {
+                console.error('Strata Carousel: Error waiting for container:', error);
+                return null;
             }
-            // Container not found after retries
-            return null;
         },
 
         /**
@@ -97,9 +101,9 @@ export function createCarouselComponent(config = {}) {
         async initializeSlides(retries = 3) {
             this.processSlides();
             
-            // If no slides found, retry after a short delay
+
             if (this.totalSlides === 0 && retries > 0) {
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, ANIMATION_DURATIONS.FAST));
                 return this.initializeSlides(retries - 1);
             }
         },
@@ -108,56 +112,138 @@ export function createCarouselComponent(config = {}) {
          * Initialize carousel component
          */
         async init() {
-            // Process deferred configuration
-            this.itemsPerView = this.normalizeItemsPerView(this._rawConfig.itemsPerView || { default: 1 });
-            
-            // Wait for container to be ready
-            await this.waitForContainer();
-            
-            this.$nextTick(async () => {
-                await this.initializeSlides();
-                this.setupScrollListener();
-                this.setupKeyboardNavigation();
-                this.updateNavigationState();
+            try {
+
+                this.itemsPerView = this.normalizeItemsPerView(config.itemsPerView || { default: 1 });
                 
-                if (this.autoplay) {
-                    this.startAutoplay();
+
+                const container = await this.waitForContainer();
+                if (!container) {
+                    console.error('Strata Carousel: Cannot initialize without scroll container');
+                    return;
                 }
                 
-                // Dispatch ready event
-                this.dispatchComponentEvent(EVENTS.COMPONENT_READY, {
-                    totalSlides: this.totalSlides,
-                    currentSlide: this.currentSlide
+
+                this._scrollContainer = container;
+                this.setupResizeObserver();
+                
+                this.$nextTick(async () => {
+                    try {
+                        await this.initializeSlides();
+                        this.setupScrollListener();
+                        this.setupKeyboardNavigation();
+                        this.updateNavigationState();
+                        
+                        if (this.autoplay && this.totalSlides > 1) {
+                            this.startAutoplay();
+                        }
+                        
+
+                        this.dispatchComponentEvent(EVENTS.CAROUSEL_READY, {
+                            totalSlides: this.totalSlides,
+                            currentSlide: this.currentSlide
+                        });
+                    } catch (error) {
+                        console.error('Strata Carousel: Initialization error:', error);
+                    }
                 });
-            });
+            } catch (error) {
+                console.error('Strata Carousel: Critical initialization error:', error);
+            }
         },
 
         /**
          * Process direct children as slides
          */
-        processSlides() {
-            const container = this.$refs.scrollContainer;
-            if (!container) {
-                return;
-            }
+        /**
+         * Setup resize observer for performance-optimized dimension caching
+         */
+        setupResizeObserver() {
+            try {
+                if (typeof ResizeObserver === 'undefined' || !this._scrollContainer) return;
 
-            // Get direct children as slides
-            const children = Array.from(container.children);
-            this.slides = children.map((child, index) => ({
-                element: child,
-                index: index
-            }));
+                this._resizeObserver = new ResizeObserver(entries => {
+                    for (const entry of entries) {
+                        this._cachedDimensions = {
+                            width: entry.contentRect.width,
+                            height: entry.contentRect.height,
+                            timestamp: Date.now()
+                        };
+                        this.updateNavigationState();
+                    }
+                });
+
+                this._resizeObserver.observe(this._scrollContainer);
+                const cleanup = () => {
+                    if (this._resizeObserver) {
+                        this._resizeObserver.disconnect();
+                        this._resizeObserver = null;
+                    }
+                };
+                this.addCleanup(cleanup);
+            } catch (error) {
+                console.warn('Strata Carousel: Error setting up resize observer:', error);
+            }
+        },
+
+        /**
+         * Get cached container dimensions for performance
+         */
+        getContainerDimensions() {
+            if (this._cachedDimensions && (Date.now() - this._cachedDimensions.timestamp < 100)) {
+                return this._cachedDimensions;
+            }
             
-            this.totalSlides = this.slides.length;
+            if (this._scrollContainer) {
+                this._cachedDimensions = {
+                    width: this._scrollContainer.clientWidth,
+                    height: this._scrollContainer.clientHeight,
+                    timestamp: Date.now()
+                };
+                return this._cachedDimensions;
+            }
             
-            // Apply item classes (width handled by CSS container queries)
-            children.forEach((child) => {
-                const classesToAdd = this.itemClasses.split(' ').filter(cls => cls.trim() !== '');
-                const classesToActuallyAdd = classesToAdd.filter(cls => !child.classList.contains(cls));
-                if (classesToActuallyAdd.length > 0) {
-                    child.classList.add(...classesToActuallyAdd);
+            return { width: 0, height: 0 };
+        },
+
+        processSlides() {
+            try {
+                const container = this._scrollContainer || this.$refs.scrollContainer;
+                if (!container) {
+                    console.warn('Strata Carousel: Cannot process slides without container');
+                    return;
                 }
-            });
+
+
+                const children = Array.from(container.children);
+                this.slides = children.map((child, index) => ({
+                    element: child,
+                    index: index
+                }));
+                
+                this.totalSlides = this.slides.length;
+                
+
+                children.forEach((child, index) => {
+                    try {
+                        const classesToAdd = this.itemClasses.split(' ').filter(cls => cls.trim() !== '');
+                        const classesToActuallyAdd = classesToAdd.filter(cls => !child.classList.contains(cls));
+                        if (classesToActuallyAdd.length > 0) {
+                            child.classList.add(...classesToActuallyAdd);
+                        }
+                        
+                        if (!child.classList.contains('strata-carousel-item')) {
+                            child.classList.add('strata-carousel-item');
+                        }
+                    } catch (error) {
+                        console.warn(`Strata Carousel: Error processing slide ${index}:`, error);
+                    }
+                });
+            } catch (error) {
+                console.error('Strata Carousel: Critical error processing slides:', error);
+                this.slides = [];
+                this.totalSlides = 0;
+            }
         },
 
 
@@ -165,25 +251,49 @@ export function createCarouselComponent(config = {}) {
          * Setup scroll event listener
          */
         setupScrollListener() {
-            const container = this.$refs.scrollContainer;
-            if (!container) return;
-
-            this._scrollHandler = () => {
-                if (!this.isProgrammaticScroll) {
-                    this.updateCurrentSlideFromScroll();
-                    this.updateNavigationState();
+            try {
+                const container = this._scrollContainer || this.$refs.scrollContainer;
+                if (!container) {
+                    console.warn('Strata Carousel: Cannot setup scroll listener without container');
+                    return;
                 }
-            };
-            
-            this._scrollContainer = container;
-            container.addEventListener('scroll', this._scrollHandler, { passive: true });
+
+                const scrollHandler = () => {
+                    try {
+                        if (!this.isProgrammaticScroll && !this._scrollUpdateScheduled) {
+                            this._scrollUpdateScheduled = true;
+                            this._animationFrameId = requestAnimationFrame(() => {
+                                this._scrollUpdateScheduled = false;
+                                this.updateCurrentSlideFromScroll();
+                                this.updateNavigationState();
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('Strata Carousel: Error in scroll handler:', error);
+                    }
+                };
+                
+
+                const cleanup = addEventListener(container, 'scroll', scrollHandler, { passive: true });
+                this.addCleanup(cleanup);
+                
+
+                this.addCleanup(() => {
+                    if (this._animationFrameId) {
+                        cancelAnimationFrame(this._animationFrameId);
+                        this._animationFrameId = null;
+                    }
+                });
+            } catch (error) {
+                console.error('Strata Carousel: Error setting up scroll listener:', error);
+            }
         },
 
         /**
          * Setup keyboard navigation
          */
         setupKeyboardNavigation() {
-            this._keydownHandler = (event) => {
+            const keydownHandler = (event) => {
                 if (!this.$el.contains(document.activeElement)) return;
 
                 let handled = true;
@@ -219,7 +329,8 @@ export function createCarouselComponent(config = {}) {
                 }
             };
 
-            document.addEventListener('keydown', this._keydownHandler);
+            const cleanup = addEventListener(document, 'keydown', keydownHandler);
+            this.addCleanup(cleanup);
         },
 
 
@@ -238,13 +349,13 @@ export function createCarouselComponent(config = {}) {
          * Update current slide based on scroll position
          */
         updateCurrentSlideFromScroll() {
-            const container = this.$refs.scrollContainer;
+            const container = this._scrollContainer || this.$refs.scrollContainer;
             if (!container || this.slides.length === 0) return;
 
             const scrollLeft = container.scrollLeft;
-            const containerWidth = container.clientWidth;
+            const dimensions = this.getContainerDimensions();
             const itemsPerView = this.getCurrentItemsPerView();
-            const slideWidth = containerWidth / itemsPerView;
+            const slideWidth = dimensions.width / itemsPerView;
             
             let newCurrentSlide = Math.round(scrollLeft / slideWidth);
             newCurrentSlide = Math.max(0, Math.min(newCurrentSlide, this.totalSlides - 1));
@@ -253,20 +364,14 @@ export function createCarouselComponent(config = {}) {
                 const previousSlide = this.currentSlide;
                 this.currentSlide = newCurrentSlide;
                 
-                this.dispatchComponentEvent(EVENTS.CHANGE, { 
+                this.dispatchComponentEvent(EVENTS.CAROUSEL_SLIDE_CHANGE, { 
                     currentSlide: this.currentSlide,
                     previousSlide: previousSlide,
                     totalSlides: this.totalSlides,
                     programmatic: false
                 });
                 
-                this.$dispatch('carousel-change', {
-                    currentSlide: this.currentSlide,
-                    previousSlide: previousSlide,
-                    totalSlides: this.totalSlides
-                });
-                
-                // Update navigation state after scroll-based change
+
                 this.updateNavigationState();
             }
         },
@@ -279,8 +384,8 @@ export function createCarouselComponent(config = {}) {
                 return this.itemsPerView;
             }
 
-            // Simple responsive implementation
-            // In a production app, you'd want proper breakpoint detection
+
+
             const width = window.innerWidth;
             let result;
             
@@ -309,7 +414,7 @@ export function createCarouselComponent(config = {}) {
                 return;
             }
             
-            // Update navigation state based on current position and loop setting
+
             this.canGoPrevious = this.loop || this.currentSlide > 0;
             this.canGoNext = this.loop || this.currentSlide < this.totalSlides - 1;
             
@@ -323,40 +428,51 @@ export function createCarouselComponent(config = {}) {
          * @param {boolean} smooth - Use smooth scrolling (default: true)
          */
         goToSlide(index, smooth = true) {
-            if (index < 0 || index >= this.totalSlides) return;
-            
-            const container = this.$refs.scrollContainer;
-            if (!container) return;
+            try {
+                if (index < 0 || index >= this.totalSlides) {
+                    console.warn(`Strata Carousel: Invalid slide index ${index}. Must be between 0 and ${this.totalSlides - 1}`);
+                    return;
+                }
+                
+                const container = this._scrollContainer || this.$refs.scrollContainer;
+                if (!container) {
+                    console.warn('Strata Carousel: Cannot navigate without scroll container');
+                    return;
+                }
 
-            const itemsPerView = this.getCurrentItemsPerView();
-            const slideWidth = container.clientWidth / itemsPerView;
-            const targetScrollLeft = index * slideWidth;
-            
-            // Mark as programmatic scroll to prevent event conflicts
-            this.isProgrammaticScroll = true;
-            
-            container.scrollTo({
-                left: targetScrollLeft,
-                behavior: smooth ? 'smooth' : 'auto'
-            });
+                const itemsPerView = this.getCurrentItemsPerView();
+                const dimensions = this.getContainerDimensions();
+                const slideWidth = dimensions.width / itemsPerView;
+                const targetScrollLeft = index * slideWidth;
+                
 
-            // Reset programmatic scroll flag after animation
-            setTimeout(() => {
-                this.isProgrammaticScroll = false;
-            }, smooth ? 500 : 50);
+                this.isProgrammaticScroll = true;
+                
+                container.scrollTo({
+                    left: targetScrollLeft,
+                    behavior: smooth ? 'smooth' : 'auto'
+                });
 
-            const previousSlide = this.currentSlide;
-            this.currentSlide = index;
-            
-            this.dispatchComponentEvent(EVENTS.CHANGE, {
-                currentSlide: this.currentSlide,
-                previousSlide: previousSlide,
-                totalSlides: this.totalSlides,
-                programmatic: true
-            });
 
-            this.resetAutoplay();
-            this.updateNavigationState();
+                setTimeout(() => {
+                    this.isProgrammaticScroll = false;
+                }, smooth ? 500 : 50);
+
+                const previousSlide = this.currentSlide;
+                this.currentSlide = index;
+                
+                this.dispatchComponentEvent(EVENTS.CAROUSEL_SLIDE_CHANGE, {
+                    currentSlide: this.currentSlide,
+                    previousSlide: previousSlide,
+                    totalSlides: this.totalSlides,
+                    programmatic: true
+                });
+
+                this.resetAutoplay();
+                this.updateNavigationState();
+            } catch (error) {
+                console.error('Strata Carousel: Error navigating to slide:', error);
+            }
         },
 
         /**
@@ -367,10 +483,10 @@ export function createCarouselComponent(config = {}) {
             let nextIndex;
             
             if (itemsPerView > 1) {
-                // For multi-item view, advance by number of visible items
+
                 nextIndex = Math.min(this.currentSlide + itemsPerView, this.totalSlides - 1);
             } else {
-                // For single-item view, advance by 1
+
                 nextIndex = this.currentSlide + 1;
             }
             
@@ -391,10 +507,10 @@ export function createCarouselComponent(config = {}) {
             let prevIndex;
             
             if (itemsPerView > 1) {
-                // For multi-item view, go back by number of visible items
+
                 prevIndex = Math.max(this.currentSlide - itemsPerView, 0);
             } else {
-                // For single-item view, go back by 1
+
                 prevIndex = this.currentSlide - 1;
             }
             
@@ -415,7 +531,7 @@ export function createCarouselComponent(config = {}) {
             
             this.autoplayEnabled = true;
             this.scheduleNextSlide();
-            this.dispatchComponentEvent('carousel-autoplay-start');
+            this.dispatchComponentEvent(EVENTS.CAROUSEL_AUTOPLAY_START);
         },
 
         /**
@@ -424,7 +540,7 @@ export function createCarouselComponent(config = {}) {
         stopAutoplay() {
             this.autoplayEnabled = false;
             this.clearAutoplayTimer();
-            this.dispatchComponentEvent('carousel-autoplay-stop');
+            this.dispatchComponentEvent(EVENTS.CAROUSEL_AUTOPLAY_STOP);
         },
 
         /**
@@ -462,7 +578,7 @@ export function createCarouselComponent(config = {}) {
             
             this.isPaused = true;
             this.clearAutoplayTimer();
-            this.dispatchComponentEvent('carousel-autoplay-pause');
+            this.dispatchComponentEvent(EVENTS.CAROUSEL_AUTOPLAY_PAUSE);
         },
 
         /**
@@ -473,7 +589,7 @@ export function createCarouselComponent(config = {}) {
             
             this.isPaused = false;
             this.scheduleNextSlide();
-            this.dispatchComponentEvent('carousel-autoplay-resume');
+            this.dispatchComponentEvent(EVENTS.CAROUSEL_AUTOPLAY_RESUME);
         },
 
         /**
@@ -495,10 +611,10 @@ export function createCarouselComponent(config = {}) {
          * Handle scroll event
          */
         handleScroll(event) {
-            // This is called from the template
+
             if (!this.isProgrammaticScroll) {
                 this.pauseAutoplay();
-                // Note: updateCurrentSlideFromScroll is called by the scroll listener
+
             }
         },
 
@@ -513,19 +629,7 @@ export function createCarouselComponent(config = {}) {
         destroy() {
             this.clearAutoplayTimer();
             
-            // Clean up event listeners
-            if (this._scrollHandler && this._scrollContainer) {
-                this._scrollContainer.removeEventListener('scroll', this._scrollHandler);
-                this._scrollHandler = null;
-                this._scrollContainer = null;
-            }
-            
-            if (this._keydownHandler) {
-                document.removeEventListener('keydown', this._keydownHandler);
-                this._keydownHandler = null;
-            }
-            
-            // Reset state
+
             this.slides = [];
             this.currentSlide = 0;
             this.totalSlides = 0;
@@ -537,5 +641,5 @@ export default {
     createCarouselComponent
 };
 
-// Global registration for Alpine template access
+
 window.strataCarousel = createCarouselComponent;

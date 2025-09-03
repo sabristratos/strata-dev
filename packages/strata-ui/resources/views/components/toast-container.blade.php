@@ -36,90 +36,101 @@
             }"
             class="w-full pointer-events-auto"
         >
-            <div class="w-full">
-                <x-strata::card class="!p-4">
-                    <div class="flex items-start gap-3">
-                        {{-- Variant icons --}}
-                        <div class="w-5 h-5 mt-0.5 shrink-0">
-                            <x-icon 
-                                name="heroicon-o-check-circle" 
-                                x-show="toast.variant === 'success'"
-                                class="w-5 h-5 text-success"
-                            />
-                            <x-icon 
-                                name="heroicon-o-exclamation-triangle" 
-                                x-show="toast.variant === 'warning'"
-                                class="w-5 h-5 text-warning"
-                            />
-                            <x-icon 
-                                name="heroicon-o-x-circle" 
-                                x-show="toast.variant === 'destructive'"
-                                class="w-5 h-5 text-destructive"
-                            />
-                            <x-icon 
-                                name="heroicon-o-information-circle" 
-                                x-show="toast.variant === 'info' || toast.variant === 'primary' || toast.variant === 'accent'"
-                                x-bind:class="toast.variant === 'primary' ? 'text-primary' : toast.variant === 'accent' ? 'text-accent' : 'text-info'"
-                                class="w-5 h-5"
-                            />
-                        </div>
-                        
-                        {{-- Content area --}}
-                        <div class="flex-1 min-w-0">
-                            <template x-if="toast.title">
-                                <h4 class="text-base font-medium text-foreground" x-text="toast.title"></h4>
-                            </template>
-                            
-                            <p 
-                                x-text="toast.message" 
-                                x-bind:class="{ 'mt-1': toast.title }" 
-                                class="text-sm text-muted-foreground"
-                            ></p>
-                            
-                            {{-- Action buttons using Button components --}}
-                            <template x-if="toast.actions && toast.actions.length > 0">
-                                <div class="flex gap-2 mt-3">
-                                    {{-- Primary action (index 0) --}}
-                                    <template x-if="toast.actions[0]">
-                                        <x-strata::button
-                                            size="sm"
-                                            variant="primary"
-                                            x-text="toast.actions[0].label"
-                                            @click="$parent.handleAction(toast.actions[0])"
-                                        />
-                                    </template>
-                                    
-                                    {{-- Secondary action (index 1) --}}
-                                    <template x-if="toast.actions[1]">
-                                        <x-strata::button
-                                            size="sm" 
-                                            variant="outline"
-                                            x-text="toast.actions[1].label"
-                                            @click="$parent.handleAction(toast.actions[1])"
-                                        />
-                                    </template>
-                                </div>
-                            </template>
-                        </div>
-                        
-                        {{-- Dismiss button using Button component --}}
-                        <x-strata::button
-                            variant="ghost"
-                            size="sm"
-                            icon="heroicon-o-x-mark"
-                            @click="removeToast()"
-                            class="!p-1 shrink-0"
-                            aria-label="Dismiss notification"
-                        />
-                    </div>
-                </x-strata::card>
-            </div>
+            <template x-if="toast.variant === 'info'">
+                <x-strata::alert
+                    color="info"
+                    dismissible="true"
+                    class="!shadow-none"
+                    x-on:click="visible = false; removeToast()"
+                >
+                    <x-slot name="title">
+                        <span x-cloak x-show="toast.title" x-text="toast.title"></span>
+                    </x-slot>
+                    
+                    <span x-cloak x-show="toast.message" x-text="toast.message"></span>
+                </x-strata::alert>
+            </template>
+
+            <template x-if="toast.variant === 'success'">
+                <x-strata::alert
+                    color="success"
+                    dismissible="true"
+                    class="!shadow-none"
+                    x-on:click="visible = false; removeToast()"
+                >
+                    <x-slot name="title">
+                        <span x-cloak x-show="toast.title" x-text="toast.title"></span>
+                    </x-slot>
+                    
+                    <span x-cloak x-show="toast.message" x-text="toast.message"></span>
+                </x-strata::alert>
+            </template>
+
+            <template x-if="toast.variant === 'warning'">
+                <x-strata::alert
+                    color="warning"
+                    dismissible="true"
+                    class="!shadow-none"
+                    x-on:click="visible = false; removeToast()"
+                >
+                    <x-slot name="title">
+                        <span x-cloak x-show="toast.title" x-text="toast.title"></span>
+                    </x-slot>
+                    
+                    <span x-cloak x-show="toast.message" x-text="toast.message"></span>
+                </x-strata::alert>
+            </template>
+
+            <template x-if="toast.variant === 'destructive'">
+                <x-strata::alert
+                    color="destructive"
+                    dismissible="true"
+                    class="!shadow-none"
+                    x-on:click="visible = false; removeToast()"
+                >
+                    <x-slot name="title">
+                        <span x-cloak x-show="toast.title" x-text="toast.title"></span>
+                    </x-slot>
+                    
+                    <span x-cloak x-show="toast.message" x-text="toast.message"></span>
+                </x-strata::alert>
+            </template>
+
+            <template x-if="toast.variant === 'primary'">
+                <x-strata::alert
+                    color="primary"
+                    dismissible="true"
+                    class="!shadow-none"
+                    x-on:click="visible = false; removeToast()"
+                >
+                    <x-slot name="title">
+                        <span x-cloak x-show="toast.title" x-text="toast.title"></span>
+                    </x-slot>
+                    
+                    <span x-cloak x-show="toast.message" x-text="toast.message"></span>
+                </x-strata::alert>
+            </template>
+
+            <template x-if="toast.variant === 'accent'">
+                <x-strata::alert
+                    color="accent"
+                    dismissible="true"
+                    class="!shadow-none"
+                    x-on:click="visible = false; removeToast()"
+                >
+                    <x-slot name="title">
+                        <span x-cloak x-show="toast.title" x-text="toast.title"></span>
+                    </x-slot>
+                    
+                    <span x-cloak x-show="toast.message" x-text="toast.message"></span>
+                </x-strata::alert>
+            </template>
         </div>
     </template>
 </div>
 
 
-{{-- Set session toast data for JavaScript handling --}}
+
 @if (session()->has('strata_toast'))
     <script>
         window.strataSessionToast = @json(session('strata_toast'));

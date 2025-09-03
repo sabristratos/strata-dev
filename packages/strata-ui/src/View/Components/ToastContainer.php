@@ -67,7 +67,7 @@ class ToastContainer extends Component
         public string $position = 'bottom-end',
         public bool $expanded = false,
     ) {
-        // Validate position parameter
+
         $validPositions = [
             'bottom-end', 'bottom-start', 'bottom-center',
             'top-end', 'top-start', 'top-center',

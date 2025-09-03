@@ -56,7 +56,7 @@
         <button
             type="button"
             x-on:click="visible = false"
-            class="shrink-0 -mr-0.5 ml-1 h-3 w-3 rounded-full inline-flex items-center justify-center text-current/70 hover:bg-black/20 hover:text-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+            class="shrink-0 -mr-0.5 ml-1 h-3 w-3 rounded-full inline-flex items-center justify-center text-current/70 hover:bg-black/20 hover:text-current focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
         >
             <span class="sr-only">Remove</span>
             <svg class="h-2.5 w-2.5" stroke="currentColor" fill="none" viewBox="0 0 8 8">

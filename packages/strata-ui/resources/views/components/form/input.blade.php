@@ -10,7 +10,7 @@
 @endphp
 
 <div class="space-y-2">
-    {{-- Label Component --}}
+
     @if($hasLabel)
         <x-strata::form.label 
             :for="$id" 
@@ -20,7 +20,7 @@
         </x-strata::form.label>
     @endif
     
-    {{-- Helper Text Component --}}
+
     @if($hasDescription && !$hasError)
         <x-strata::form.helper 
             :field="$name"
@@ -28,13 +28,25 @@
         />
     @endif
 
-    {{-- Input Container --}}
+
     <div
         x-data="{
             /** @type {string} Current input value */
-            value: @if($attributes->wire('model')) @entangle($attributes->wire('model')) @else '{{ $value }}' @endif,
+            value: @if($attributes->has('wire:model')) @entangle($attributes->get('wire:model')) @else @js($value ?? '') @endif,
             /** @type {string} Input type */
             type: '{{ $type }}',
+            
+            init() {
+
+                console.log('🔍 INPUT DEBUG - Name:', @js($name ?? 'unnamed'));
+                console.log('🔍 INPUT DEBUG - Type:', @js($type));  
+                console.log('🔍 INPUT DEBUG - Raw $value type:', typeof(@js($value)));
+                console.log('🔍 INPUT DEBUG - Raw $value:', @js($value));
+                console.log('🔍 INPUT DEBUG - Final Alpine value:', this.value);
+                console.log('🔍 INPUT DEBUG - Has wire:model:', @js($attributes->has('wire:model')));
+                console.log('========================');
+            },
+            
             /** @type {boolean} Whether this is a password input */
             isPassword: '{{ $type === 'password' }}',
             /** @type {boolean} Whether password is currently visible */
@@ -75,14 +87,14 @@
             }
         }"
     >
-        {{-- Flex Wrapper - Takes on all input styling --}}
+
         <div 
             class="{{ $getWrapperClasses() }}"
             @click="$refs.input.focus()"
             :class="{ 'opacity-50': {{ $disabled ? 'true' : 'false' }} }"
             {{ $attributes->except(['wire:model', 'id', 'name', 'placeholder', 'required', 'disabled', 'readonly', 'type']) }}
         >
-            {{-- Leading Icon/Slot --}}
+
             @if($hasIcon || $hasLeadingSlot)
                 <div class="flex items-center px-3 py-2">
                     @isset($leading)
@@ -97,7 +109,7 @@
                 </div>
             @endif
 
-            {{-- Input Element - Invisible/Transparent --}}
+
             <input
                 x-ref="input"
                 :type="inputType"
@@ -115,7 +127,7 @@
                 class="{{ $getInputClasses() }}"
             />
 
-            {{-- Trailing Controls (Clear, Password Toggle, Custom Slot) --}}
+
             @if($hasClearable || $hasPasswordToggle || $hasTrailingSlot)
                 <div class="flex items-center px-3 py-2 gap-1">
                     @isset($trailing)
@@ -127,7 +139,7 @@
                             type="button"
                             x-show="hasValue"
                             x-on:click.stop="clearInput()"
-                            class="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
+                            class="text-muted-foreground hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
                             aria-label="Clear input"
                             tabindex="0"
                         >
@@ -139,7 +151,7 @@
                         <button
                             type="button"
                             x-on:click.stop="togglePassword()"
-                            class="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
+                            class="text-muted-foreground hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:text-foreground transition-colors duration-200 rounded-sm p-0.5"
                             :aria-label="showPassword ? 'Hide password' : 'Show password'"
                             tabindex="0"
                         >
@@ -152,7 +164,7 @@
         </div>
     </div>
     
-    {{-- Error Component --}}
+
     @if($hasError)
         <x-strata::form.error 
             :field="$name"

@@ -19,18 +19,18 @@ export function createBaseCalendar(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Main calendar value
-        value: config.value || { start: null, end: null },
+
+        value: config.value || (config.range ? { start: null, end: null } : null),
         
-        // Configuration
+
         config: config,
         
-        // Date state
+
         currentDate: new Date(config.initialDate || new Date()),
         startDate: null,
         endDate: null,
         
-        // UI state
+
         selecting: config.initialSelecting || false,
         updating: config.initialUpdating || false,
         months: [],
@@ -41,21 +41,21 @@ export function createBaseCalendar(config = {}) {
          * Calendar-specific initialization
          */
         init() {
-            // Parse initial dates
+
             this.startDate = this.value.start ? this.parseDate(this.value.start) : null;
             this.endDate = this.value.end ? this.parseDate(this.value.end) : null;
             
-            // Initialize Livewire sync if available
+
             this.initializeLivewireSync();
             
-            // Watch for value changes
+
             this.$watch('value', (newValue) => {
                 this.startDate = newValue.start ? this.parseDate(newValue.start) : null;
                 this.endDate = newValue.end ? this.parseDate(newValue.end) : null;
                 this.generateMonths();
             });
             
-            // Generate initial calendar
+
             this.generateMonths();
         },
 
@@ -67,8 +67,23 @@ export function createBaseCalendar(config = {}) {
         parseDate(dateString) {
             if (!dateString) return null;
             
-            const [year, month, day] = dateString.split('-').map(Number);
-            return new Date(year, month - 1, day);
+            try {
+
+                if (dateString.includes('T')) {
+
+                    return new Date(dateString);
+                } else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+
+                    return new Date(dateString + 'T00:00:00');
+                } else {
+
+                    const [year, month, day] = dateString.split('-').map(Number);
+                    return new Date(year, month - 1, day);
+                }
+            } catch (error) {
+                console.warn('Failed to parse date:', dateString, error);
+                return null;
+            }
         },
 
         /**
@@ -119,40 +134,46 @@ export function createBaseCalendar(config = {}) {
          * @returns {Object} Month data with days array
          */
         generateCalendarData(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            const monthYear = date.toLocaleDateString(this.config.locale, { month: 'long', year: 'numeric' });
-            const firstDayOfMonth = new Date(year, month, 1);
-            let dayOfWeek = firstDayOfMonth.getDay();
+            try {
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const monthYear = date.toLocaleDateString(this.config.locale, { month: 'long', year: 'numeric' });
+                const firstDayOfMonth = new Date(year, month, 1);
+                let dayOfWeek = firstDayOfMonth.getDay();
 
-            if (this.config.weekStart === 'monday') {
-                dayOfWeek = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
-            }
-
-            const days = [];
-
-            // Add previous month's days
-            for (let i = dayOfWeek; i > 0; i--) {
-                days.push(this.formatDay(new Date(year, month, 1 - i), false));
-            }
-
-            // Add current month's days
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            for (let i = 1; i <= daysInMonth; i++) {
-                days.push(this.formatDay(new Date(year, month, i), true));
-            }
-
-            // Add minimal next month's days to complete the final week only
-            const currentDaysCount = dayOfWeek + daysInMonth;
-            const daysInFinalWeek = currentDaysCount % 7;
-            if (daysInFinalWeek > 0) {
-                const daysToAdd = 7 - daysInFinalWeek;
-                for (let i = 1; i <= daysToAdd; i++) {
-                    days.push(this.formatDay(new Date(year, month + 1, i), false));
+                if (this.config.weekStart === 'monday') {
+                    dayOfWeek = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
                 }
-            }
 
-            return { monthYear, days };
+                const days = [];
+
+
+                for (let i = dayOfWeek; i > 0; i--) {
+                    days.push(this.formatDay(new Date(year, month, 1 - i), false));
+                }
+
+
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                for (let i = 1; i <= daysInMonth; i++) {
+                    days.push(this.formatDay(new Date(year, month, i), true));
+                }
+
+
+                const currentDaysCount = dayOfWeek + daysInMonth;
+                const daysInFinalWeek = currentDaysCount % 7;
+                if (daysInFinalWeek > 0) {
+                    const daysToAdd = 7 - daysInFinalWeek;
+                    for (let i = 1; i <= daysToAdd; i++) {
+                        days.push(this.formatDay(new Date(year, month + 1, i), false));
+                    }
+                }
+
+                return { monthYear, days };
+            } catch (error) {
+                console.warn('Failed to generate calendar data for', date, error);
+
+                return { monthYear: 'Error', days: [] };
+            }
         },
 
         /**
@@ -198,17 +219,17 @@ export function createBaseCalendar(config = {}) {
         isDateDisabled(date) {
             const dateString = date.toISOString().split('T')[0];
             
-            // Check min date
+
             if (this.config.minDate && date < this.parseDate(this.config.minDate)) {
                 return true;
             }
             
-            // Check max date
+
             if (this.config.maxDate && date > this.parseDate(this.config.maxDate)) {
                 return true;
             }
             
-            // Check disabled dates array
+
             if (this.config.disabledDates && this.config.disabledDates.includes(dateString)) {
                 return true;
             }
@@ -221,42 +242,48 @@ export function createBaseCalendar(config = {}) {
          * @param {Object} day - Day object from formatDay
          */
         selectDate(day) {
-            if (!day.isCurrentMonth || day.isDisabled) return;
+            if (!day || !day.isCurrentMonth || day.isDisabled) return;
 
-            if (!this.config.range) {
-                // Single date selection
-                this.startDate = this.endDate = new Date(day.fullDate);
-                this.selecting = false;
-                this.updateValue();
-                this.generateMonths();
-                
-                // Auto-close if enabled
-                if (this.config.closeOnSelect) {
-                    this.$dispatch('calendar-close');
-                }
-            } else if (!this.selecting || !this.startDate) {
-                // Start range selection
-                this.startDate = new Date(day.fullDate);
-                this.endDate = null;
-                this.selecting = true;
-                this.activePreset = '';
-                this.generateMonths();
-            } else {
-                // Complete range selection
-                if (day.fullDate < this.startDate) {
-                    this.endDate = this.startDate;
+            try {
+                if (!this.config.range) {
+
+                    this.startDate = this.endDate = new Date(day.fullDate);
+                    this.selecting = false;
+                    this.updateValue();
+                    this.generateMonths();
+                    
+
+                    if (this.config.closeOnSelect) {
+                        this.$dispatch('calendar-close');
+                    }
+                } else if (!this.selecting || !this.startDate) {
+
                     this.startDate = new Date(day.fullDate);
+                    this.endDate = null;
+                    this.selecting = true;
+                    this.activePreset = '';
+                    this.generateMonths();
                 } else {
-                    this.endDate = new Date(day.fullDate);
+
+                    if (day.fullDate < this.startDate) {
+                        this.endDate = this.startDate;
+                        this.startDate = new Date(day.fullDate);
+                    } else {
+                        this.endDate = new Date(day.fullDate);
+                    }
+                    this.selecting = false;
+                    this.updateValue();
+                    this.generateMonths();
+                    
+
+                    if (this.config.closeOnSelect) {
+                        this.$dispatch('calendar-close');
+                    }
                 }
+            } catch (error) {
+                console.warn('Failed to select date:', error);
+
                 this.selecting = false;
-                this.updateValue();
-                this.generateMonths();
-                
-                // Auto-close if enabled and range is complete
-                if (this.config.closeOnSelect) {
-                    this.$dispatch('calendar-close');
-                }
             }
         },
 
@@ -268,7 +295,24 @@ export function createBaseCalendar(config = {}) {
             this.endDate = null;
             this.selecting = false;
             this.activePreset = '';
-            this.updateValue();
+            
+
+            this.updating = true;
+            
+
+            this.value = this.config.range ? { start: null, end: null } : null;
+            
+            this.updateHiddenInput();
+            this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
+                value: this.value,
+                startDate: this.startDate,
+                endDate: this.endDate
+            });
+            
+
+            this.dispatchCalendarChangeEvent('clear');
+            this.updating = false;
+            
             this.generateMonths();
         },
 
@@ -286,7 +330,26 @@ export function createBaseCalendar(config = {}) {
             this.selecting = false;
             this.currentDate = new Date(start);
 
-            this.updateValue();
+
+            this.updating = true;
+            
+
+            this.value = this.config.range ? {
+                start: this.startDate ? this.formatLocalDate(this.startDate) : null,
+                end: this.endDate ? this.formatLocalDate(this.endDate) : null
+            } : (this.startDate ? this.formatLocalDate(this.startDate) : null);
+            
+            this.updateHiddenInput();
+            this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
+                value: this.value,
+                startDate: this.startDate,
+                endDate: this.endDate
+            });
+            
+
+            this.dispatchCalendarChangeEvent('preset');
+            this.updating = false;
+            
             this.generateMonths();
         },
 
@@ -347,23 +410,52 @@ export function createBaseCalendar(config = {}) {
          * Update the component value and trigger events
          */
         updateValue() {
-            this.updating = true;
-            this.value = {
-                start: this.startDate ? this.formatLocalDate(this.startDate) : null,
-                end: this.endDate ? this.formatLocalDate(this.endDate) : null
-            };
-            
-            // Update hidden input for form submission
-            this.updateHiddenInput();
-            
-            // Dispatch change event
-            this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
-                value: this.value,
-                startDate: this.startDate,
-                endDate: this.endDate
+            try {
+                this.updating = true;
+                
+
+                this.value = this.config.range ? {
+                    start: this.startDate ? this.formatLocalDate(this.startDate) : null,
+                    end: this.endDate ? this.formatLocalDate(this.endDate) : null
+                } : (this.startDate ? this.formatLocalDate(this.startDate) : null);
+                
+
+                this.updateHiddenInput();
+                
+
+                this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
+                    value: this.value,
+                    startDate: this.startDate,
+                    endDate: this.endDate
+                });
+                
+
+                this.dispatchCalendarChangeEvent('select');
+            } catch (error) {
+                console.warn('Failed to update calendar value:', error);
+            } finally {
+                this.updating = false;
+            }
+        },
+
+        /**
+         * Dispatch calendar-specific change event
+         * @param {string} action - The action that caused the change (select, preset, clear, etc.)
+         */
+        dispatchCalendarChangeEvent(action = 'change') {
+            const event = new CustomEvent('strata-calendar-change', {
+                detail: {
+                    value: this.value,
+                    action: action,
+                    startDate: this.startDate,
+                    endDate: this.endDate,
+                    selecting: this.selecting
+                },
+                bubbles: true,
+                composed: true
             });
             
-            this.updating = false;
+            this.$el.dispatchEvent(event);
         }
     });
 }

@@ -19,10 +19,10 @@ export function createBaseEditor(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // Editor content (HTML)
+
         content: config.initialValue || '',
         
-        // Active format tracking
+
         activeFormats: {
             bold: false,
             italic: false,
@@ -33,44 +33,44 @@ export function createBaseEditor(config = {}) {
             heading: 'p'
         },
 
-        // Link creation state
+
         createLinkMode: false,
         selectedText: '',
         selectedRange: null,
         linkUrl: '',
         linkTarget: false,
 
-        // Link editing state
+
         linkEditMode: false,
         currentLink: null,
         currentLinkUrl: '',
         currentLinkText: '',
 
-        // Heading level state
+
         headingLevel: 'p',
 
-        // Text selection state for UI reactivity
+
         hasSelection: false,
 
-        // Event listener tracking to prevent duplicates
+
         _eventListeners: [],
 
         /**
          * Editor-specific initialization
          */
         init() {
-            // Set initial content
+
             if (this.$refs.editor) {
                 this.$refs.editor.innerHTML = this.content;
             }
             
-            // Set up form submission handler
+
             this.setupFormSubmission();
             
-            // Set up editor event listeners
+
             this.setupEditorEventListeners();
             
-            // Initial active state check
+
             this.$nextTick(() => {
                 this.updateActiveStates();
             });
@@ -80,7 +80,7 @@ export function createBaseEditor(config = {}) {
          * Editor-specific cleanup
          */
         destroy() {
-            // Clean up event listeners
+
             this._eventListeners.forEach(({ target, event, handler }) => {
                 target.removeEventListener(event, handler);
             });
@@ -154,7 +154,7 @@ export function createBaseEditor(config = {}) {
                     document.execCommand(command, false, param);
                     this.$nextTick(() => this.updateActiveStates());
                 } catch (e) {
-                    console.error('Format command failed:', e);
+                    // Format command failed - silently continue
                 }
             }
         },
@@ -179,7 +179,7 @@ export function createBaseEditor(config = {}) {
                     this.headingLevel = tag;
                     this.$nextTick(() => this.updateActiveStates());
                 } catch (e) {
-                    console.error('Heading format command failed:', e);
+                    // Heading format command failed - silently continue
                 }
             }
         },
@@ -280,16 +280,16 @@ export function createBaseEditor(config = {}) {
          * @param {Event} event - Click event
          */
         handleEditorClick(event) {
-            // Check if click was on a link
+
             if (event.target.tagName === 'A') {
                 event.preventDefault(); // Prevent default link behavior
                 
-                // Small delay to ensure selection/cursor is updated
+
                 setTimeout(() => {
                     this.showLinkEditPopover();
                 }, 10);
             } else {
-                // Hide link edit popup if clicking elsewhere
+
                 if (this.linkEditMode) {
                     this.hideLinkEditPopover();
                 }
@@ -389,12 +389,12 @@ export function createBaseEditor(config = {}) {
          */
         editCurrentLink() {
             if (this.currentLink) {
-                // Set up edit state
+
                 this.linkUrl = this.currentLinkUrl;
                 this.linkTarget = this.currentLink.target === '_blank';
                 this.selectedText = this.currentLinkText;
                 
-                // Select the link content
+
                 const range = document.createRange();
                 range.selectNodeContents(this.currentLink);
                 const selection = window.getSelection();
@@ -402,7 +402,7 @@ export function createBaseEditor(config = {}) {
                 selection.addRange(range);
                 this.selectedRange = range.cloneRange();
                 
-                // Hide edit popup and show create popup
+
                 this.hideLinkEditPopover();
                 this.createLinkMode = true;
                 
@@ -477,7 +477,7 @@ export function createBaseEditor(config = {}) {
                 
                 return doc.body.innerHTML;
             } catch (e) {
-                console.error('HTML sanitization failed:', e);
+                // HTML sanitization failed - fallback to text content
                 const div = document.createElement('div');
                 div.textContent = html;
                 return div.innerHTML;
@@ -539,7 +539,7 @@ export function createBaseEditor(config = {}) {
                     this.$nextTick(() => this.updateActiveStates());
                 }
             } catch (e) {
-                console.error('Paste handling failed:', e);
+                // Paste handling failed - silently continue
             }
         },
 
@@ -571,7 +571,7 @@ export function createBaseEditor(config = {}) {
                     this.activeFormats.insertOrderedList = document.queryCommandState('insertOrderedList');
                     this.activeFormats.link = this.isOnLink(selection, range);
                     
-                    // Update current link if cursor is on one
+
                     const linkElement = this.getCurrentLinkElement(selection, range);
                     if (linkElement) {
                         this.currentLink = linkElement;
@@ -583,7 +583,7 @@ export function createBaseEditor(config = {}) {
                         this.currentLinkText = '';
                     }
 
-                    // Detect current heading level
+
                     const container = range.commonAncestorContainer;
                     let element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
                     let currentHeading = 'p';
@@ -601,7 +601,7 @@ export function createBaseEditor(config = {}) {
                     this.headingLevel = currentHeading;
                 }
             } catch (e) {
-                console.error('Failed to update active states:', e);
+                // Failed to update active states - silently continue
                 this.clearActiveStates();
             }
         }

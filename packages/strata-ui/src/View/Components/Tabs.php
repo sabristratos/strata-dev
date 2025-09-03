@@ -36,17 +36,17 @@ class Tabs extends Component
      */
     private function validateAndNormalizeConfiguration(): void
     {
-        // Normalize orientation to valid values
+
         if (!in_array($this->orientation, ['horizontal', 'vertical'])) {
             $this->orientation = 'horizontal';
         }
 
-        // Normalize activation mode to valid values
+
         if (!in_array($this->activationMode, ['automatic', 'manual'])) {
             $this->activationMode = 'automatic';
         }
 
-        // Normalize variant to valid values
+
         if (!in_array($this->variant, ['default', 'pills', 'underline'])) {
             $this->variant = 'default';
         }

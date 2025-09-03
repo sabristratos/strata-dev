@@ -50,11 +50,57 @@ class Carousel extends Component
      */
     private function validateAndNormalizeConfiguration(): void
     {
-        // Normalize interval (keep between 1-30 seconds)
+
+        $this->validateVariant();
+        $this->validateSize();
+        $this->validateGap();
+        $this->validateSnapAlign();
+
+
         $this->interval = max(1000, min(30000, $this->interval));
 
-        // Normalize and validate itemsPerView
+
         $this->itemsPerView = $this->normalizeItemsPerView($this->itemsPerView);
+    }
+
+    private function validateVariant(): void
+    {
+        $validVariants = ['default', 'gallery', 'cards'];
+        if (!in_array($this->variant, $validVariants)) {
+            throw new \InvalidArgumentException(
+                "Invalid carousel variant: {$this->variant}. Valid options are: " . implode(', ', $validVariants)
+            );
+        }
+    }
+
+    private function validateSize(): void
+    {
+        $validSizes = ['sm', 'md', 'lg'];
+        if (!in_array($this->size, $validSizes)) {
+            throw new \InvalidArgumentException(
+                "Invalid carousel size: {$this->size}. Valid options are: " . implode(', ', $validSizes)
+            );
+        }
+    }
+
+    private function validateGap(): void
+    {
+        $validGaps = ['sm', 'md', 'lg'];
+        if (!in_array($this->gap, $validGaps)) {
+            throw new \InvalidArgumentException(
+                "Invalid carousel gap: {$this->gap}. Valid options are: " . implode(', ', $validGaps)
+            );
+        }
+    }
+
+    private function validateSnapAlign(): void
+    {
+        $validAlignments = ['start', 'center', 'end'];
+        if (!in_array($this->snapAlign, $validAlignments)) {
+            throw new \InvalidArgumentException(
+                "Invalid snap alignment: {$this->snapAlign}. Valid options are: " . implode(', ', $validAlignments)
+            );
+        }
     }
 
     /**
@@ -62,7 +108,7 @@ class Carousel extends Component
      */
     private function normalizeItemsPerView($itemsPerView): array
     {
-        // Convert single values to array format
+
         if (is_string($itemsPerView) || is_numeric($itemsPerView)) {
             $count = max(1, min(10, (int) $itemsPerView));
 
@@ -79,7 +125,7 @@ class Carousel extends Component
                 }
             }
 
-            // Ensure we have at least a default value
+
             if (! isset($normalized['default'])) {
                 $normalized['default'] = 1;
             }
@@ -87,7 +133,7 @@ class Carousel extends Component
             return $normalized;
         }
 
-        // Fallback to safe default
+
         return ['default' => 1];
     }
 
@@ -128,9 +174,8 @@ class Carousel extends Component
      */
     public function shouldShowEmptyState(): bool
     {
-        // This would typically be determined by the presence of slot content,
-        // but we can't easily check that here. The Blade template should handle this.
-        return false;
+
+        return empty($this->slot->toHtml()) || trim($this->slot->toHtml()) === '';
     }
 
     /**
@@ -253,17 +298,17 @@ class Carousel extends Component
             return '100cqw';
         }
 
-        // Get gap size in Tailwind spacing units
+
         $gapSpacing = match ($this->gap) {
-            'sm' => '0.5rem', // theme(spacing.2)
-            'lg' => '1.5rem', // theme(spacing.6)
-            default => '1rem', // theme(spacing.4) for md
+            'sm' => 'theme(spacing.2)', // 0.5rem
+            'lg' => 'theme(spacing.6)', // 1.5rem
+            default => 'theme(spacing.4)', // 1rem for md
         };
 
-        // Calculate total gap space: (items - 1) * gap
+
         $totalGaps = $items - 1;
 
-        // Container query formula: 100cqw / items - (gap * total_gaps / items)
+
         return "calc(100cqw / {$items} - {$gapSpacing} * {$totalGaps} / {$items})";
     }
 
@@ -330,7 +375,7 @@ class Carousel extends Component
      */
     public function shouldShowDots(): bool
     {
-        // Auto-hide dots when any breakpoint shows more than 1 item
+
         return $this->showDots && $this->getMaxItemsPerView() === 1;
     }
 

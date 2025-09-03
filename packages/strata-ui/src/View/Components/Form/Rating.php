@@ -36,14 +36,13 @@ class Rating extends Component
         public bool $clearable = true,
         public string $size = 'md',
         public string $icon = 'heroicon-o-star',
+        public string $color = 'yellow-500',
         public ?string $id = null,
     ) {
         $this->id = $id ?: 'rating-'.uniqid();
 
-        // Ensure max is at least 1
         $this->max = max(1, $this->max);
 
-        // Ensure value is within bounds if provided
         if ($this->value !== null) {
             $this->value = max(0, min($this->max, $this->value));
         }
@@ -99,5 +98,73 @@ class Rating extends Component
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * Get the active color class for stars.
+     */
+    public function getActiveColorClass(): string
+    {
+        return match ($this->color) {
+            'yellow-400' => 'text-yellow-400',
+            'yellow-500' => 'text-yellow-500',
+            'yellow-600' => 'text-yellow-600',
+            'blue-400' => 'text-blue-400',
+            'blue-500' => 'text-blue-500',
+            'blue-600' => 'text-blue-600',
+            'red-400' => 'text-red-400',
+            'red-500' => 'text-red-500',
+            'red-600' => 'text-red-600',
+            'green-400' => 'text-green-400',
+            'green-500' => 'text-green-500',
+            'green-600' => 'text-green-600',
+            'purple-400' => 'text-purple-400',
+            'purple-500' => 'text-purple-500',
+            'purple-600' => 'text-purple-600',
+            'orange-400' => 'text-orange-400',
+            'orange-500' => 'text-orange-500',
+            'orange-600' => 'text-orange-600',
+            'pink-400' => 'text-pink-400',
+            'pink-500' => 'text-pink-500',
+            'pink-600' => 'text-pink-600',
+            'indigo-400' => 'text-indigo-400',
+            'indigo-500' => 'text-indigo-500',
+            'indigo-600' => 'text-indigo-600',
+            default => 'text-yellow-500',
+        };
+    }
+
+    /**
+     * Get the hover color class for stars.
+     */
+    public function getHoverColorClass(): string
+    {
+        return match ($this->color) {
+            'yellow-400' => 'hover:text-yellow-400',
+            'yellow-500' => 'hover:text-yellow-500',
+            'yellow-600' => 'hover:text-yellow-600',
+            'blue-400' => 'hover:text-blue-400',
+            'blue-500' => 'hover:text-blue-500',
+            'blue-600' => 'hover:text-blue-600',
+            'red-400' => 'hover:text-red-400',
+            'red-500' => 'hover:text-red-500',
+            'red-600' => 'hover:text-red-600',
+            'green-400' => 'hover:text-green-400',
+            'green-500' => 'hover:text-green-500',
+            'green-600' => 'hover:text-green-600',
+            'purple-400' => 'hover:text-purple-400',
+            'purple-500' => 'hover:text-purple-500',
+            'purple-600' => 'hover:text-purple-600',
+            'orange-400' => 'hover:text-orange-400',
+            'orange-500' => 'hover:text-orange-500',
+            'orange-600' => 'hover:text-orange-600',
+            'pink-400' => 'hover:text-pink-400',
+            'pink-500' => 'hover:text-pink-500',
+            'pink-600' => 'hover:text-pink-600',
+            'indigo-400' => 'hover:text-indigo-400',
+            'indigo-500' => 'hover:text-indigo-500',
+            'indigo-600' => 'hover:text-indigo-600',
+            default => 'hover:text-yellow-500',
+        };
     }
 }

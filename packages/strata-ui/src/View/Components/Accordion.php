@@ -40,27 +40,27 @@ class Accordion extends Component
      */
     private function validateAndNormalizeConfiguration(): void
     {
-        // Normalize type to valid values
+
         if (! in_array($this->type, ['single', 'multiple'])) {
             $this->type = 'single';
         }
 
-        // Normalize variant to valid values
+
         if (! in_array($this->variant, ['default', 'bordered', 'flush', 'filled'])) {
             $this->variant = 'default';
         }
 
-        // Normalize size to valid values
+
         if (! in_array($this->size, ['sm', 'md', 'lg'])) {
             $this->size = 'md';
         }
 
-        // Normalize iconPosition to valid values
+
         if (! in_array($this->iconPosition, ['start', 'end'])) {
             $this->iconPosition = 'end';
         }
 
-        // Normalize defaultValue based on type
+
         if ($this->type === 'single' && is_array($this->defaultValue)) {
             $this->defaultValue = reset($this->defaultValue) ?: null;
         } elseif ($this->type === 'multiple' && is_string($this->defaultValue)) {

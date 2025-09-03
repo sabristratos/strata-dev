@@ -20,41 +20,41 @@ export function createBaseSelect(config = {}) {
     });
     
     return extendComponent(baseComponent, {
-        // UI state
+
         open: false,
         highlighted: config.multiple ? 0 : (config.selected ?? 0),
         
-        // Configuration
+
         count: config.count || 0,
         multiple: config.multiple || false,
         maxSelections: config.maxSelections || 0,
         items: config.items || {},
         searchable: config.searchable || false,
         
-        // Search state
+
         searchQuery: '',
         filteredItems: config.items || {},
         filteredIndices: Object.keys(config.items || {}),
         
-        // Component value (inherits from base form component)
-        // value is managed by base component
+
+
 
         /**
          * Select-specific initialization
          */
         init() {
-            // Initialize value from config
+
             if (config.initialSelected !== undefined) {
                 this.value = this.multiple 
                     ? (Array.isArray(config.initialSelected) ? config.initialSelected : [])
                     : config.initialSelected;
             }
             
-            // Initialize filtered items
+
             this.filteredItems = Object.values(this.items);
             this.filteredIndices = Object.keys(this.items);
             
-            // Set up keyboard event handlers
+
             this.setupKeyboardHandlers();
         },
 
@@ -62,7 +62,7 @@ export function createBaseSelect(config = {}) {
          * Set up keyboard event handlers
          */
         setupKeyboardHandlers() {
-            // Add event listener for window escape key
+
             const escapeHandler = (e) => {
                 if (e.key === 'Escape') {
                     this.close();
@@ -122,7 +122,7 @@ export function createBaseSelect(config = {}) {
                 this.value.push(index);
             }
             
-            // Update hidden input and dispatch change event
+
             this.updateHiddenInput();
             this.dispatchComponentEvent(EVENTS.FORM_CHANGE, {
                 value: this.value,
@@ -166,7 +166,7 @@ export function createBaseSelect(config = {}) {
             if (!Array.isArray(this.value) || this.value.length === 0) {
                 return [];
             }
-            // Show max 2 tags to prevent layout issues
+
             return this.value.slice(0, 2);
         },
 
@@ -201,7 +201,7 @@ export function createBaseSelect(config = {}) {
                 });
             }
             
-            // Reset highlighted to first item
+
             this.highlighted = 0;
         },
 
@@ -288,20 +288,20 @@ export function createBaseSelect(config = {}) {
             this.open = !this.open;
             
             if (this.open) {
-                // Enhanced focus management when opening
+
                 this.$nextTick(() => {
                     if (this.searchable && this.$refs.searchInput) {
                         this.$refs.searchInput.focus();
                     } else if (this.$refs.dropdown) {
-                        // Focus first focusable element in dropdown using utility
+
                         focusFirst(this.$refs.dropdown);
                     }
                 });
                 
-                // Dispatch opened event
+
                 this.dispatchComponentEvent(EVENTS.SELECT_OPENED);
             } else {
-                // Dispatch closed event
+
                 this.dispatchComponentEvent(EVENTS.SELECT_CLOSED);
             }
         },
@@ -390,15 +390,15 @@ export function createBaseSelect(config = {}) {
          * Update the hidden input value for form submission
          */
         updateHiddenInput() {
-            // For multiple selects, we need to handle multiple hidden inputs
-            // This is handled in the template, but we trigger the update
+
+
             this.$nextTick(() => {
-                // Trigger Alpine reactivity for hidden inputs
+
                 if (this.multiple) {
-                    // Multiple hidden inputs are handled by the template
+
                     this.value = [...this.value]; // Trigger reactivity
                 } else {
-                    // Single hidden input
+
                     const hiddenInput = this.$el.querySelector('input[type="hidden"]');
                     if (hiddenInput) {
                         hiddenInput.value = this.value || '';

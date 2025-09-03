@@ -53,9 +53,9 @@
                 <h3 class="text-xl font-semibold">Avatars</h3>
                 <div class="flex flex-wrap gap-4 items-end">
                     <x-strata::avatar size="xs" initials="XS" />
-                    <x-strata::avatar size="sm" initials="SM" status="online" />
-                    <x-strata::avatar size="md" initials="MD" status="away" />
-                    <x-strata::avatar size="lg" initials="LG" status="busy" />
+                    <x-strata::avatar size="sm" initials="SM" status="online" tooltip="Sarah Miller - Online" />
+                    <x-strata::avatar size="md" initials="MD" status="away" tooltip="Mark Davis - Away" />
+                    <x-strata::avatar size="lg" initials="LG" status="busy" tooltip="Lisa Green - Busy" />
                     <x-strata::avatar size="xl" initials="XL" status="offline" />
                     <x-strata::avatar size="2xl" initials="2XL" />
                     <x-strata::avatar size="3xl" initials="3XL" shape="square" border />
@@ -205,8 +205,9 @@
                 <p class="text-muted-foreground">Comprehensive form inputs with validation and features</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {{-- Left Column --}}
+            <form>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {{-- Left Column --}}
                 <div class="space-y-6">
                     <x-strata::form.input
                         name="email"
@@ -372,8 +373,30 @@
                         description="Rate your experience from 1-5 stars"
                         :max="5"
                     />
+
+                    <x-strata::form.datepicker
+                        name="birth_date"
+                        label="Birth Date"
+                        placeholder="Select your birth date"
+                        description="Single date selection"
+                        :maxDate="now()->format('Y-m-d')"
+                        wire:model="birth_date"
+                    />
+
+                    <x-strata::form.datepicker
+                        name="event_dates"
+                        label="Event Date Range"
+                        placeholder="Select event dates"
+                        description="Date range with presets"
+                        :range="true"
+                        :presets="true"
+                        :minDate="now()->format('Y-m-d')"
+                        :clearable="true"
+                        wire:model="event_dates"
+                    />
                 </div>
-            </div>
+                </div>
+            </form>
         </section>
 
         {{-- Advanced Components --}}
@@ -488,94 +511,7 @@
                 </div>
             </div>
 
-            {{-- Video Player --}}
-            <div class="space-y-6">
-                <h3 class="text-xl font-semibold">Video Player</h3>
 
-                {{-- Default Video Player --}}
-                <div class="space-y-2">
-                    <h4 class="font-medium">Default Video Player</h4>
-                    <p class="text-sm text-muted-foreground">Full-featured video player with controls and keyboard navigation</p>
-                    <div class="max-w-2xl">
-                        <x-strata::video-player
-                            :sources="[
-                                'mp4' => [
-                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                                    'type' => 'video/mp4',
-                                    'label' => '720p'
-                                ]
-                            ]"
-                            poster="https://images.unsplash.com/photo-1611095790444-1dfa35be8c1d?w=1280&h=720&fit=crop"
-                            :controls="true"
-                        />
-                    </div>
-                </div>
-
-                {{-- Compact Video Player --}}
-                <div class="space-y-2">
-                    <h4 class="font-medium">Compact Video Player</h4>
-                    <p class="text-sm text-muted-foreground">Smaller variant for inline content</p>
-                    <div class="max-w-lg">
-                        <x-strata::video-player
-                            variant="compact"
-                            size="sm"
-                            :sources="[
-                                'webm' => [
-                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                                    'type' => 'video/webm'
-                                ]
-                            ]"
-                            :autoplay="false"
-                            :muted="true"
-                            :loop="true"
-                        />
-                    </div>
-                </div>
-
-                {{-- Theater Mode Video Player --}}
-                <div class="space-y-2">
-                    <h4 class="font-medium">Theater Mode</h4>
-                    <p class="text-sm text-muted-foreground">Wide format for cinematic content</p>
-                    <div class="max-w-4xl">
-                        <x-strata::video-player
-                            variant="theater"
-                            size="lg"
-                            :sources="[
-                                'hd' => [
-                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                                    'type' => 'video/mp4',
-                                    'label' => 'HD'
-                                ]
-                            ]"
-                            :volume="0.7"
-                            :autoHideControlsDelay="5000"
-                        />
-                    </div>
-                </div>
-
-                {{-- Multiple Sources Example --}}
-                <div class="space-y-2">
-                    <h4 class="font-medium">Multiple Video Sources</h4>
-                    <p class="text-sm text-muted-foreground">Browser automatically selects best format</p>
-                    <div class="max-w-xl">
-                        <x-strata::video-player
-                            :sources="[
-                                'mp4' => [
-                                    'src' => 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                                    'type' => 'video/mp4',
-                                    'label' => '360p MP4'
-                                ],
-                                'webm' => [
-                                    'src' => 'https://sample-videos.com/zip/10/webm/SampleVideo_640x360_1mb.webm',
-                                    'type' => 'video/webm',
-                                    'label' => '360p WebM'
-                                ]
-                            ]"
-                            preload="metadata"
-                        />
-                    </div>
-                </div>
-            </div>
 
             {{-- Tabs --}}
             <div class="space-y-6">
@@ -777,23 +713,23 @@
             {{-- Sidebar --}}
             <div class="space-y-6">
                 <h3 class="text-xl font-semibold">Sidebar</h3>
-                
+
                 {{-- Sidebar Toggle Examples --}}
                 <div class="space-y-4">
                     <h4 class="font-medium">Sidebar Variants</h4>
                     <p class="text-sm text-muted-foreground">Different sidebar types with toggle buttons</p>
-                    
+
                     <div class="flex flex-wrap gap-4">
                         <x-strata::sidebar-toggle target="overlay-sidebar" variant="button">
                             Overlay Sidebar
                         </x-strata::sidebar-toggle>
-                        
+
                         <x-strata::sidebar-toggle target="push-sidebar" variant="button">
                             Push Content
                         </x-strata::sidebar-toggle>
-                        
+
                         <x-strata::sidebar-toggle target="right-sidebar" variant="hamburger" />
-                        
+
                         <x-strata::sidebar-toggle target="collapsible-sidebar" variant="icon" icon="heroicon-o-plus" />
                     </div>
                 </div>
@@ -802,34 +738,34 @@
                 <div class="space-y-4">
                     <h4 class="font-medium">JavaScript API</h4>
                     <p class="text-sm text-muted-foreground">Control sidebars programmatically</p>
-                    
+
                     <div class="flex flex-wrap gap-3">
-                        <x-strata::button 
-                            variant="outline" 
+                        <x-strata::button
+                            variant="outline"
                             size="sm"
                             @click="$strata.sidebar('overlay-sidebar').show()"
                         >
                             Show Overlay
                         </x-strata::button>
-                        
-                        <x-strata::button 
-                            variant="outline" 
+
+                        <x-strata::button
+                            variant="outline"
                             size="sm"
                             @click="$strata.sidebar('push-sidebar').toggle()"
                         >
                             Toggle Push
                         </x-strata::button>
-                        
-                        <x-strata::button 
-                            variant="outline" 
+
+                        <x-strata::button
+                            variant="outline"
                             size="sm"
                             @click="$strata.sidebars().closeAll()"
                         >
                             Close All
                         </x-strata::button>
-                        
-                        <x-strata::button 
-                            variant="outline" 
+
+                        <x-strata::button
+                            variant="outline"
                             size="sm"
                             onclick="Strata.sidebar('right-sidebar').show()"
                         >
@@ -1144,7 +1080,7 @@
                             description="Upload images or documents (max 5MB each) - Progress bars powered by Strata Progress component"
                         />
                     </div>
-                    
+
                     <div class="max-w-2xl">
                         <h4 class="font-medium mb-2">Gallery View Upload</h4>
                         <p class="text-sm text-muted-foreground mb-3">Perfect for image collections with visual previews</p>
@@ -1332,9 +1268,9 @@
     </x-strata::modal>
 
     {{-- Sidebar Definitions --}}
-    <x-strata::sidebar 
-        name="overlay-sidebar" 
-        variant="overlay" 
+    <x-strata::sidebar
+        name="overlay-sidebar"
+        variant="overlay"
         position="left"
         width="w-80"
     >
@@ -1347,25 +1283,25 @@
                 </div>
             </div>
         </x-slot>
-        
+
         <x-strata::sidebar-group label="Main Navigation">
             <x-strata::nav-item href="#" icon="heroicon-o-home" active>Dashboard</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-users">Team</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-folder">Projects</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-chart-bar">Analytics</x-strata::nav-item>
         </x-strata::sidebar-group>
-        
+
         <x-strata::sidebar-group label="Recent" collapsible>
             <x-strata::nav-item href="#" icon="heroicon-o-document">Project Alpha</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-document">Website Redesign</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-document">Mobile App</x-strata::nav-item>
         </x-strata::sidebar-group>
-        
+
         <x-strata::sidebar-group label="Settings">
             <x-strata::nav-item href="#" icon="heroicon-o-cog-6-tooth">Preferences</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-bell">Notifications</x-strata::nav-item>
         </x-strata::sidebar-group>
-        
+
         <x-slot name="footer">
             <div class="flex items-center gap-2">
                 <x-strata::button variant="ghost" size="sm" class="flex-1">
@@ -1376,9 +1312,9 @@
         </x-slot>
     </x-strata::sidebar>
 
-    <x-strata::sidebar 
-        name="push-sidebar" 
-        variant="push" 
+    <x-strata::sidebar
+        name="push-sidebar"
+        variant="push"
         position="left"
         width="w-72"
         persistent
@@ -1389,14 +1325,14 @@
                 <div class="text-sm text-muted-foreground">Pushes content aside</div>
             </div>
         </x-slot>
-        
+
         <x-strata::sidebar-group label="Navigation">
             <x-strata::nav-item href="#" icon="heroicon-o-squares-2x2">Overview</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-document-text">Documentation</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-code-bracket">Components</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-paint-brush">Themes</x-strata::nav-item>
         </x-strata::sidebar-group>
-        
+
         <x-strata::sidebar-group label="Tools" collapsible collapsed>
             <x-strata::nav-item href="#" icon="heroicon-o-wrench-screwdriver">Settings</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-bug-ant">Debug</x-strata::nav-item>
@@ -1404,9 +1340,9 @@
         </x-strata::sidebar-group>
     </x-strata::sidebar>
 
-    <x-strata::sidebar 
-        name="right-sidebar" 
-        variant="overlay" 
+    <x-strata::sidebar
+        name="right-sidebar"
+        variant="overlay"
         position="right"
         width="w-96"
     >
@@ -1416,7 +1352,7 @@
                 <div class="text-sm text-muted-foreground">Information panel</div>
             </div>
         </x-slot>
-        
+
         <div class="space-y-6">
             <x-strata::card size="sm">
                 <div class="text-center">
@@ -1424,14 +1360,14 @@
                     <div class="text-sm text-muted-foreground">Active Users</div>
                 </div>
             </x-strata::card>
-            
+
             <x-strata::card size="sm">
                 <div class="text-center">
                     <div class="text-2xl font-bold text-accent mb-1">89%</div>
                     <div class="text-sm text-muted-foreground">Success Rate</div>
                 </div>
             </x-strata::card>
-            
+
             <div>
                 <h4 class="font-medium mb-3">Recent Activity</h4>
                 <div class="space-y-2">
@@ -1452,9 +1388,9 @@
         </div>
     </x-strata::sidebar>
 
-    <x-strata::sidebar 
-        name="collapsible-sidebar" 
-        variant="fixed" 
+    <x-strata::sidebar
+        name="collapsible-sidebar"
+        variant="fixed"
         position="left"
         width="w-64"
         collapsible
@@ -1471,14 +1407,14 @@
                 </div>
             </div>
         </x-slot>
-        
+
         <x-strata::sidebar-group label="Main" x-show="!collapsed">
             <x-strata::nav-item href="#" icon="heroicon-o-home">Dashboard</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-chart-bar">Analytics</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-users">Users</x-strata::nav-item>
             <x-strata::nav-item href="#" icon="heroicon-o-cog-6-tooth">Settings</x-strata::nav-item>
         </x-strata::sidebar-group>
-        
+
         <div x-show="collapsed" x-transition class="space-y-1">
             <x-strata::nav-item href="#" icon="heroicon-o-home" :tooltip="'Dashboard'" />
             <x-strata::nav-item href="#" icon="heroicon-o-chart-bar" :tooltip="'Analytics'" />
