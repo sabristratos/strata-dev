@@ -1,0 +1,3 @@
+<svg x-bind:class="{ 'rotate-180': !collapsed }" class="w-3 h-3 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+</svg><?php /**PATH C:\Users\chaab\Herd\strata-dev\storage\framework\views/7a7a2977271dd9d45909cd1263f386d4.blade.php ENDPATH**/ ?>

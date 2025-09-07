@@ -1,6 +1,6 @@
 ---
 name: make-component
-description: Create a comprehensive Strata UI component with PHP class, Blade template, Alpine.js integration, and theme system
+description: "Create Strata UI component: ComponentName --type=form|interactive|basic --variants=primary,secondary --interactive --theme-colors --accessibility --responsive"
 ---
 
 # Create Strata UI Component
@@ -124,9 +124,6 @@ use Illuminate\View\Component;
  */
 class $1 extends Component
 {
-    /**
-     * Create a new component instance.
-     */
     public function __construct(
         public string $variant = '{{ variants[0] }}',
         {{ needsResponsive ? 'public string $size = "md",' : '' }}
@@ -140,36 +137,10 @@ class $1 extends Component
         {{ isInteractive ? '$this->name = $this->name ?? uniqid("' + componentName.toLowerCase() + '-");' : '' }}
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
     public function render(): View
     {
         return view('strata::components.{{ isFormComponent ? 'form.' : '' }}{{ componentName.toLowerCase().replace(/([A-Z])/g, '-$1').substring(1) }}');
     }
-
-    {{ needsThemeColors ? `/**
-     * Get the CSS classes for the component variant.
-     */
-    public function getVariantClasses(): string
-    {
-        return match ($this->variant) {
-            ${variants.map(v => `'${v}' => 'bg-${v === 'primary' ? 'brand' : v === 'destructive' ? 'destructive' : v}-500 text-white hover:bg-${v === 'primary' ? 'brand' : v === 'destructive' ? 'destructive' : v}-600',`).join('\n            ')}
-            default => 'bg-primary text-primary-foreground hover:bg-primary/90',
-        };
-    }` : '' }}
-
-    {{ needsResponsive ? `/**
-     * Get the CSS classes for the component size.
-     */
-    public function getSizeClasses(): string
-    {
-        return match ($this->size) {
-            'sm' => 'text-sm px-3 py-1.5',
-            'lg' => 'text-lg px-6 py-3',
-            default => 'text-base px-4 py-2',
-        };
-    }` : '' }}
 
     {{ isInteractive ? `/**
      * Get configuration for Alpine.js component.
