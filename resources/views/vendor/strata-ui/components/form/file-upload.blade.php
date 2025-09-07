@@ -1,5 +1,5 @@
 @php
-    $hasWireModel = $attributes->wire('model');
+    $hasWireModel = $attributes->has('wire:model');
     $inputId = $attributes->get('id') ?: 'file-upload-' . uniqid();
     $isMultiple = $multiple;
     $isGalleryView = $variant === 'gallery';
@@ -17,30 +17,31 @@
     })"
     class="w-full"
 >
-    <!-- Hidden file input -->
     <input
         type="file"
         x-ref="fileInput"
         :multiple="multiple"
         :accept="accept"
         @if($name) name="{{ $name }}" @endif
-        @if($hasWireModel) {{ $attributes->wire('model') }} @endif
         {{ $attributes->except(['wire:model', 'class', 'id']) }}
         class="sr-only"
         id="{{ $inputId }}"
     />
 
     @if($variant === 'gallery')
-        <!-- Gallery View -->
         <div class="space-y-4">
-            <!-- Upload Zone -->
             <div
                 @dragover.prevent="handleDragOver"
                 @dragleave.prevent="handleDragLeave"
                 @drop.prevent="handleDrop"
                 @click="openFileBrowser"
+                @keydown.enter="openFileBrowser"
+                @keydown.space.prevent="openFileBrowser"
                 :class="{ 'border-primary bg-primary/5': dragOver }"
                 class="{{ $getVariantClasses() }} cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors duration-200 text-center"
+                role="button"
+                tabindex="0"
+                :aria-label="multiple ? 'Drop files here or click to browse' : 'Drop file here or click to browse'"
             >
                 <div class="flex flex-col items-center gap-2">
                     <x-icon name="heroicon-o-cloud-arrow-up" class="w-8 h-8 text-muted-foreground" />
@@ -52,7 +53,6 @@
                 </div>
             </div>
             
-            <!-- File Grid -->
             <div x-show="(multiple && files && files.length > 0) || (!multiple && files)" x-transition class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <template x-for="file in multiple ? (files || []) : (files ? [files] : [])" :key="file ? getFileId(file) : 'empty'">
                     <div x-show="file" class="relative group">
@@ -84,7 +84,7 @@
                             
                             <!-- Error Message -->
                             <div x-show="errors[getFileId(file)]" class="mt-2">
-                                <p class="text-xs text-destructive" x-text="errors[getFileId(file)]"></p>
+                                <p class="text-xs text-destructive" x-text="errors[getFileId(file)]" role="alert"></p>
                             </div>
                         </div>
                         
@@ -93,6 +93,7 @@
                             type="button"
                             @click.stop="removeFile(getFileId(file))"
                             class="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-destructive/90"
+                            x-bind:aria-label="'Remove ' + getFileName(file)"
                         >
                             <span class="text-sm">×</span>
                         </button>
@@ -103,14 +104,18 @@
     @else
         <!-- Default/Compact View -->
         <div class="space-y-4">
-            <!-- Upload Zone -->
             <div
                 @dragover.prevent="handleDragOver"
                 @dragleave.prevent="handleDragLeave"
                 @drop.prevent="handleDrop"
                 @click="openFileBrowser"
+                @keydown.enter="openFileBrowser"
+                @keydown.space.prevent="openFileBrowser"
                 :class="{ 'border-primary bg-primary/5': dragOver }"
                 class="{{ $getVariantClasses() }} cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors duration-200"
+                role="button"
+                tabindex="0"
+                :aria-label="multiple ? 'Drop files here or click to browse' : 'Drop file here or click to browse'"
             >
                 <div class="text-center">
                     <x-icon name="heroicon-o-cloud-arrow-up" class="w-16 h-16 text-muted-foreground mb-4 mx-auto" />
@@ -160,7 +165,7 @@
                             
                             <!-- Error Message -->
                             <div x-show="errors[getFileId(file)]" class="mt-1">
-                                <p class="text-xs text-destructive" x-text="errors[getFileId(file)]"></p>
+                                <p class="text-xs text-destructive" x-text="errors[getFileId(file)]" role="alert"></p>
                             </div>
                         </div>
                         
@@ -179,10 +184,16 @@
                                 size="sm"
                                 icon="heroicon-o-trash"
                                 class="!p-1.5 text-muted-foreground hover:text-destructive"
+                                x-bind:aria-label="'Remove ' + getFileName(file)"
                             />
                         </div>
                     </div>
                 </template>
+            </div>
+
+            <!-- General Error Messages -->
+            <div x-show="errors.general" x-transition class="mt-2">
+                <p class="text-sm text-destructive" x-text="errors.general" role="alert"></p>
             </div>
         </div>
     @endif

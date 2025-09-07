@@ -3,6 +3,6 @@
     $classes = implode(' ', [$baseClasses, $getSizeClasses(), $getBorderClasses()]);
 @endphp
 
-<div {{ $attributes->merge(['class' => $classes . ' card-radius']) }}>
+<div {{ $attributes->merge(['class' => $classes . ' card-radius']) }} data-strata-card="root">
     {{ $slot }}
 </div>

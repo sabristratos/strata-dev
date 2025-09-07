@@ -11,10 +11,10 @@
     class="relative inline-block max-w-max"
     x-ref="trigger"
 >
-    {{-- This is the element that triggers the tooltip --}}
+
     {{ $slot }}
 
-    {{-- The tooltip content itself --}}
+
     <div
         x-show="open"
         x-transition:enter="transition ease-out duration-200"

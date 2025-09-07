@@ -1,6 +1,18 @@
 @php
-    $hasWireModel = $attributes->wire('model');
+    $hasWireModel = $attributes->has('wire:model');
 @endphp
+
+{{-- 
+Rating component color classes for Tailwind scanning:
+text-yellow-400 text-yellow-500 text-yellow-600 hover:text-yellow-400 hover:text-yellow-500 hover:text-yellow-600
+text-blue-400 text-blue-500 text-blue-600 hover:text-blue-400 hover:text-blue-500 hover:text-blue-600
+text-red-400 text-red-500 text-red-600 hover:text-red-400 hover:text-red-500 hover:text-red-600
+text-green-400 text-green-500 text-green-600 hover:text-green-400 hover:text-green-500 hover:text-green-600
+text-purple-400 text-purple-500 text-purple-600 hover:text-purple-400 hover:text-purple-500 hover:text-purple-600
+text-orange-400 text-orange-500 text-orange-600 hover:text-orange-400 hover:text-orange-500 hover:text-orange-600
+text-pink-400 text-pink-500 text-pink-600 hover:text-pink-400 hover:text-pink-500 hover:text-pink-600
+text-indigo-400 text-indigo-500 text-indigo-600 hover:text-indigo-400 hover:text-indigo-500 hover:text-indigo-600
+--}}
 
 <div 
     x-data="strataRating({
@@ -11,7 +23,7 @@
         name: @js($name)
     })"
     x-modelable="value"
-    @if($hasWireModel) {{ $attributes->wire('model') }} @endif
+    @if($hasWireModel) {{ $attributes->get('wire:model') }} @endif
     class="flex flex-col space-y-2"
 >
     @if($name && !$hasWireModel)
@@ -54,7 +66,7 @@
                 @endif
                 class="transition-colors duration-150 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 input-radius-sm"
                 :class="{
-                    'text-rating-star': (stars || 0) >= {{ $i }},
+                    '{{ $getActiveColorClass() }}': (stars || 0) >= {{ $i }},
                     'text-muted-foreground/40': (stars || 0) < {{ $i }},
                     'cursor-pointer': !readonly,
                     'cursor-default': readonly

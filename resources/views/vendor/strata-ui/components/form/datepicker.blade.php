@@ -6,7 +6,7 @@
 @endphp
 
 <div class="space-y-2">
-    {{-- Label Component --}}
+
     @if($hasLabel)
         <x-strata::form.label 
             :for="$id" 
@@ -16,7 +16,7 @@
         </x-strata::form.label>
     @endif
     
-    {{-- Helper Text Component --}}
+
     @if($hasDescription && !$hasError)
         <x-strata::form.helper 
             :field="$name"
@@ -24,7 +24,7 @@
         />
     @endif
 
-    {{-- Datepicker Container --}}
+
     <div
         x-data="strataDatepicker({
             value: @js($getFormValue()),
@@ -34,23 +34,33 @@
             readonly: @js($readonly),
             placeholder: @js($placeholder)
         })"
-        x-modelable="value"
-        {{ $attributes->wire('model') }}
         @keydown.escape.window="open = false"
         @click.outside="open = false"
         class="relative"
         @strata-calendar-change="handleCalendarChange($event)"
     >
-        {{-- Hidden Input for Form Submission --}}
+
         @if($name)
             @if($range)
-                <input type="hidden" x-bind:value="value ? JSON.stringify(value) : ''" name="{{ $name }}" x-ref="hiddenInput" />
+                <input 
+                    type="hidden" 
+                    x-bind:value="value ? JSON.stringify(value) : ''" 
+                    name="{{ $name }}" 
+                    x-ref="hiddenInput"
+                    @if($attributes->has('wire:model')) {{ $attributes->get('wire:model') }} @endif
+                />
             @else
-                <input type="hidden" x-bind:value="value || ''" name="{{ $name }}" x-ref="hiddenInput" />
+                <input 
+                    type="hidden" 
+                    x-bind:value="value || ''" 
+                    name="{{ $name }}" 
+                    x-ref="hiddenInput"
+                    @if($attributes->has('wire:model')) {{ $attributes->get('wire:model') }} @endif
+                />
             @endif
         @endif
 
-        {{-- Trigger Input --}}
+
         <div 
             class="{{ $getWrapperClasses() }}"
             @click="openCalendar()"
@@ -66,7 +76,7 @@
             @if($hasDescription && $hasError) aria-describedby="{{ $name }}-description {{ $name }}-error" @endif
             :class="{ 'opacity-50': disabled || {{ $disabled ? 'true' : 'false' }} }"
         >
-            {{-- Leading Icon --}}
+
             @if($hasIcon)
                 <div class="flex items-center px-3 py-2">
                     <x-dynamic-component 
@@ -77,7 +87,7 @@
                 </div>
             @endif
 
-            {{-- Display Value --}}
+
             <div class="input-element flex-1 px-3 py-2">
                 <span 
                     x-show="displayValue" 
@@ -91,7 +101,7 @@
                 ></span>
             </div>
 
-            {{-- Trailing Controls --}}
+
             <div class="flex items-center px-3 py-2 gap-1">
                 @if($clearable)
                     <button
@@ -110,7 +120,7 @@
             </div>
         </div>
 
-        {{-- Calendar Popover using existing calendar component --}}
+
         <div
             x-show="open"
             x-transition:enter="transition ease-out duration-200"
@@ -142,7 +152,7 @@
         </div>
     </div>
     
-    {{-- Error Component --}}
+
     @if($hasError)
         <x-strata::form.error 
             :field="$name"

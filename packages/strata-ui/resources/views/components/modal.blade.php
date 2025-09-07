@@ -61,6 +61,7 @@
     x-show="show"
     x-cloak
     data-variant="{{ $variant }}"
+    data-strata-modal="root"
     @if($variant === 'flyout')
         data-position="{{ $position }}"
     @endif
@@ -89,6 +90,7 @@
             @click="handleBackdropClick()"
         @endif
         class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        data-strata-modal="overlay"
     ></div>
     
 
@@ -107,10 +109,11 @@
             aria-modal="true"
             :aria-labelledby="name ? 'modal-title-' + name : null"
             :aria-describedby="name ? 'modal-description-' + name : null"
+            data-strata-modal="content"
             @class(array_filter($contentClasses))
         >
             @if($dismissible && $variant !== 'bare')
-                <div class="absolute right-4 top-4 z-10">
+                <div class="absolute right-4 top-4 z-10" data-strata-modal="close-container">
                     <x-strata::button
                         variant="ghost"
                         size="sm"
@@ -118,16 +121,19 @@
                         @click="hideModal()"
                         class="!p-1.5 hover:bg-muted"
                         aria-label="Close modal"
+                        data-strata-modal="close"
                     />
                 </div>
             @endif
             
             @if($variant !== 'bare')
-                <div class="p-6">
+                <div class="p-6" data-strata-modal="body">
                     {{ $slot }}
                 </div>
             @else
-                {{ $slot }}
+                <div data-strata-modal="body">
+                    {{ $slot }}
+                </div>
             @endif
         </div>
     </div>

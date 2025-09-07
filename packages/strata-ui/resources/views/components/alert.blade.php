@@ -18,6 +18,7 @@
     x-transition:leave-end="opacity-0 transform scale-95"
     role="{{ $role }}"
     aria-live="{{ $ariaLive }}"
+    data-strata-alert="root"
     @class([
         'alert-radius shadow-xs relative',
         'border border-info bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'info',
@@ -53,12 +54,13 @@
                 'bg-accent/15 text-accent toast-pulse-accent' => $color === 'accent',
             ])
             aria-hidden="true"
+            data-strata-alert="icon-container"
         >
-            <x-icon :name="$getContextualIcon()" :class="$getIconSizeClasses()" />
+            <x-icon :name="$getContextualIcon()" :class="$getIconSizeClasses()" data-strata-alert="icon" />
         </div>
 
 
-        <div class="flex flex-col gap-2 flex-1 min-w-0 pr-8">
+        <div class="flex flex-col gap-2 flex-1 min-w-0 pr-8" data-strata-alert="content">
             @if ($title)
                 <h3 
                     @class([
@@ -71,23 +73,24 @@
                         'text-primary' => $color === 'primary',
                         'text-accent' => $color === 'accent',
                     ])
+                    data-strata-alert="title"
                 >
                     {{ $title }}
                 </h3>
                 @if ($slot->isNotEmpty())
-                    <div class="text-pretty text-sm">
+                    <div class="text-pretty text-sm" data-strata-alert="message">
                         {{ $slot }}
                     </div>
                 @endif
             @else
-                <div class="text-pretty text-sm">
+                <div class="text-pretty text-sm" data-strata-alert="message">
                     {{ $slot }}
                 </div>
             @endif
             
 
             @isset($actions)
-                <div class="flex gap-2 mt-1">
+                <div class="flex gap-2 mt-1" data-strata-alert="actions">
                     {!! $actions !!}
                 </div>
             @endisset
@@ -102,6 +105,7 @@
                 x-on:click="visible = false"
                 aria-label="Dismiss alert"
                 class="!p-1 absolute top-2 right-2 shrink-0"
+                data-strata-alert="dismiss"
             />
         @endif
     </div>

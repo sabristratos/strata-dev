@@ -7,7 +7,7 @@
 
 <div>
     <div class="relative flex items-start">
-        @if($name && !$attributes->wire('model'))
+        @if($name && !$attributes->has('wire:model'))
             <input type="hidden" name="{{ $name }}" value="0">
         @endif
         

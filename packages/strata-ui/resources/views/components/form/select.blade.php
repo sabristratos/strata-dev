@@ -5,7 +5,7 @@
     $isSearchable = $searchable || count($items) >= $searchThreshold;
 @endphp
 
-<div>
+<div data-strata-select="wrapper">
 
     <div
         x-data="strataSelect({
@@ -24,6 +24,7 @@
         @click.outside="close()"
         @keydown.escape.window="close()"
         class="relative"
+        data-strata-select="container"
     >
         <button
             x-ref="trigger"
@@ -31,6 +32,7 @@
             @keydown="handleTriggerKeydown($event)"
             type="button"
             :disabled="@json($disabled)"
+            data-strata-select="trigger"
             {{ $attributes->except(['wire:model']) }}
             class="{{ $getVariantClasses() }} flex items-center justify-between {{ $variant === 'minimal' ? '' : 'pl-3' }}"
             :class="@json($clearable) && hasSelection() ? 'pr-16' : 'pr-10'"

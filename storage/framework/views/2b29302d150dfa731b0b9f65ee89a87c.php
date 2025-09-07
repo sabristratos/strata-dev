@@ -45,12 +45,12 @@ unset($__defined_vars, $__key, $__value); ?>
 
 >
 
-    <?php if($mobileHeader && isset($header)): ?>
+    <!--[if BLOCK]><![endif]--><?php if($mobileHeader && isset($header)): ?>
         <header class="<?php echo e($getMobileHeaderClasses()); ?>">
             <?php echo e($header); ?>
 
         </header>
-    <?php endif; ?>
+    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
 
     <main class="<?php echo e($getContentClasses()); ?>">

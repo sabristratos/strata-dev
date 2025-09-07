@@ -9,9 +9,10 @@
     @keydown.escape.window="open = false"
     @click.outside="open = false"
     class="relative"
+    data-strata-popover="root"
     {{ $attributes->except(['position', 'offset', 'width']) }}
 >
-    <div @click="open = !open" x-ref="trigger" class="inline-block w-full">
+    <div @click="open = !open" x-ref="trigger" class="inline-block w-full" data-strata-popover="trigger">
         {{ $trigger }}
     </div>
     <template x-teleport="body">
@@ -27,7 +28,7 @@
             class="absolute z-50 {{ $width }}"
             style="display: none;"
         >
-            <div class="bg-popover text-popover-foreground dropdown-radius shadow-lg border border-border">
+            <div class="bg-popover text-popover-foreground dropdown-radius shadow-lg border border-border" data-strata-popover="content">
                 {{ $slot }}
             </div>
         </div>

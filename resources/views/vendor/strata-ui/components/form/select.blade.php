@@ -13,8 +13,8 @@
             count: {{ $itemCount }},
             multiple: {{ $multiple ? 'true' : 'false' }},
             maxSelections: {{ $maxSelections }},
-            @if($attributes->wire('model'))
-            value: @entangle($attributes->wire('model')),
+            @if($attributes->has('wire:model'))
+            value: @entangle($attributes->get('wire:model')),
             @else
             initialSelected: @js($initialSelected),
             @endif

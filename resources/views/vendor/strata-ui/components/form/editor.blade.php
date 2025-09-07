@@ -2,7 +2,7 @@
     $editorId = $id ?: 'editor-' . Str::random(8);
     $isDisabled = $disabled ?? false;
 
-    // Prepare editor div attributes
+
     $editorAttributes = [
         'x-ref' => 'editor',
         'class' => 'block w-full p-4 text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-card prose prose-sm max-w-none [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_p]:font-normal [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mt-6 [&_h1]:mb-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-5 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:mt-4 [&_h3]:mb-2 [&_h4]:text-base [&_h4]:font-bold [&_h4]:mt-3 [&_h4]:mb-2 [&_h5]:text-sm [&_h5]:font-bold [&_h5]:mt-2 [&_h5]:mb-1 [&_h6]:text-xs [&_h6]:font-bold [&_h6]:mt-2 [&_h6]:mb-1',
@@ -18,7 +18,7 @@
     }
     if ($placeholder) $editorAttributes['data-placeholder'] = $placeholder;
 
-    // Prepare hidden input attributes
+
     $hiddenInputAttributes = [
         'type' => 'hidden',
         'x-model' => 'content'
@@ -27,7 +27,7 @@
 @endphp
 
 <div
-    x-data="strataEditor({ initialValue: '{{ $value }}' })"
+    x-data="strataEditor({ initialValue: @js($value ?? '') })"
     class="w-full"
 >
     <div class="overflow-hidden bg-card">
@@ -193,7 +193,7 @@
                     </div>
                 </template>
 
-                {{-- Link Edit Popup --}}
+
                 <template x-teleport="body">
                     <div
                         x-show="linkEditMode"

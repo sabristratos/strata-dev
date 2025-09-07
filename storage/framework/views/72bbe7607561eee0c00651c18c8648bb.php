@@ -46,7 +46,7 @@
             $getVariantClasses()
         ])
     ])); ?>>
-    <!--[if BLOCK]><![endif]--><?php if($icon): ?>
+    <?php if($icon): ?>
         <?php if (isset($component)) { $__componentOriginal606b6d7eddc2e418f11096356be15e19 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal606b6d7eddc2e418f11096356be15e19 = $attributes; } ?>
 <?php $component = BladeUI\Icons\Components\Icon::resolve(['name' => $icon] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -67,11 +67,11 @@
 <?php $component = $__componentOriginal606b6d7eddc2e418f11096356be15e19; ?>
 <?php unset($__componentOriginal606b6d7eddc2e418f11096356be15e19); ?>
 <?php endif; ?>
-    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    <?php endif; ?>
 
     <span><?php echo e($content); ?></span>
 
-    <!--[if BLOCK]><![endif]--><?php if($dismissible): ?>
+    <?php if($dismissible): ?>
         <button
             type="button"
             x-on:click="visible = false"
@@ -82,6 +82,6 @@
                 <path stroke-linecap="round" stroke-width="1.5" d="M1 1l6 6m0-6L1 7" />
             </svg>
         </button>
-    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    <?php endif; ?>
 </span>
 <?php /**PATH C:\Users\chaab\Herd\strata\packages\strata-ui\src/../resources/views/components/badge.blade.php ENDPATH**/ ?>

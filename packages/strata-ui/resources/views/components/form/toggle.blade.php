@@ -2,7 +2,7 @@
     $hasError = !empty($error);
 @endphp
 
-<div class="flex flex-col gap-1">
+<div class="flex flex-col gap-1" data-strata-toggle="wrapper">
     <div 
         x-data="{
             value: @if($attributes->has('wire:model')) @entangle($attributes->get('wire:model')) @else {{ $checked ? 'true' : 'false' }} @endif,
@@ -20,6 +20,7 @@
             'flex items-center gap-3',
             'justify-between' => $position === 'after' && ($label || $description)
         ])
+        data-strata-toggle="container"
     >
     @if($name && !$attributes->has('wire:model'))
         <input type="hidden" name="{{ $name }}" value="0">

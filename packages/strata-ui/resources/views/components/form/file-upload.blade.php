@@ -93,7 +93,7 @@
                             type="button"
                             @click.stop="removeFile(getFileId(file))"
                             class="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-destructive/90"
-                            :aria-label="'Remove ' + getFileName(file)"
+                            x-bind:aria-label="'Remove ' + getFileName(file)"
                         >
                             <span class="text-sm">×</span>
                         </button>
@@ -184,7 +184,7 @@
                                 size="sm"
                                 icon="heroicon-o-trash"
                                 class="!p-1.5 text-muted-foreground hover:text-destructive"
-                                :aria-label="'Remove ' + getFileName(file)"
+                                x-bind:aria-label="'Remove ' + getFileName(file)"
                             />
                         </div>
                     </div>

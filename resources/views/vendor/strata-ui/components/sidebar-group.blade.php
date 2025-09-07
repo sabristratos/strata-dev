@@ -17,7 +17,7 @@
         x-data="{ collapsed: {{ $collapsed ? 'true' : 'false' }} }"
     @endif
 >
-    {{-- Group Label --}}
+
     @if($hasLabel())
         @if($collapsible)
             <button
@@ -40,7 +40,7 @@
         @endif
     @endif
 
-    {{-- Group Content --}}
+
     <div
         @if($collapsible)
             x-show="!collapsed"

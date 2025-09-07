@@ -4,9 +4,9 @@
     $hasError = !empty($error);
 ?>
 
-<div class="space-y-2">
+<div class="space-y-2" data-strata-textarea="wrapper">
 
-    <!--[if BLOCK]><![endif]--><?php if($hasLabel): ?>
+    <?php if($hasLabel): ?>
         <?php if (isset($component)) { $__componentOriginal3ea2f8edb912a0e37cb1305e82ccd412 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal3ea2f8edb912a0e37cb1305e82ccd412 = $attributes; } ?>
 <?php $component = Strata\UI\View\Components\Form\Label::resolve(['for' => $id,'required' => $required] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -29,10 +29,10 @@
 <?php $component = $__componentOriginal3ea2f8edb912a0e37cb1305e82ccd412; ?>
 <?php unset($__componentOriginal3ea2f8edb912a0e37cb1305e82ccd412); ?>
 <?php endif; ?>
-    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    <?php endif; ?>
 
 
-    <!--[if BLOCK]><![endif]--><?php if($hasDescription && !$hasError): ?>
+    <?php if($hasDescription && !$hasError): ?>
         <?php if (isset($component)) { $__componentOriginalb3a838ced65e177e8ce9c340733dd8dd = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb3a838ced65e177e8ce9c340733dd8dd = $attributes; } ?>
 <?php $component = Strata\UI\View\Components\Form\Helper::resolve(['field' => $name,'text' => $description] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -53,7 +53,7 @@
 <?php $component = $__componentOriginalb3a838ced65e177e8ce9c340733dd8dd; ?>
 <?php unset($__componentOriginalb3a838ced65e177e8ce9c340733dd8dd); ?>
 <?php endif; ?>
-    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    <?php endif; ?>
 
 
     <textarea
@@ -93,13 +93,14 @@
         <?php if($hasError): ?> aria-describedby="<?php echo e($name); ?>-error" aria-invalid="true" <?php endif; ?>
         <?php if($hasDescription && $hasError): ?> aria-describedby="<?php echo e($name); ?>-description <?php echo e($name); ?>-error" <?php endif; ?>
         rows="<?php echo e($rows); ?>"
+        data-strata-textarea="field"
         <?php echo e($attributes->except(['wire:model', 'id', 'name', 'placeholder', 'required', 'disabled', 'readonly'])); ?>
 
         class="<?php echo e($getTextareaClasses()); ?>"
-    ><!--[if BLOCK]><![endif]--><?php if(!$attributes->has('wire:model') && $value): ?><?php echo e($value); ?><?php endif; ?><!--[if ENDBLOCK]><![endif]--></textarea>
+    ><?php if(!$attributes->has('wire:model') && $value): ?><?php echo e($value); ?><?php endif; ?></textarea>
 
 
-    <!--[if BLOCK]><![endif]--><?php if($hasError): ?>
+    <?php if($hasError): ?>
         <?php if (isset($component)) { $__componentOriginal432ea598424c224929c48147fe2a40a7 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal432ea598424c224929c48147fe2a40a7 = $attributes; } ?>
 <?php $component = Strata\UI\View\Components\Form\Error::resolve(['field' => $name,'message' => $error] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -120,6 +121,6 @@
 <?php $component = $__componentOriginal432ea598424c224929c48147fe2a40a7; ?>
 <?php unset($__componentOriginal432ea598424c224929c48147fe2a40a7); ?>
 <?php endif; ?>
-    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+    <?php endif; ?>
 </div>
 <?php /**PATH C:\Users\chaab\Herd\strata\packages\strata-ui\src/../resources/views/components/form/textarea.blade.php ENDPATH**/ ?>

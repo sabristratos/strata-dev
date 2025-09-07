@@ -38,7 +38,24 @@
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::scripts(); ?>
 
     <?php
-                // For development, always use a cache-busting timestamp
+                $config = [
+                    "theme" => config("strata-ui.theme", "auto"),
+                    "animations" => [
+                        "enabled" => config("strata-ui.animations.enabled", true),
+                        "duration" => config("strata-ui.animations.duration", "normal"),
+                        "reduce_motion" => config("strata-ui.animations.reduce_motion", "auto")
+                    ],
+                    "defaults" => [
+                        "toast_duration" => config("strata-ui.defaults.toast_duration", 5000),
+                        "modal_closable" => config("strata-ui.defaults.modal_closable", true),
+                        "focus_trap" => config("strata-ui.defaults.focus_trap", true)
+                    ],
+                    "debug" => [
+                        "component_logging" => config("strata-ui.debug.component_logging", false),
+                        "show_performance" => config("strata-ui.debug.show_performance", false)
+                    ]
+                ];
+                
                 $developmentPath = base_path("packages/strata-ui/resources/dist/strata-ui.iife.js");
                 $publishedPath = public_path("vendor/strata-ui/strata-ui.iife.js");
                 
@@ -46,14 +63,20 @@
                     $version = time(); // Always fresh for development
                     $assetUrl = asset("vendor/strata-ui/strata-ui.iife.js") . "?v=" . $version;
                     echo "<!-- Strata UI Debug: Loading from development path -->";
+                    echo "<script>window.strataUIConfig = " . json_encode($config) . ";</script>";
                     echo "<script src=\"" . $assetUrl . "\" defer></script>";
-                    echo "<script>console.log(\"Strata UI: Script loaded (dev mode) from " . $assetUrl . "\");</script>";
+                    if ($config["debug"]["component_logging"]) {
+                        echo "<script>console.log(\"Strata UI: Script loaded (dev mode) from " . $assetUrl . "\");</script>";
+                    }
                 } elseif (file_exists($publishedPath)) {
                     $version = filemtime($publishedPath);
                     $assetUrl = asset("vendor/strata-ui/strata-ui.iife.js") . "?v=" . $version;
                     echo "<!-- Strata UI Debug: Loading from published path -->";
+                    echo "<script>window.strataUIConfig = " . json_encode($config) . ";</script>";
                     echo "<script src=\"" . $assetUrl . "\" defer></script>";
-                    echo "<script>console.log(\"Strata UI: Script loaded from " . $assetUrl . "\");</script>";
+                    if ($config["debug"]["component_logging"]) {
+                        echo "<script>console.log(\"Strata UI: Script loaded from " . $assetUrl . "\");</script>";
+                    }
                 } else {
                     echo "<!-- Strata UI: JavaScript bundle not found -->";
                     echo "<script>console.error(\"Strata UI: JavaScript bundle not found. Please run: php artisan vendor:publish --tag=strata-ui-assets\");</script>";

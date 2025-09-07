@@ -19,7 +19,7 @@
     role="{{ $role }}"
     aria-live="{{ $ariaLive }}"
     @class([
-        'alert-radius shadow-xs',
+        'alert-radius shadow-xs relative',
         'border border-info bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'info',
         'border border-success bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'success',
         'border border-warning bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'warning',
@@ -31,7 +31,7 @@
 >
     <div 
         @class([
-            'flex w-full items-center gap-2.5 alert-radius transition-all duration-300',
+            'flex w-full items-center gap-3 alert-radius transition-all duration-300',
             $getSizeClasses(),
             'bg-info/10' => $color === 'info',
             'bg-success/10' => $color === 'success',
@@ -41,24 +41,24 @@
             'bg-accent/10' => $color === 'accent',
         ])
     >
-        {{-- Icon --}}
+
         <div 
             @class([
-                'rounded-full p-0.5 shrink-0 animate-pulse',
-                'bg-info/15 text-info' => $color === 'info',
-                'bg-success/15 text-success' => $color === 'success',
-                'bg-warning/15 text-warning' => $color === 'warning',
-                'bg-destructive/15 text-destructive' => $color === 'destructive',
-                'bg-primary/15 text-primary' => $color === 'primary',
-                'bg-accent/15 text-accent' => $color === 'accent',
+                'rounded-full p-0.5 shrink-0',
+                'bg-info/15 text-info toast-pulse-info' => $color === 'info',
+                'bg-success/15 text-success toast-pulse-success' => $color === 'success',
+                'bg-warning/15 text-warning toast-pulse-warning' => $color === 'warning',
+                'bg-destructive/15 text-destructive toast-pulse-destructive' => $color === 'destructive',
+                'bg-primary/15 text-primary toast-pulse-primary' => $color === 'primary',
+                'bg-accent/15 text-accent toast-pulse-accent' => $color === 'accent',
             ])
             aria-hidden="true"
         >
             <x-icon :name="$getContextualIcon()" :class="$getIconSizeClasses()" />
         </div>
 
-        {{-- Title & Message --}}
-        <div class="flex flex-col gap-2 flex-1 min-w-0">
+
+        <div class="flex flex-col gap-2 flex-1 min-w-0 pr-8">
             @if ($title)
                 <h3 
                     @class([
@@ -85,7 +85,7 @@
                 </div>
             @endif
             
-            {{-- Actions slot --}}
+
             @isset($actions)
                 <div class="flex gap-2 mt-1">
                     {!! $actions !!}
@@ -93,7 +93,7 @@
             @endisset
         </div>
 
-        {{-- Dismiss Button --}}
+
         @if ($dismissible)
             <x-strata::button
                 variant="ghost"
@@ -101,7 +101,7 @@
                 icon="heroicon-o-x-mark"
                 x-on:click="visible = false"
                 aria-label="Dismiss alert"
-                class="!p-1 ml-auto shrink-0"
+                class="!p-1 absolute top-2 right-2 shrink-0"
             />
         @endif
     </div>

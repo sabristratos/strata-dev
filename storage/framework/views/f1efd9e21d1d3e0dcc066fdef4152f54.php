@@ -1,3 +1,0 @@
-<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
-</svg><?php /**PATH C:\Users\chaab\Herd\strata\storage\framework/views/c311916467d0b9b63f952f86af8014ad.blade.php ENDPATH**/ ?>

@@ -9,7 +9,7 @@
     $hasError = !empty($error);
 @endphp
 
-<div class="space-y-2">
+<div class="space-y-2" data-strata-input="wrapper">
 
     @if($hasLabel)
         <x-strata::form.label 
@@ -92,6 +92,7 @@
             class="{{ $getWrapperClasses() }}"
             @click="$refs.input.focus()"
             :class="{ 'opacity-50': {{ $disabled ? 'true' : 'false' }} }"
+            data-strata-input="container"
             {{ $attributes->except(['wire:model', 'id', 'name', 'placeholder', 'required', 'disabled', 'readonly', 'type']) }}
         >
 
@@ -125,6 +126,7 @@
                 @if($hasError) aria-describedby="{{ $name }}-error" aria-invalid="true" @endif
                 @if($hasDescription && $hasError) aria-describedby="{{ $name }}-description {{ $name }}-error" @endif
                 class="{{ $getInputClasses() }}"
+                data-strata-input="field"
             />
 
 

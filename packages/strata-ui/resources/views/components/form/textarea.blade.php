@@ -4,7 +4,7 @@
     $hasError = !empty($error);
 @endphp
 
-<div class="space-y-2">
+<div class="space-y-2" data-strata-textarea="wrapper">
 
     @if($hasLabel)
         <x-strata::form.label
@@ -61,6 +61,7 @@
         @if($hasError) aria-describedby="{{ $name }}-error" aria-invalid="true" @endif
         @if($hasDescription && $hasError) aria-describedby="{{ $name }}-description {{ $name }}-error" @endif
         rows="{{ $rows }}"
+        data-strata-textarea="field"
         {{ $attributes->except(['wire:model', 'id', 'name', 'placeholder', 'required', 'disabled', 'readonly']) }}
         class="{{ $getTextareaClasses() }}"
     >@if(!$attributes->has('wire:model') && $value){!! e($value) !!}@endif</textarea>

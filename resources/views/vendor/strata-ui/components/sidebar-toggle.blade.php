@@ -18,14 +18,14 @@
     {!! $accessibilityAttrs !!}
 >
     @if($isHamburger())
-        {{-- Animated Hamburger Icon --}}
+
         <div class="hamburger-icon">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
         </div>
     @else
-        {{-- Regular Icon --}}
+
         <x-strata::icon 
             :name="$icon" 
             class="{{ $getIconSizeClasses() }}"
@@ -40,7 +40,7 @@
 </button>
 
 @if($isHamburger())
-    {{-- Hamburger Animation Styles --}}
+
     <style>
         .hamburger-toggle {
             --hamburger-line-height: 2px;

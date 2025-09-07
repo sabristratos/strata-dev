@@ -14,7 +14,7 @@
     $accessibilityAttrs = collect($getAccessibilityAttributes())->map(fn($value, $key) => "{$key}=\"{$value}\"")->implode(' ');
 @endphp
 
-{{-- Sidebar Container with Alpine.js scope --}}
+
 <div
     x-data="strataSidebar({
         name: '{{ $name }}',
@@ -23,7 +23,7 @@
         collapsible: {{ $collapsible ? 'true' : 'false' }}
     })"
 >
-    {{-- Backdrop (for overlay and hybrid variants) --}}
+
     @if($shouldShowBackdrop())
         <div
             x-show="show"
@@ -40,7 +40,7 @@
         ></div>
     @endif
 
-    {{-- Sidebar Container --}}
+
     <aside
     x-show="show || variant === 'fixed'"
     x-transition:enter="transform transition-transform duration-300 ease-in-out"
@@ -63,7 +63,7 @@
     @touchmove.passive="handleTouchMove"
     @touchend.passive="handleTouchEnd"
 >
-    {{-- Screen reader announcements --}}
+
     <div
         class="sr-only"
         aria-live="polite"
@@ -72,7 +72,7 @@
     >
         <span x-text="show ? `${name || 'Sidebar'} navigation opened` : `${name || 'Sidebar'} navigation closed`"></span>
     </div>
-    {{-- Sidebar Header --}}
+
     @if(isset($header))
         <div class="p-4" id="{{ $targetId }}-header">
             {{ $header }}
@@ -85,7 +85,7 @@
             <button
                 type="button"
                 @click="toggleCollapsed()"
-                class="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                class="p-1 button-radius text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
                 aria-describedby="{{ $targetId }}-header"
             >
@@ -103,7 +103,7 @@
         </div>
     @endif
 
-    {{-- Sidebar Content (Scrollable Navigation) --}}
+
     <nav
         class="overflow-y-auto p-4 space-y-1 focus:outline-hidden min-h-0"
         :class="{ 'px-2': collapsed && collapsible }"
@@ -114,7 +114,7 @@
         {{ $slot }}
     </nav>
 
-    {{-- Sidebar Footer --}}
+
     @if(isset($footer))
         <div class="p-4 border-t border-border">
             {{ $footer }}
@@ -123,7 +123,7 @@
 </aside>
 </div>
 
-{{-- Reduced motion styles --}}
+
 @once
 <style>
 @media (prefers-reduced-motion: reduce) {

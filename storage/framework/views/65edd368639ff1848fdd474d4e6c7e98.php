@@ -18,6 +18,7 @@
     x-transition:leave-end="opacity-0 transform scale-95"
     role="<?php echo e($role); ?>"
     aria-live="<?php echo e($ariaLive); ?>"
+    data-strata-alert="root"
     class="<?php echo \Illuminate\Support\Arr::toCssClasses([
         'alert-radius shadow-xs relative',
         'border border-info bg-card text-card-foreground dark:bg-card dark:text-card-foreground' => $color === 'info',
@@ -54,6 +55,7 @@
                 'bg-accent/15 text-accent toast-pulse-accent' => $color === 'accent',
             ]); ?>"
             aria-hidden="true"
+            data-strata-alert="icon-container"
         >
             <?php if (isset($component)) { $__componentOriginal606b6d7eddc2e418f11096356be15e19 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal606b6d7eddc2e418f11096356be15e19 = $attributes; } ?>
@@ -64,7 +66,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\BladeUI\Icons\Components\Icon::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getIconSizeClasses())]); ?>
+<?php $component->withAttributes(['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($getIconSizeClasses()),'data-strata-alert' => 'icon']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal606b6d7eddc2e418f11096356be15e19)): ?>
@@ -78,7 +80,7 @@
         </div>
 
 
-        <div class="flex flex-col gap-2 flex-1 min-w-0 pr-8">
+        <div class="flex flex-col gap-2 flex-1 min-w-0 pr-8" data-strata-alert="content">
             <?php if($title): ?>
                 <h3 
                     class="<?php echo \Illuminate\Support\Arr::toCssClasses([
@@ -91,18 +93,19 @@
                         'text-primary' => $color === 'primary',
                         'text-accent' => $color === 'accent',
                     ]); ?>"
+                    data-strata-alert="title"
                 >
                     <?php echo e($title); ?>
 
                 </h3>
                 <?php if($slot->isNotEmpty()): ?>
-                    <div class="text-pretty text-sm">
+                    <div class="text-pretty text-sm" data-strata-alert="message">
                         <?php echo e($slot); ?>
 
                     </div>
                 <?php endif; ?>
             <?php else: ?>
-                <div class="text-pretty text-sm">
+                <div class="text-pretty text-sm" data-strata-alert="message">
                     <?php echo e($slot); ?>
 
                 </div>
@@ -110,7 +113,7 @@
             
 
             <?php if(isset($actions)): ?>
-                <div class="flex gap-2 mt-1">
+                <div class="flex gap-2 mt-1" data-strata-alert="actions">
                     <?php echo $actions; ?>
 
                 </div>
@@ -128,7 +131,7 @@
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Strata\UI\View\Components\Button::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['x-on:click' => 'visible = false','aria-label' => 'Dismiss alert','class' => '!p-1 absolute top-2 right-2 shrink-0']); ?>
+<?php $component->withAttributes(['x-on:click' => 'visible = false','aria-label' => 'Dismiss alert','class' => '!p-1 absolute top-2 right-2 shrink-0','data-strata-alert' => 'dismiss']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal95445069a1a7fd595fddae94c95ee9b5)): ?>

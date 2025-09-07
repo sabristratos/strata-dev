@@ -6,9 +6,9 @@
     $baseClasses = 'inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0';
 
     $sizeClasses = match ($size) {
-        'sm' => 'h-8 button-radius-sm px-3 text-xs',
-        'lg' => 'h-10 button-radius-lg px-8',
-        default => 'h-9 px-4 py-2 button-radius',
+        'sm' => 'h-8 rounded-sm px-3 text-sm',
+        'lg' => 'h-10 rounded-lg px-8 text-lg',
+        default => 'h-9 px-4 py-2 rounded text-base',
     };
 
     $iconSizeClasses = match ($size) {
@@ -19,9 +19,9 @@
 
     if ($isIconOnly) {
         $layoutClasses = match ($size) {
-            'sm' => 'h-8 w-8 button-radius-sm',
-            'lg' => 'h-10 w-10 button-radius-lg',
-            default => 'h-9 w-9 button-radius',
+            'sm' => 'h-8 w-8 rounded-sm',
+            'lg' => 'h-10 w-10 rounded-lg',
+            default => 'h-9 w-9 rounded',
         };
     } else {
         $layoutClasses = $sizeClasses;
@@ -29,14 +29,14 @@
 @endphp
 
 @isset($badge)
-<div class="relative inline-block">
+<div class="relative inline-block" data-strata-button="badge-container">
 @endisset
 
 <{{ $tag }} {{ $attributes->merge([
     'type' => $tag === 'button' ? $type : null,
     'disabled' => $tag === 'button' ? ($disabled || $loading) : null,
     'class' => implode(' ', [$baseClasses, $layoutClasses, $getVariantClasses()])
-]) }}>
+]) }} data-strata-button="root">
 @if ($loading)
     <svg @class(["animate-spin", $iconSizeClasses]) xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -44,21 +44,21 @@
     </svg>
 @else
     @if ($icon && $iconPosition === 'left')
-        <x-icon :name="$icon" :class="$iconSizeClasses" />
+        <x-icon :name="$icon" :class="$iconSizeClasses" data-strata-button="icon" />
     @endif
 
     @if ($slot->isNotEmpty())
-        <span>{!! $slot !!}</span>
+        <span data-strata-button="text">{!! $slot !!}</span>
     @endif
 
     @if ($icon && $iconPosition === 'right')
-        <x-icon :name="$icon" :class="$iconSizeClasses" />
+        <x-icon :name="$icon" :class="$iconSizeClasses" data-strata-button="icon" />
     @endif
 @endif
 </{{ $tag }}>
 
 @isset($badge)
-    <div class="absolute -top-2 -right-2 z-10">
+    <div class="absolute -top-2 -right-2 z-10" data-strata-button="badge">
         {{ $badge }}
     </div>
 </div>

@@ -27,7 +27,7 @@
             _originalMultiple: @js($multiple),
             _originalVisibleMonths: @js($visibleMonths),
             
-            // Explicitly expose methods that might get lost in spreading
+
             isPresetActive: baseCalendar.isPresetActive,
             
             get responsiveMonthsToShow() {
@@ -35,21 +35,21 @@
             },
             
             init() {
-                // Call original init if exists
+
                 if (baseCalendar.init) {
                     baseCalendar.init.call(this);
                 }
                 
-                // Override monthsToShow with responsive version
+
                 this.config.monthsToShow = this.responsiveMonthsToShow;
                 
-                // Add resize listener
+
                 const resizeHandler = () => {
                     this._isMobile = window.innerWidth < 768;
                     const newMonthsToShow = this.responsiveMonthsToShow;
                     if (this.config.monthsToShow !== newMonthsToShow) {
                         this.config.monthsToShow = newMonthsToShow;
-                        // Regenerate months array if method exists
+
                         if (this.generateMonths) {
                             this.generateMonths();
                         }
@@ -61,7 +61,7 @@
         };
     })()"
     x-modelable="value"
-    {{ $attributes->wire('model') }}
+    @if($attributes->has('wire:model')) {{ $attributes->get('wire:model') }} @endif
     class="flex flex-col w-full mx-auto bg-card"
     role="application"
     :aria-label="config.range ? 'Date range picker' : 'Date picker'"
@@ -209,7 +209,7 @@
         @endif
     @endisset
     
-    {{-- Live region for screen reader announcements --}}
+
     <div aria-live="polite" aria-atomic="true" class="sr-only">
         <span x-show="selecting" x-text="'Selecting date range. Start date: ' + (startDate && typeof startDate.toLocaleDateString === 'function' ? startDate.toLocaleDateString() : 'Not selected')"></span>
         <span x-show="!selecting && startDate && endDate" x-text="'Date range selected: ' + (startDate && typeof startDate.toLocaleDateString === 'function' ? startDate.toLocaleDateString() : '') + ' to ' + (endDate && typeof endDate.toLocaleDateString === 'function' ? endDate.toLocaleDateString() : '')"></span>

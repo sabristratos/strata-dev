@@ -12,12 +12,12 @@
         $tableClasses .= ' [&>tbody>tr:nth-child(even)]:bg-default';
     }
     
-    // Add sticky classes directly to table element for proper behavior
+
     if ($sticky) {
         $tableClasses .= ' [&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-10 [&_thead_th]:bg-default';
     }
     
-    // CSS variables for dynamic cell padding based on size
+
     $paddingVariables = match($size) {
         'sm' => '--table-cell-px: 0.75rem; --table-cell-py: 0.5rem;', // px-3 py-2
         'md' => '--table-cell-px: 1rem; --table-cell-py: 0.75rem;',    // px-4 py-3

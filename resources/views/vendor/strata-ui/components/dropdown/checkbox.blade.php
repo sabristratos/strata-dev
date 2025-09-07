@@ -1,6 +1,6 @@
 @php
     $checkboxId = $name . '_' . $value . '_' . uniqid();
-    // Remove [] from name for the ID if present (common in multi-value form fields)
+
     $cleanName = str_replace(['[', ']'], '', $name);
 @endphp
 
